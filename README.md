@@ -15,8 +15,8 @@ Use of this component/library in your project should make it easier to communica
 
 Installation
 ---
-<Work in progress>
+**Work in progress**
 
 Usage
 ---
-<Work in progress>
+**Work in progress**
