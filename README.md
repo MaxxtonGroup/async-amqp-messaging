@@ -1,5 +1,4 @@
 # Async AMQP Messaging
----
 Development of a Java (Spring) library which expands the current Spring AMQP components.
 
 It has support for:
