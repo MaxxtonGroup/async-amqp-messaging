@@ -107,7 +107,7 @@ public class DataContainer
   {
     this.ssIdentifiers = identifiers;
   }
-  
+
   /**
    * Adds a given message to the send Set.
    * 
@@ -117,6 +117,7 @@ public class DataContainer
   public void addSendMessage(Message message)
   {
     this.smSendMessages.add(message);
+    this.ssIdentifiers.add(message.getMessageId());
   }
 
   /**
@@ -188,6 +189,10 @@ public class DataContainer
   public void removeReceivedMessage(Message message)
   {
     this.smReceivedMessages.remove(message);
+    if (this.isOwnedByMe(message.getMessageId()))
+    {
+      this.ssIdentifiers.remove(message.getMessageId());
+    }
   }
 
   /**
