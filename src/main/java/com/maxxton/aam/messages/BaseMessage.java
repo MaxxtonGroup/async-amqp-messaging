@@ -8,7 +8,7 @@ package com.maxxton.aam.messages;
  * @copyright Maxxton 2015
  */
 
-public abstract class Message
+public abstract class BaseMessage
 {
   protected String strMessageId;
 
@@ -63,9 +63,9 @@ public abstract class Message
       return true;
     if (obj == null)
       return false;
-    if (!(obj instanceof Message))
+    if (!(obj instanceof BaseMessage))
       return false;
-    Message other = (Message) obj;
+    BaseMessage other = (BaseMessage) obj;
     if (mtMessageType != other.mtMessageType)
       return false;
     if (strMessageId == null)

@@ -6,10 +6,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import com.maxxton.aam.messages.Message;
+import com.maxxton.aam.messages.BaseMessage;
 
 /**
- * DataContainer class Contains all data which passes the Send- and/or ReceiveController.
+ * DataContainer class Contains all data which passes the Send- and/or ReceiveController. 
  * This may include id's and messages.
  * 
  * @author Robin Hermans
@@ -17,42 +17,43 @@ import com.maxxton.aam.messages.Message;
  */
 public class DataContainer
 {
-  private static Map<String, DataContainer> _dInstances = new HashMap<String, DataContainer>();
+  private static Map<String, DataContainer> _mInstances = new HashMap<String, DataContainer>();
 
-  private Set<String> ssIdentifiers;
-  private Set<Message> smSendMessages;
-  private Set<Message> smReceivedMessages;
+  private Set<String> seIdentifiers;
+  private Set<BaseMessage> seSendMessages;
+  private Set<BaseMessage> seReceivedMessages;
 
   /**
-   * DataContainer constructor Initiates elements defined in this class
+   * DataContainer constructor 
+   * Initiates elements defined in this class
    */
   public DataContainer()
   {
-    this.ssIdentifiers = new HashSet<String>();
-    this.smSendMessages = new HashSet<Message>();
-    this.smReceivedMessages = new HashSet<Message>();
+    this.seIdentifiers = new HashSet<String>();
+    this.seSendMessages = new HashSet<BaseMessage>();
+    this.seReceivedMessages = new HashSet<BaseMessage>();
   }
 
   /**
-   * Creates or returns an (existing) instance of this class by key.
-   * Support the creation of multiple singletons.
+   * Creates or returns an (existing) instance of this class by key. Support the creation of multiple singletons.
    * 
-   * @param key Identifier which may refer to a existing object
+   * @param key
+   *          Identifier which may refer to a existing object
    * @return an instance of this class
    */
   public static DataContainer getInstance(String key)
   {
-    DataContainer container = _dInstances.get(key);
+    DataContainer container = _mInstances.get(key);
     if (container == null)
     {
-      synchronized (_dInstances)
+      synchronized (_mInstances)
       {
-        container = _dInstances.get(key);
+        container = _mInstances.get(key);
 
         if (container == null)
         {
           container = new DataContainer();
-          _dInstances.put(key, container);
+          _mInstances.put(key, container);
         }
       }
     }
@@ -67,7 +68,7 @@ public class DataContainer
   public String getUniqueId()
   {
     String id = UUID.randomUUID().toString();
-    this.ssIdentifiers.add(id);
+    this.seIdentifiers.add(id);
     return id;
   }
 
@@ -80,7 +81,7 @@ public class DataContainer
    */
   public boolean isOwnedByMe(String id)
   {
-    if (this.ssIdentifiers.contains(id))
+    if (this.seIdentifiers.contains(id))
     {
       return true;
     }
@@ -95,9 +96,9 @@ public class DataContainer
    */
   public void removeId(String id)
   {
-    if (this.ssIdentifiers.contains(id))
+    if (this.seIdentifiers.contains(id))
     {
-      this.ssIdentifiers.remove(id);
+      this.seIdentifiers.remove(id);
     }
   }
 
@@ -108,7 +109,7 @@ public class DataContainer
    */
   public Set<String> getIdentifiers()
   {
-    return this.ssIdentifiers;
+    return this.seIdentifiers;
   }
 
   /**
@@ -119,7 +120,7 @@ public class DataContainer
    */
   public void setIdentifiers(Set<String> identifiers)
   {
-    this.ssIdentifiers = identifiers;
+    this.seIdentifiers = identifiers;
   }
 
   /**
@@ -128,10 +129,10 @@ public class DataContainer
    * @param message
    *          the Message object.
    */
-  public void addSendMessage(Message message)
+  public void addSendMessage(BaseMessage message)
   {
-    this.smSendMessages.add(message);
-    this.ssIdentifiers.add(message.getMessageId());
+    this.seSendMessages.add(message);
+    this.seIdentifiers.add(message.getMessageId());
   }
 
   /**
@@ -140,9 +141,9 @@ public class DataContainer
    * @param message
    *          the Message object.
    */
-  public void removeSendMessage(Message message)
+  public void removeSendMessage(BaseMessage message)
   {
-    this.smSendMessages.remove(message);
+    this.seSendMessages.remove(message);
   }
 
   /**
@@ -153,11 +154,11 @@ public class DataContainer
    */
   public void removeSendMessageById(String id)
   {
-    for (Message message : this.smSendMessages)
+    for (BaseMessage message : this.seSendMessages)
     {
       if (message.getMessageId().equals(id))
       {
-        this.smSendMessages.remove(message);
+        this.seSendMessages.remove(message);
       }
     }
   }
@@ -168,9 +169,9 @@ public class DataContainer
    * @param messages
    *          the Set with Message objects.
    */
-  public void setSendMessages(Set<Message> messages)
+  public void setSendMessages(Set<BaseMessage> messages)
   {
-    this.smReceivedMessages = messages;
+    this.seReceivedMessages = messages;
   }
 
   /**
@@ -178,9 +179,9 @@ public class DataContainer
    * 
    * @return Set with messages.
    */
-  public Set<Message> getSendMessages()
+  public Set<BaseMessage> getSendMessages()
   {
-    return this.smReceivedMessages;
+    return this.seReceivedMessages;
   }
 
   /**
@@ -189,9 +190,9 @@ public class DataContainer
    * @param message
    *          the Message object.
    */
-  public void addReceivedMessage(Message message)
+  public void addReceivedMessage(BaseMessage message)
   {
-    this.smReceivedMessages.add(message);
+    this.seReceivedMessages.add(message);
   }
 
   /**
@@ -200,12 +201,12 @@ public class DataContainer
    * @param message
    *          the Message object.
    */
-  public void removeReceivedMessage(Message message)
+  public void removeReceivedMessage(BaseMessage message)
   {
-    this.smReceivedMessages.remove(message);
+    this.seReceivedMessages.remove(message);
     if (this.isOwnedByMe(message.getMessageId()))
     {
-      this.ssIdentifiers.remove(message.getMessageId());
+      this.seIdentifiers.remove(message.getMessageId());
     }
   }
 
@@ -217,11 +218,11 @@ public class DataContainer
    */
   public void removeReceivedMessageById(String id)
   {
-    for (Message message : this.smReceivedMessages)
+    for (BaseMessage message : this.seReceivedMessages)
     {
       if (message.getMessageId().equals(id))
       {
-        this.smSendMessages.remove(message);
+        this.seSendMessages.remove(message);
       }
     }
   }
@@ -232,9 +233,9 @@ public class DataContainer
    * @param messages
    *          the Set with Message objects.
    */
-  public void setReceivedMessages(Set<Message> messages)
+  public void setReceivedMessages(Set<BaseMessage> messages)
   {
-    this.smReceivedMessages = messages;
+    this.seReceivedMessages = messages;
   }
 
   /**
@@ -242,8 +243,8 @@ public class DataContainer
    * 
    * @return Set with messages.
    */
-  public Set<Message> getReceivedMessages()
+  public Set<BaseMessage> getReceivedMessages()
   {
-    return this.smReceivedMessages;
+    return this.seReceivedMessages;
   }
 }
