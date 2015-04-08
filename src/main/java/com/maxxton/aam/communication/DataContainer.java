@@ -15,7 +15,7 @@ import com.maxxton.aam.messages.Message;
  */
 public class DataContainer
 {
-  private static DataContainer instance = null;
+  private static final DataContainer instance = new DataContainer();
 
   private Set<String> ssIdentifiers;
   private Set<Message> smSendMessages;
@@ -32,16 +32,13 @@ public class DataContainer
   }
 
   /**
-   * Singleton getInstance class. Creates a new or return an existing instance of this class.
+   * Singleton getInstance class. Returns an existing instance of this class.
+   * Initialized on runtime to support thread safety.
    * 
    * @return an instance of the DataContainer class
    */
   public static DataContainer getInstance()
   {
-    if (instance == null)
-    {
-      instance = new DataContainer();
-    }
     return instance;
   }
 
