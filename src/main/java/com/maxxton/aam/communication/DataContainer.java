@@ -1,6 +1,8 @@
 package com.maxxton.aam.communication;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -15,6 +17,8 @@ import com.maxxton.aam.messages.Message;
  */
 public class DataContainer
 {
+  private static Map<String, DataContainer> _dInstances = new HashMap<String, DataContainer>();
+
   private Set<String> ssIdentifiers;
   private Set<Message> smSendMessages;
   private Set<Message> smReceivedMessages;
@@ -27,6 +31,32 @@ public class DataContainer
     this.ssIdentifiers = new HashSet<String>();
     this.smSendMessages = new HashSet<Message>();
     this.smReceivedMessages = new HashSet<Message>();
+  }
+
+  /**
+   * Creates or returns an (existing) instance of this class by key.
+   * Support the creation of multiple singletons.
+   * 
+   * @param key Identifier which may refer to a existing object
+   * @return an instance of this class
+   */
+  public static DataContainer getInstance(String key)
+  {
+    DataContainer container = _dInstances.get(key);
+    if (container == null)
+    {
+      synchronized (_dInstances)
+      {
+        container = _dInstances.get(key);
+
+        if (container == null)
+        {
+          container = new DataContainer();
+          _dInstances.put(key, container);
+        }
+      }
+    }
+    return container;
   }
 
   /**
