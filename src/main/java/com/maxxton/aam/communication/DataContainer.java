@@ -27,7 +27,7 @@ public class DataContainer
    * DataContainer constructor 
    * Initiates elements defined in this class
    */
-  public DataContainer()
+  private DataContainer()
   {
     this.seIdentifiers = new HashSet<String>();
     this.seSendMessages = new HashSet<BaseMessage>();

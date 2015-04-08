@@ -29,11 +29,11 @@ public class SendController
   /**
    * Creates a new connection to an AMQP broker with the given information.
    * 
-   * @return an object to be able to maintain connections.
+   * @return an object to be able to manage connections.
    */
-  public CachingConnectionFactory connectToBroker()
+  private CachingConnectionFactory connectToBroker()
   {
-    // TODO : change static information to dynamically loadeds
+    // TODO : change static information to dynamically loaded
     CachingConnectionFactory connectionFactory = new CachingConnectionFactory("localhost");
     connectionFactory.setUsername("username");
     connectionFactory.setPassword("password");
@@ -50,10 +50,10 @@ public class SendController
    */
   public void sendMessage(String receiver, Message message)
   {
-    CachingConnectionFactory connection = connectToBroker();
+    CachingConnectionFactory connection = this.connectToBroker();
     RabbitTemplate template = new RabbitTemplate(connection);
     template.setExchange("amq.direct");
-    template.setRoutingKey(receiver + ".queue");
+    template.setRoutingKey(receiver + ".route");
 
     template.send(message);
 
