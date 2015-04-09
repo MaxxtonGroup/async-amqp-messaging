@@ -2,11 +2,12 @@ package com.maxxton.aam.communication;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import com.maxxton.aam.messages.BaseMessage;
+import org.springframework.amqp.core.Message;
 
 /**
  * DataContainer class Contains all data which passes the Send- and/or ReceiveController. This may include id's and messages.
@@ -19,8 +20,8 @@ public class DataContainer
   private static Map<String, DataContainer> mInstances = new HashMap<String, DataContainer>();
 
   private Set<String> seIdentifiers;
-  private Set<BaseMessage> seSendMessages;
-  private Set<BaseMessage> seReceivedMessages;
+  private Set<Message> seSendMessages;
+  private Set<Message> seReceivedMessages;
 
   /**
    * DataContainer constructor Initiates elements defined in this class
@@ -28,8 +29,8 @@ public class DataContainer
   private DataContainer()
   {
     this.seIdentifiers = new HashSet<String>();
-    this.seSendMessages = new HashSet<BaseMessage>();
-    this.seReceivedMessages = new HashSet<BaseMessage>();
+    this.seSendMessages = new HashSet<Message>();
+    this.seReceivedMessages = new HashSet<Message>();
   }
 
   /**
@@ -127,10 +128,13 @@ public class DataContainer
    * @param message
    *          the Message object.
    */
-  public void addSendMessage(BaseMessage message)
+  public void addSendMessage(Message message)
   {
     this.seSendMessages.add(message);
-    this.seIdentifiers.add(message.getMessageId());
+    if (message.getMessageProperties().getCorrelationId() != null && message.getMessageProperties().getCorrelationId().length > 0)
+    {
+      this.seIdentifiers.add((String) MessageSerializer.deserialize(message.getMessageProperties().getCorrelationId()));
+    }
   }
 
   /**
@@ -139,7 +143,7 @@ public class DataContainer
    * @param message
    *          the Message object.
    */
-  public void removeSendMessage(BaseMessage message)
+  public void removeSendMessage(Message message)
   {
     this.seSendMessages.remove(message);
   }
@@ -152,11 +156,15 @@ public class DataContainer
    */
   public void removeSendMessageById(String id)
   {
-    for (BaseMessage message : this.seSendMessages)
+    for (Message message : this.seSendMessages)
     {
-      if (message.getMessageId().equals(id))
+      if (message.getMessageProperties().getCorrelationId() != null && message.getMessageProperties().getCorrelationId().length > 0)
       {
-        this.seSendMessages.remove(message);
+        String messageId = (String) MessageSerializer.deserialize(message.getMessageProperties().getCorrelationId());
+        if (messageId.equals(id))
+        {
+          this.seSendMessages.remove(message);
+        }
       }
     }
   }
@@ -167,7 +175,7 @@ public class DataContainer
    * @param messages
    *          the Set with Message objects.
    */
-  public void setSendMessages(Set<BaseMessage> messages)
+  public void setSendMessages(Set<Message> messages)
   {
     this.seReceivedMessages = messages;
   }
@@ -177,7 +185,7 @@ public class DataContainer
    * 
    * @return Set with messages.
    */
-  public Set<BaseMessage> getSendMessages()
+  public Set<Message> getSendMessages()
   {
     return this.seReceivedMessages;
   }
@@ -188,9 +196,27 @@ public class DataContainer
    * @param message
    *          the Message object.
    */
-  public void addReceivedMessage(BaseMessage message)
+  public void addReceivedMessage(Message message)
   {
+    // TODO : Make sure that messages which the same correlationId override each other
     this.seReceivedMessages.add(message);
+  }
+
+  /**
+   * Pops the oldest received message from the array
+   * 
+   * @return the oldest message from the array
+   */
+  public Message popReceivedMessage()
+  {
+    Iterator<Message> it = this.seReceivedMessages.iterator();
+    Message message = null;
+    while (it.hasNext())
+    {
+      message = (Message) it.next();
+    }
+    this.seReceivedMessages.remove(message);
+    return message;
   }
 
   /**
@@ -199,13 +225,9 @@ public class DataContainer
    * @param message
    *          the Message object.
    */
-  public void removeReceivedMessage(BaseMessage message)
+  public void removeReceivedMessage(Message message)
   {
     this.seReceivedMessages.remove(message);
-    if (this.isOwnedByMe(message.getMessageId()))
-    {
-      this.seIdentifiers.remove(message.getMessageId());
-    }
   }
 
   /**
@@ -216,11 +238,15 @@ public class DataContainer
    */
   public void removeReceivedMessageById(String id)
   {
-    for (BaseMessage message : this.seReceivedMessages)
+    for (Message message : this.seReceivedMessages)
     {
-      if (message.getMessageId().equals(id))
+      if (message.getMessageProperties().getCorrelationId() != null && message.getMessageProperties().getCorrelationId().length > 0)
       {
-        this.seSendMessages.remove(message);
+        String messageId = (String) MessageSerializer.deserialize(message.getMessageProperties().getCorrelationId());
+        if (messageId.equals(id))
+        {
+          this.seSendMessages.remove(message);
+        }
       }
     }
   }
@@ -231,7 +257,7 @@ public class DataContainer
    * @param messages
    *          the Set with Message objects.
    */
-  public void setReceivedMessages(Set<BaseMessage> messages)
+  public void setReceivedMessages(Set<Message> messages)
   {
     this.seReceivedMessages = messages;
   }
@@ -241,7 +267,7 @@ public class DataContainer
    * 
    * @return Set with messages.
    */
-  public Set<BaseMessage> getReceivedMessages()
+  public Set<Message> getReceivedMessages()
   {
     return this.seReceivedMessages;
   }

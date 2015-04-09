@@ -58,6 +58,13 @@ public class SendController
     template.send(message);
 
     connection.destroy();
+
+    this.objContainer.addSendMessage(message);
+  }
+
+  public String generateUniqueId()
+  {
+    return this.objContainer.getUniqueId();
   }
 
   /**

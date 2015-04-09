@@ -8,10 +8,10 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.Binding.DestinationType;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 
-import com.maxxton.aam.messages.BaseMessage;
+import com.maxxton.aam.messages.ResponseMessage;
+import com.maxxton.aam.messages.StatusMessage;
 import com.maxxton.aam.resources.Callback;
 import com.maxxton.aam.resources.Resources;
 
@@ -94,22 +94,13 @@ public class ReceiveController implements MessageListener
   }
 
   /**
-   * Poll for a message located in the messenger specific queue and return it.
+   * Get the oldest message available from the DataContainer.
    * 
    * @return Message The received message
    */
   public Message receiveMessage()
   {
-    // TODO : change static defined name to dynamically declared configuration variable
-    String receiver = "test";
-
-    CachingConnectionFactory connection = this.connectToBroker();
-    RabbitTemplate template = new RabbitTemplate(connection);
-
-    Message message = template.receive(receiver + ".queue");
-
-    connection.destroy();
-
+    Message message = this.objContainer.popReceivedMessage();
     return message;
   }
 
@@ -138,7 +129,7 @@ public class ReceiveController implements MessageListener
    * Sets the Callback instance.
    * 
    * @param callback
-   *          Instance of the Callback class
+   *          nstance of the Callback class
    */
   public void setCallback(Callback callback)
   {
@@ -159,6 +150,7 @@ public class ReceiveController implements MessageListener
    * Sets the Resources class
    * 
    * @param resources
+   *          instance of the Resources class
    */
   public void setResources(Resources resources)
   {
@@ -179,6 +171,7 @@ public class ReceiveController implements MessageListener
    * Sets the SimpleMessageListenerContainer class
    * 
    * @param listener
+   *          instance of the SimpleMessageListenerContainer class
    */
   public void setListener(SimpleMessageListenerContainer listener)
   {
@@ -188,11 +181,29 @@ public class ReceiveController implements MessageListener
   /**
    * Gets the SimpleMessageListenerContainer class
    * 
-   * @return
+   * @return an instance of the SimpleMessageListenerContainer class
    */
   public SimpleMessageListenerContainer getListener()
   {
     return this.objListener;
+  }
+
+  /**
+   * Handles incoming messages based on whether or not the callback has been set.
+   * 
+   * @param messagen
+   */
+  private void handleMessageCallback(String correlationId, Message message)
+  {
+    if (this.objCallback == null)
+    {
+      // TODO : add custom callback support
+    }
+    else
+    {
+      this.objContainer.removeSendMessageById(correlationId);
+      this.objContainer.addReceivedMessage(message);
+    }
   }
 
   /**
@@ -209,23 +220,20 @@ public class ReceiveController implements MessageListener
 
     if (ciBytes != null)
     {
-      if (ciBytes.length == 0)
+      if (ciBytes.length > 0)
       {
         String correlationId = (String) MessageSerializer.deserialize(properties.getCorrelationId());
-
-        if (this.objContainer.isOwnedByMe(correlationId))
+        Object messageBody = MessageSerializer.deserialize(message.getBody());
+        if (messageBody instanceof StatusMessage || messageBody instanceof ResponseMessage)
         {
-          this.objContainer.removeSendMessageById(correlationId);
-          BaseMessage msg = (BaseMessage) MessageSerializer.deserialize(message.getBody());
-          if (this.objCallback != null)
+          if (this.objContainer.isOwnedByMe(correlationId))
           {
-            // TODO : Get the message out and fire the callback using it and an identifier.
-            // this.objCallback.onMessage(msg, id)
+            this.handleMessageCallback(correlationId, message);
           }
-          else
-          {
-            this.objContainer.addReceivedMessage(msg);
-          }
+        }
+        else
+        {
+          this.handleMessageCallback(correlationId, message);
         }
       }
       else
