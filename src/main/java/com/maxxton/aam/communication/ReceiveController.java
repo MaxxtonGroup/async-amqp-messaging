@@ -2,32 +2,34 @@ package com.maxxton.aam.communication;
 
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageListener;
+import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.Binding.DestinationType;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
+
+import com.maxxton.aam.messages.BaseMessage;
 import com.maxxton.aam.resources.Callback;
 import com.maxxton.aam.resources.Resources;
 
-//TODO : set up callback(s) for asynchronous message receiving
-
 /**
- * ReceiveController class
- * Handles all message communication which involves receiving.
+ * ReceiveController class Handles all message communication which involves receiving.
  * 
  * @author Robin Hermans
  * @copyright Maxxton 2015
  */
-public class ReceiveController
-{ 
+public class ReceiveController implements MessageListener
+{
   private Resources objResources;
   private DataContainer objContainer;
   private Callback objCallback;
+  private SimpleMessageListenerContainer objListener;
 
   /**
-   * ReceiveController constructor
-   * Initiates elements defined in this class
+   * ReceiveController constructor Initiates elements defined in this class
    */
   public ReceiveController(Resources resources)
   {
@@ -35,28 +37,48 @@ public class ReceiveController
     this.objContainer = DataContainer.getInstance("temporary");
     this.objCallback = null;
     this.objResources = resources;
-    
+
     this.configureQueue();
+    this.objListener = this.configureMessageListener();
   }
-  
+
   /**
-   * 
+   * Configures the queue and binding based on the messenger specific name.
    */
   private void configureQueue()
   {
     // TODO : change static defined name to dynamically declared configuration variable
     String receiver = "test";
     CachingConnectionFactory connection = this.connectToBroker();
-    
+
     RabbitAdmin admin = new RabbitAdmin(connection);
-    Queue queue = new Queue(receiver+".queue", true, false, false);
+    Queue queue = new Queue(receiver + ".queue", true, false, false);
     admin.declareQueue(queue);
-    Binding binding = new Binding(queue.getName(), DestinationType.QUEUE, "amq.direct", receiver+".route", null);
+    Binding binding = new Binding(queue.getName(), DestinationType.QUEUE, "amq.direct", receiver + ".route", null);
     admin.declareBinding(binding);
-    
-    connection.destroy();
   }
-  
+
+  /**
+   * Creates a new MessageListener that gets fired once a message has been received.
+   * 
+   * @return an instance of SimpleMessageListernerContainer
+   */
+  private SimpleMessageListenerContainer configureMessageListener()
+  {
+    // TODO : change static defined name to dynamically declared configuration variable
+    String receiver = "test";
+
+    CachingConnectionFactory connection = this.connectToBroker();
+
+    SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
+    container.setConnectionFactory(connection);
+    container.setQueueNames(receiver + ".queue");
+    container.setMessageListener(this);
+    container.afterPropertiesSet();
+    container.start();
+    return container;
+  }
+
   /**
    * Creates a new connection to an AMQP broker with the given information.
    * 
@@ -70,27 +92,27 @@ public class ReceiveController
     connectionFactory.setPassword("password");
     return connectionFactory;
   }
-  
+
   /**
-   * 
+   * Poll for a message located in the messenger specific queue and return it.
    * 
    * @return Message The received message
    */
   public Message receiveMessage()
-  { 
+  {
     // TODO : change static defined name to dynamically declared configuration variable
     String receiver = "test";
-    
+
     CachingConnectionFactory connection = this.connectToBroker();
     RabbitTemplate template = new RabbitTemplate(connection);
-    
-    Message message = template.receive(receiver+".queue");
-    
+
+    Message message = template.receive(receiver + ".queue");
+
     connection.destroy();
-    
+
     return message;
   }
-  
+
   /**
    * Gets the DataContainer instance.
    * 
@@ -111,17 +133,18 @@ public class ReceiveController
   {
     return this.objContainer;
   }
-  
+
   /**
    * Sets the Callback instance.
    * 
-   * @param callback Instance of the Callback class
+   * @param callback
+   *          Instance of the Callback class
    */
   public void setCallback(Callback callback)
   {
     this.objCallback = callback;
   }
-  
+
   /**
    * Gets the Callback instance.
    * 
@@ -131,18 +154,17 @@ public class ReceiveController
   {
     return this.objCallback;
   }
-  
+
   /**
    * Sets the Resources class
    * 
-   * @param resources 
+   * @param resources
    */
   public void setResources(Resources resources)
   {
     this.objResources = resources;
   }
-  
-  
+
   /**
    * Gets the Resources class
    * 
@@ -151,5 +173,69 @@ public class ReceiveController
   public Resources getResources()
   {
     return this.objResources;
+  }
+
+  /**
+   * Sets the SimpleMessageListenerContainer class
+   * 
+   * @param listener
+   */
+  public void setListener(SimpleMessageListenerContainer listener)
+  {
+    this.objListener = listener;
+  }
+
+  /**
+   * Gets the SimpleMessageListenerContainer class
+   * 
+   * @return
+   */
+  public SimpleMessageListenerContainer getListener()
+  {
+    return this.objListener;
+  }
+
+  /**
+   * Asynchronously handles incoming messages
+   * 
+   * @param message
+   *          the received message instance
+   */
+  @Override
+  public void onMessage(Message message)
+  {
+    MessageProperties properties = message.getMessageProperties();
+    byte[] ciBytes = properties.getCorrelationId();
+
+    if (ciBytes != null)
+    {
+      if (ciBytes.length == 0)
+      {
+        String correlationId = (String) MessageSerializer.deserialize(properties.getCorrelationId());
+
+        if (this.objContainer.isOwnedByMe(correlationId))
+        {
+          this.objContainer.removeSendMessageById(correlationId);
+          BaseMessage msg = (BaseMessage) MessageSerializer.deserialize(message.getBody());
+          if (this.objCallback != null)
+          {
+            // TODO : Get the message out and fire the callback using it and an identifier.
+            // this.objCallback.onMessage(msg, id)
+          }
+          else
+          {
+            this.objContainer.addReceivedMessage(msg);
+          }
+        }
+      }
+      else
+      {
+        // TODO : Generate error based on 'CorrelationId is empty.'
+      }
+    }
+    else
+    {
+      // TODO : Generate error based on 'CorrelationId is not set.'
+    }
   }
 }

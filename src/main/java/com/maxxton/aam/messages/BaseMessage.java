@@ -1,15 +1,21 @@
 package com.maxxton.aam.messages;
 
+import java.io.Serializable;
+
 /**
- * Message interface Skeleton class for the different types of messages. 
- * Includes the mandatory fields to be used by it's extender.
+ * Message interface Skeleton class for the different types of messages. Includes the mandatory fields to be used by it's extender.
  * 
  * @author Robin Hermans
  * @copyright Maxxton 2015
  */
 
-public abstract class BaseMessage
+public abstract class BaseMessage implements Serializable
 {
+  /**
+   * Serial version for UID
+   */
+  private static final long serialVersionUID = -8763348067503641944L;
+
   protected String strMessageId;
 
   protected MessageType mtMessageType;

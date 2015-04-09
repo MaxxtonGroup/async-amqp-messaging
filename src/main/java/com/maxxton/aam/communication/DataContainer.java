@@ -9,23 +9,21 @@ import java.util.UUID;
 import com.maxxton.aam.messages.BaseMessage;
 
 /**
- * DataContainer class Contains all data which passes the Send- and/or ReceiveController. 
- * This may include id's and messages.
+ * DataContainer class Contains all data which passes the Send- and/or ReceiveController. This may include id's and messages.
  * 
  * @author Robin Hermans
  * @copyright Maxxton 2015
  */
 public class DataContainer
 {
-  private static Map<String, DataContainer> _mInstances = new HashMap<String, DataContainer>();
+  private static Map<String, DataContainer> mInstances = new HashMap<String, DataContainer>();
 
   private Set<String> seIdentifiers;
   private Set<BaseMessage> seSendMessages;
   private Set<BaseMessage> seReceivedMessages;
 
   /**
-   * DataContainer constructor 
-   * Initiates elements defined in this class
+   * DataContainer constructor Initiates elements defined in this class
    */
   private DataContainer()
   {
@@ -43,17 +41,17 @@ public class DataContainer
    */
   public static DataContainer getInstance(String key)
   {
-    DataContainer container = _mInstances.get(key);
+    DataContainer container = mInstances.get(key);
     if (container == null)
     {
-      synchronized (_mInstances)
+      synchronized (mInstances)
       {
-        container = _mInstances.get(key);
+        container = mInstances.get(key);
 
         if (container == null)
         {
           container = new DataContainer();
-          _mInstances.put(key, container);
+          mInstances.put(key, container);
         }
       }
     }
