@@ -133,7 +133,7 @@ public class DataContainer
     this.seSendMessages.add(message);
     if (message.getMessageProperties().getCorrelationId() != null && message.getMessageProperties().getCorrelationId().length > 0)
     {
-      this.seIdentifiers.add((String) MessageSerializer.deserialize(message.getMessageProperties().getCorrelationId()));
+      this.seIdentifiers.add(message.getMessageProperties().getCorrelationId().toString());
     }
   }
 
@@ -160,7 +160,7 @@ public class DataContainer
     {
       if (message.getMessageProperties().getCorrelationId() != null && message.getMessageProperties().getCorrelationId().length > 0)
       {
-        String messageId = (String) MessageSerializer.deserialize(message.getMessageProperties().getCorrelationId());
+        String messageId = message.getMessageProperties().getCorrelationId().toString();
         if (messageId.equals(id))
         {
           this.seSendMessages.remove(message);

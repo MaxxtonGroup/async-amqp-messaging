@@ -37,9 +37,9 @@ public class ReceiveController implements MessageListener
   public ReceiveController(Resources resources)
   {
     // TODO : Change the key to the appropriate one as mentioned in the configuration class.
-    this.objContainer = DataContainer.getInstance("temporary");
-    this.objCallback = null;
     this.objResources = resources;
+    this.objContainer = DataContainer.getInstance(this.objResources.getHost().getMessengerName());
+    this.objCallback = null;
 
     this.configureQueue();
     this.objListener = this.configureMessageListener();
@@ -51,7 +51,7 @@ public class ReceiveController implements MessageListener
   private void configureQueue()
   {
     // TODO : change static defined name to dynamically declared configuration variable
-    String receiver = "test";
+    String receiver = this.objResources.getHost().getMessengerName();
     CachingConnectionFactory connection = this.connectToBroker();
 
     RabbitAdmin admin = new RabbitAdmin(connection);
@@ -69,7 +69,7 @@ public class ReceiveController implements MessageListener
   private SimpleMessageListenerContainer configureMessageListener()
   {
     // TODO : change static defined name to dynamically declared configuration variable
-    String receiver = "test";
+    String receiver = this.objResources.getHost().getMessengerName();
 
     CachingConnectionFactory connection = this.connectToBroker();
 
@@ -198,7 +198,7 @@ public class ReceiveController implements MessageListener
    */
   private void handleMessageCallback(String correlationId, Message message)
   {
-    if (this.objCallback == null)
+    if (this.objCallback != null)
     {
       // TODO : add custom callback support
     }
@@ -225,7 +225,7 @@ public class ReceiveController implements MessageListener
     {
       if (ciBytes.length > 0)
       {
-        String correlationId = (String) MessageSerializer.deserialize(properties.getCorrelationId());
+        String correlationId = properties.getCorrelationId().toString();
         Object messageBody = MessageSerializer.deserialize(message.getBody());
         if (messageBody instanceof StatusMessage || messageBody instanceof ResponseMessage)
         {

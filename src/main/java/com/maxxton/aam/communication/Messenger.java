@@ -27,6 +27,7 @@ public class Messenger
   public Messenger(String messengerName)
   {
     this.objResources = new Resources();
+    this.objResources.getHost().setMessengerName(messengerName);
     // TODO : setup + initialize the resources.
 
     this.objCommunication = new CommunicationController(objResources);
@@ -63,8 +64,9 @@ public class Messenger
   {
     // TODO : request new message instance from MessageFactory by specifying the MessageType given.
     BaseMessage message = new GenerateMessage();
+    message.setPayload(payload);
 
-    this.objCommunication.packAndSend(receiver, message, responseTo);
+    this.objCommunication.packAndSend(receiver.toLowerCase(), message, responseTo);
   }
 
   /**
@@ -73,16 +75,21 @@ public class Messenger
    * @return an instance of the BaseMessage class.
    */
   // TODO : create generic type to support passing the more relevant data.
-  public BaseMessage receiveMessage()
+  public Object receiveMessage()
   {
     BaseMessage message = this.objCommunication.unpackAndReceive();
-    return message;
+    if (message != null)
+    {
+      return message.getPayload();
+    }
+    return null;
   }
-  
+
   /**
    * Sets the callback to support asynchronous messaging.
    * 
-   * @param callback the implemented callback object.
+   * @param callback
+   *          the implemented callback object.
    */
   public void setReceiveCallback(Callback callback)
   {

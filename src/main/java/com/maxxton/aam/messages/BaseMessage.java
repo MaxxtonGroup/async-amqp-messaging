@@ -18,12 +18,15 @@ public abstract class BaseMessage implements Serializable
 
   protected String strMessageId;
 
+  protected Object objPayload;
+
   protected MessageType mtMessageType;
 
   /**
    * Sets the identifier of this message
    * 
    * @param messageId
+   *          message identifier as string
    */
   public void setMessageId(String messageId)
   {
@@ -38,6 +41,27 @@ public abstract class BaseMessage implements Serializable
   public String getMessageId()
   {
     return this.strMessageId;
+  }
+
+  /**
+   * Sets the payload object of the message.
+   * 
+   * @param payload
+   *          the payload object.
+   */
+  public void setPayload(Object payload)
+  {
+    this.objPayload = payload;
+  }
+
+  /**
+   * Gets the payload object.
+   * 
+   * @return an instance of the payload object.
+   */
+  public Object getPayload()
+  {
+    return this.objPayload;
   }
 
   /**

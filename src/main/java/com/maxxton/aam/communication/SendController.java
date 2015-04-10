@@ -25,8 +25,8 @@ public class SendController
   public SendController(Resources resources)
   {
     // TODO : Change the key to the appropriate one as mentioned in the configuration class.
-    this.objContainer = DataContainer.getInstance("temporary");
     this.objResources = resources;
+    this.objContainer = DataContainer.getInstance(this.objResources.getHost().getMessengerName());
   }
 
   /**

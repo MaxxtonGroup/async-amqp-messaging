@@ -1,5 +1,7 @@
 package com.maxxton.aam.communication;
 
+import java.util.UUID;
+
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 
@@ -46,7 +48,7 @@ public class CommunicationController
     }
     return null;
   }
-  
+
   /**
    * Convert a message to the appropriate Message class and send it.
    * 
@@ -73,13 +75,13 @@ public class CommunicationController
   public void packAndSend(String receiver, BaseMessage baseMessage, String responseTo)
   {
     MessageProperties properties = new MessageProperties();
-    properties.setCorrelationId(responseTo == null || responseTo == "" ? MessageSerializer.serialize(this.objSender.generateUniqueId()) : MessageSerializer.serialize(responseTo));
+    properties.setCorrelationId(responseTo == null || responseTo == "" ? UUID.randomUUID().toString().getBytes() : responseTo.getBytes());
 
     byte[] messageBytes = MessageSerializer.serialize(baseMessage);
     Message message = new Message(messageBytes, properties);
     objSender.sendMessage(receiver, message);
   }
-  
+
   public void setCallback(Callback callback)
   {
     this.objReceiver.setCallback(callback);
