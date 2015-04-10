@@ -4,6 +4,7 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 
 import com.maxxton.aam.messages.BaseMessage;
+import com.maxxton.aam.resources.Callback;
 import com.maxxton.aam.resources.Resources;
 
 /**
@@ -45,6 +46,19 @@ public class CommunicationController
     }
     return null;
   }
+  
+  /**
+   * Convert a message to the appropriate Message class and send it.
+   * 
+   * @param receiver
+   *          the receiver of the message.
+   * @param baseMessage
+   *          the message to be send.
+   */
+  public void packAndSend(String receiver, BaseMessage baseMessage)
+  {
+    this.packAndSend(receiver, baseMessage, null);
+  }
 
   /**
    * Convert a message to the appropriate Message class and send it using a response correlationId.
@@ -65,18 +79,10 @@ public class CommunicationController
     Message message = new Message(messageBytes, properties);
     objSender.sendMessage(receiver, message);
   }
-
-  /**
-   * Convert a message to the appropriate Message class and send it.
-   * 
-   * @param receiver
-   *          the receiver of the message.
-   * @param message
-   *          the message to be send.
-   */
-  public void packAndSend(String receiver, BaseMessage baseMessage)
+  
+  public void setCallback(Callback callback)
   {
-    this.packAndSend(receiver, baseMessage, null);
+    this.objReceiver.setCallback(callback);
   }
 
   /**
@@ -104,7 +110,7 @@ public class CommunicationController
    * Sets the ReceiveController instance
    * 
    * @param receiver
-   *          instance fo the ReceiveController class
+   *          instance for the ReceiveController class
    */
   public void setReceiver(ReceiveController receiver)
   {

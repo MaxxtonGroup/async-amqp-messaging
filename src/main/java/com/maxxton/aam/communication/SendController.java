@@ -18,6 +18,9 @@ public class SendController
 
   /**
    * SendController constructor Initiates elements defined in this class
+   * 
+   * @param resources
+   *          an instance of the resources class
    */
   public SendController(Resources resources)
   {

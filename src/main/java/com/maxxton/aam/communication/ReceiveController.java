@@ -30,6 +30,9 @@ public class ReceiveController implements MessageListener
 
   /**
    * ReceiveController constructor Initiates elements defined in this class
+   * 
+   * @param resources
+   *          an instance of the resources class
    */
   public ReceiveController(Resources resources)
   {
