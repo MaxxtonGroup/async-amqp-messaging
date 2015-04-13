@@ -42,10 +42,11 @@ public class Messenger
    *          the receiver of the message as string
    * @param payload
    *          the contents of the message (can be any object)
+   * @return outcome of the send method. True for success and false for failed.
    */
-  public void sendMessage(MessageType type, String receiver, Object payload)
+  public boolean sendMessage(MessageType type, String receiver, Object payload)
   {
-    this.sendMessage(type, receiver, payload, null);
+    return this.sendMessage(type, receiver, payload, null);
   }
 
   /**
@@ -59,14 +60,15 @@ public class Messenger
    *          the contents of the message (can be any object)
    * @param responseTo
    *          correlationId where the message is a response to.
+   * @return outcome of the send method. True for success and false for failed.
    */
-  public void sendMessage(MessageType type, String receiver, Object payload, String responseTo)
+  public boolean sendMessage(MessageType type, String receiver, Object payload, String responseTo)
   {
     // TODO : request new message instance from MessageFactory by specifying the MessageType given.
     BaseMessage message = new GenerateMessage();
     message.setPayload(payload);
 
-    this.objCommunication.packAndSend(receiver.toLowerCase(), message, responseTo);
+    return this.objCommunication.packAndSend(receiver.toLowerCase(), message, responseTo);
   }
 
   /**

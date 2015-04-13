@@ -2,8 +2,11 @@ package com.maxxton.aam.communication;
 
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
+import org.springframework.amqp.rabbit.core.ChannelCallback;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+
 import com.maxxton.aam.resources.Resources;
+import com.rabbitmq.client.AMQP.Queue.DeclareOk;
 
 /**
  * SendController class Handles all message communication which involves sending.
@@ -28,7 +31,7 @@ public class SendController
     // TODO : Change the key to the appropriate one as mentioned in the configuration class.
     this.objResources = resources;
     this.objContainer = DataContainer.getInstance(this.objResources.getHost().getMessengerName());
-    
+
     this.connectToBroker();
   }
 
@@ -37,7 +40,7 @@ public class SendController
    */
   private void connectToBroker()
   {
-    if(this.objConnection != null)
+    if (this.objConnection == null)
     {
       // TODO : change static information to dynamically loaded
       this.objConnection = new CachingConnectionFactory("localhost");
@@ -45,7 +48,7 @@ public class SendController
       this.objConnection.setPassword("password");
     }
   }
-  
+
   /**
    * Stops the message listener and closes the connection.
    */
@@ -61,16 +64,36 @@ public class SendController
    *          The receiver of the message.
    * @param message
    *          The converted message to be send out.
+   * @return a boolean if the receiver exists.
    */
-  public void sendMessage(String receiver, Message message)
+  public boolean sendMessage(String receiver, Message message)
   {
     RabbitTemplate template = new RabbitTemplate(this.objConnection);
     template.setExchange("amq.direct");
     template.setRoutingKey(receiver + ".route");
 
-    template.send(message);
+    boolean excists = template.execute(new ChannelCallback<DeclareOk>()
+    {
+      @Override
+      public DeclareOk doInRabbit(com.rabbitmq.client.Channel channel) throws Exception
+      {
+        try
+        {
+          return channel.queueDeclarePassive(receiver + ".queue");
+        }
+        catch (Exception e)
+        {
+          return null;
+        }
+      }
+    }) != null;
 
-    this.objContainer.addSendMessage(message);
+    if (excists)
+    {
+      template.send(message);
+      this.objContainer.addSendMessage(message);
+    }
+    return excists;
   }
 
   public String generateUniqueId()

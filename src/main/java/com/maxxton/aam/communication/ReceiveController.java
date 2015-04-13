@@ -86,7 +86,7 @@ public class ReceiveController implements MessageListener
    */
   private void connectToBroker()
   {
-    if(this.objConnection != null)
+    if (this.objConnection == null)
     {
       // TODO : change static information to dynamically loaded
       this.objConnection = new CachingConnectionFactory("localhost");

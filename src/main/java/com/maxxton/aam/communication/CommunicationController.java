@@ -56,10 +56,11 @@ public class CommunicationController
    *          the receiver of the message.
    * @param baseMessage
    *          the message to be send.
+   * @return outcome of the send method. True for success and false for failed.
    */
-  public void packAndSend(String receiver, BaseMessage baseMessage)
+  public boolean packAndSend(String receiver, BaseMessage baseMessage)
   {
-    this.packAndSend(receiver, baseMessage, null);
+    return this.packAndSend(receiver, baseMessage, null);
   }
 
   /**
@@ -70,18 +71,25 @@ public class CommunicationController
    * @param baseMessage
    *          the message to be send.
    * @param responseTo
-   *          correlationId where the message is a response to.
+   *          correlationId where the message is a response to.\
+   * @return outcome of the send method. True for success and false for failed.
    */
-  public void packAndSend(String receiver, BaseMessage baseMessage, String responseTo)
+  public boolean packAndSend(String receiver, BaseMessage baseMessage, String responseTo)
   {
     MessageProperties properties = new MessageProperties();
     properties.setCorrelationId(responseTo == null || responseTo == "" ? UUID.randomUUID().toString().getBytes() : responseTo.getBytes());
 
     byte[] messageBytes = MessageSerializer.serialize(baseMessage);
     Message message = new Message(messageBytes, properties);
-    objSender.sendMessage(receiver, message);
+    return objSender.sendMessage(receiver, message);
   }
 
+  /**
+   * Sets the callback object.
+   * 
+   * @param callback
+   *          instance of the callback object.
+   */
   public void setCallback(Callback callback)
   {
     this.objReceiver.setCallback(callback);
