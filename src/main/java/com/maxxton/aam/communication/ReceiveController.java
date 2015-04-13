@@ -27,7 +27,7 @@ public class ReceiveController implements MessageListener
   private DataContainer objContainer;
   private Callback objCallback;
   private SimpleMessageListenerContainer objListener;
-  private CachingConnectionFactory connection;
+  private CachingConnectionFactory objConnection;
 
   /**
    * ReceiveController constructor Initiates elements defined in this class
@@ -55,7 +55,7 @@ public class ReceiveController implements MessageListener
     // TODO : change static defined name to dynamically declared configuration variable
     String receiver = this.objResources.getHost().getMessengerName();
 
-    RabbitAdmin admin = new RabbitAdmin(connection);
+    RabbitAdmin admin = new RabbitAdmin(this.objConnection);
     Queue queue = new Queue(receiver + ".queue", true, false, false);
     admin.declareQueue(queue);
     Binding binding = new Binding(queue.getName(), DestinationType.QUEUE, "amq.direct", receiver + ".route", null);
@@ -73,7 +73,7 @@ public class ReceiveController implements MessageListener
     String receiver = this.objResources.getHost().getMessengerName();
 
     SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
-    container.setConnectionFactory(connection);
+    container.setConnectionFactory(this.objConnection);
     container.setQueueNames(receiver + ".queue");
     container.setMessageListener(this);
     container.afterPropertiesSet();
@@ -86,10 +86,13 @@ public class ReceiveController implements MessageListener
    */
   private void connectToBroker()
   {
-    // TODO : change static information to dynamically loaded
-    this.connection = new CachingConnectionFactory("localhost");
-    this.connection.setUsername("username");
-    this.connection.setPassword("password");
+    if(this.objConnection != null)
+    {
+      // TODO : change static information to dynamically loaded
+      this.objConnection = new CachingConnectionFactory("localhost");
+      this.objConnection.setUsername("username");
+      this.objConnection.setPassword("password");
+    }
   }
 
   /**
@@ -102,7 +105,7 @@ public class ReceiveController implements MessageListener
       objListener.destroy();
     }
 
-    connection.destroy();
+    this.objConnection.destroy();
   }
 
   /**

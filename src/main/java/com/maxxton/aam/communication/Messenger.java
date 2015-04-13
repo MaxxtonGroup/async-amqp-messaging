@@ -101,7 +101,9 @@ public class Messenger
    */
   public void closeConnection()
   {
+    SendController sender = this.objCommunication.getSender();
     ReceiveController receiver = this.objCommunication.getReceiver();
+    sender.disconnectFromBroker();
     receiver.disconnectFromBroker();
   }
 

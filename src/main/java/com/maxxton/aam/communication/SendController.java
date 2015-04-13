@@ -15,6 +15,7 @@ public class SendController
 {
   private Resources objResources;
   private DataContainer objContainer;
+  private CachingConnectionFactory objConnection;
 
   /**
    * SendController constructor Initiates elements defined in this class
@@ -27,20 +28,30 @@ public class SendController
     // TODO : Change the key to the appropriate one as mentioned in the configuration class.
     this.objResources = resources;
     this.objContainer = DataContainer.getInstance(this.objResources.getHost().getMessengerName());
+    
+    this.connectToBroker();
   }
 
   /**
    * Creates a new connection to an AMQP broker with the given information.
-   * 
-   * @return an object to be able to manage connections.
    */
-  private CachingConnectionFactory connectToBroker()
+  private void connectToBroker()
   {
-    // TODO : change static information to dynamically loaded
-    CachingConnectionFactory connectionFactory = new CachingConnectionFactory("localhost");
-    connectionFactory.setUsername("username");
-    connectionFactory.setPassword("password");
-    return connectionFactory;
+    if(this.objConnection != null)
+    {
+      // TODO : change static information to dynamically loaded
+      this.objConnection = new CachingConnectionFactory("localhost");
+      this.objConnection.setUsername("username");
+      this.objConnection.setPassword("password");
+    }
+  }
+  
+  /**
+   * Stops the message listener and closes the connection.
+   */
+  public void disconnectFromBroker()
+  {
+    this.objConnection.destroy();
   }
 
   /**
@@ -53,14 +64,11 @@ public class SendController
    */
   public void sendMessage(String receiver, Message message)
   {
-    CachingConnectionFactory connection = this.connectToBroker();
-    RabbitTemplate template = new RabbitTemplate(connection);
+    RabbitTemplate template = new RabbitTemplate(this.objConnection);
     template.setExchange("amq.direct");
     template.setRoutingKey(receiver + ".route");
 
     template.send(message);
-
-    connection.destroy();
 
     this.objContainer.addSendMessage(message);
   }
