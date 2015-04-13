@@ -248,6 +248,10 @@ public class ReceiveController implements MessageListener
           {
             this.handleMessageCallback(correlationId, message);
           }
+          else
+          {
+            this.objContainer.addOddMessage(message);
+          }
         }
         else
         {

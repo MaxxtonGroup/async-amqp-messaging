@@ -22,6 +22,7 @@ public class DataContainer
   private Set<String> seIdentifiers;
   private Set<Message> seSendMessages;
   private Set<Message> seReceivedMessages;
+  private Set<Message> seOddMessages;
 
   /**
    * DataContainer constructor Initiates elements defined in this class
@@ -31,6 +32,7 @@ public class DataContainer
     this.seIdentifiers = new HashSet<String>();
     this.seSendMessages = new HashSet<Message>();
     this.seReceivedMessages = new HashSet<Message>();
+    this.seOddMessages = new HashSet<Message>();
   }
 
   /**
@@ -270,5 +272,69 @@ public class DataContainer
   public Set<Message> getReceivedMessages()
   {
     return this.seReceivedMessages;
+  }
+
+  /**
+   * Adds a message instance to the odd messages set.
+   * 
+   * @param message
+   *          an instance of a message object.
+   */
+  public void addOddMessage(Message message)
+  {
+    this.seOddMessages.add(message);
+  }
+
+  /**
+   * Removes a given message object from the odd messages set.
+   * 
+   * @param message
+   *          instance of the Message object
+   */
+  public void removeOddMessage(Message message)
+  {
+    this.seOddMessages.remove(message);
+  }
+
+  /**
+   * Removes a message object by id from the odd messages set.
+   * 
+   * @param id
+   *          the message identifier as string.
+   */
+  public void removeOddMessageById(String id)
+  {
+    for (Message message : this.seOddMessages)
+    {
+      if (message.getMessageProperties().getCorrelationId() != null && message.getMessageProperties().getCorrelationId().length > 0)
+      {
+        String messageId = (String) MessageSerializer.deserialize(message.getMessageProperties().getCorrelationId());
+        if (messageId.equals(id))
+        {
+          this.seOddMessages.remove(message);
+        }
+      }
+    }
+  }
+
+  /**
+   * Getter for the odd messages set.
+   * 
+   * @return a list of odd received messages.
+   */
+  public Set<Message> getOddMessages()
+  {
+    return this.seOddMessages;
+  }
+
+  /**
+   * Setter for the odd messages set.
+   * 
+   * @param messages
+   *          the Set with Message objects.
+   */
+  public void setOddMessages(Set<Message> messages)
+  {
+    this.seOddMessages = messages;
   }
 }
