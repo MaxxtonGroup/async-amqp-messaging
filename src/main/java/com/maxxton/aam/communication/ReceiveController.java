@@ -206,7 +206,10 @@ public class ReceiveController implements MessageListener
   /**
    * Handles incoming messages based on whether or not the callback has been set.
    * 
-   * @param messagen
+   * @param correlationId
+   *          the id of the message.
+   * @param message
+   *          the message to be handled.
    */
   private void handleMessageCallback(String correlationId, Message message)
   {

@@ -99,7 +99,7 @@ public class Messenger
   }
 
   /**
-   * closes the connection to the broker.
+   * Closes the connection to the broker.
    */
   public void closeConnection()
   {
