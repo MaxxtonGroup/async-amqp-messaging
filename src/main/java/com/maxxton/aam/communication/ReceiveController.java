@@ -27,6 +27,7 @@ public class ReceiveController implements MessageListener
   private DataContainer objContainer;
   private Callback objCallback;
   private SimpleMessageListenerContainer objListener;
+  private CachingConnectionFactory connection;
 
   /**
    * ReceiveController constructor Initiates elements defined in this class
@@ -41,6 +42,7 @@ public class ReceiveController implements MessageListener
     this.objContainer = DataContainer.getInstance(this.objResources.getHost().getMessengerName());
     this.objCallback = null;
 
+    this.connectToBroker();
     this.configureQueue();
     this.objListener = this.configureMessageListener();
   }
@@ -52,7 +54,6 @@ public class ReceiveController implements MessageListener
   {
     // TODO : change static defined name to dynamically declared configuration variable
     String receiver = this.objResources.getHost().getMessengerName();
-    CachingConnectionFactory connection = this.connectToBroker();
 
     RabbitAdmin admin = new RabbitAdmin(connection);
     Queue queue = new Queue(receiver + ".queue", true, false, false);
@@ -71,8 +72,6 @@ public class ReceiveController implements MessageListener
     // TODO : change static defined name to dynamically declared configuration variable
     String receiver = this.objResources.getHost().getMessengerName();
 
-    CachingConnectionFactory connection = this.connectToBroker();
-
     SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
     container.setConnectionFactory(connection);
     container.setQueueNames(receiver + ".queue");
@@ -84,16 +83,26 @@ public class ReceiveController implements MessageListener
 
   /**
    * Creates a new connection to an AMQP broker with the given information.
-   * 
-   * @return an object to be able to manage connections.
    */
-  private CachingConnectionFactory connectToBroker()
+  private void connectToBroker()
   {
     // TODO : change static information to dynamically loaded
-    CachingConnectionFactory connectionFactory = new CachingConnectionFactory("localhost");
-    connectionFactory.setUsername("username");
-    connectionFactory.setPassword("password");
-    return connectionFactory;
+    this.connection = new CachingConnectionFactory("localhost");
+    this.connection.setUsername("username");
+    this.connection.setPassword("password");
+  }
+
+  /**
+   * Stops the message listener and closes the connection.
+   */
+  public void disconnectFromBroker()
+  {
+    if (objListener.isRunning())
+    {
+      objListener.destroy();
+    }
+
+    connection.destroy();
   }
 
   /**
@@ -132,7 +141,7 @@ public class ReceiveController implements MessageListener
    * Sets the Callback instance.
    * 
    * @param callback
-   *          nstance of the Callback class
+   *          instance of the Callback class
    */
   public void setCallback(Callback callback)
   {

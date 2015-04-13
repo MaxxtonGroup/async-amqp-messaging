@@ -97,6 +97,15 @@ public class Messenger
   }
 
   /**
+   * closes the connection to the broker.
+   */
+  public void closeConnection()
+  {
+    ReceiveController receiver = this.objCommunication.getReceiver();
+    receiver.disconnectFromBroker();
+  }
+
+  /**
    * Load a custom configuration to override the default one.
    * 
    * @param configFile
@@ -129,13 +138,14 @@ public class Messenger
   }
 
   /**
-   * Sets the CommuncanicationController instance.
+   * Closes the current connection. Sets the CommuncanicationController instance.
    * 
    * @param communication
    *          an instance of the CommunicationController.
    */
   public void setCommunication(CommunicationController communication)
   {
+    this.closeConnection();
     this.objCommunication = communication;
   }
 
