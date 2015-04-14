@@ -121,8 +121,12 @@ public class Messenger
   {
     if (deleteBrokerData)
     {
-      ReceiveController receiver = this.objCommunication.getReceiver();
-      receiver.deleteBrokerData();
+      SendController sender = this.objCommunication.getSender();
+      if(sender.doesReceiverExist(objResources.getHost().getMessengerName()))
+      {
+        ReceiveController receiver = this.objCommunication.getReceiver();
+        receiver.deleteBrokerData();
+      }
     }
     this.closeConnection();
     this.bIsAlive = false;

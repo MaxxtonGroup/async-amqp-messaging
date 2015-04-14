@@ -18,6 +18,7 @@ public class SendController
 {
   private Resources objResources;
   private DataContainer objContainer;
+  private RabbitTemplate objTemplate;
   private CachingConnectionFactory objConnection;
 
   /**
@@ -58,6 +59,36 @@ public class SendController
   }
 
   /**
+   * Check if a certain receiver (queue) exists.
+   *
+   * @param receiver
+   *          the name of the receiver.
+   * @return true if it does, false if it doesn't exists.
+   */
+  public boolean doesReceiverExist(String receiver)
+  {
+    if(objTemplate != null)
+    {
+      return objTemplate.execute(new ChannelCallback<DeclareOk>()
+      {
+        @Override
+        public DeclareOk doInRabbit(com.rabbitmq.client.Channel channel) throws Exception
+        {
+          try
+          {
+            return channel.queueDeclarePassive(receiver + ".queue");
+          }
+          catch (Exception e)
+          {
+            return null;
+          }
+        }
+      }) != null;
+    }
+    return false;
+  }
+
+  /**
    * Sends a converted message to a given receiver.
    * 
    * @param receiver
@@ -72,28 +103,14 @@ public class SendController
     template.setExchange("amq.direct");
     template.setRoutingKey(receiver + ".route");
 
-    boolean excists = template.execute(new ChannelCallback<DeclareOk>()
-    {
-      @Override
-      public DeclareOk doInRabbit(com.rabbitmq.client.Channel channel) throws Exception
-      {
-        try
-        {
-          return channel.queueDeclarePassive(receiver + ".queue");
-        }
-        catch (Exception e)
-        {
-          return null;
-        }
-      }
-    }) != null;
+    boolean exists = this.doesReceiverExist(receiver);
 
-    if (excists)
+    if (exists)
     {
       template.send(message);
       this.objContainer.addSendMessage(message);
     }
-    return excists;
+    return exists;
   }
 
   public String generateUniqueId()
