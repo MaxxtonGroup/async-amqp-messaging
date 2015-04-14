@@ -17,6 +17,7 @@ public class Messenger
 
   private Resources objResources;
   private CommunicationController objCommunication;
+  private boolean bIsAlive;
 
   /**
    * Constructor for the Messenger class.
@@ -31,6 +32,7 @@ public class Messenger
     // TODO : setup + initialize the resources.
 
     this.objCommunication = new CommunicationController(objResources);
+    this.bIsAlive = true;
   }
 
   /**
@@ -101,12 +103,39 @@ public class Messenger
   /**
    * Closes the connection to the broker.
    */
-  public void closeConnection()
+  private void closeConnection()
   {
     SendController sender = this.objCommunication.getSender();
     ReceiveController receiver = this.objCommunication.getReceiver();
     sender.disconnectFromBroker();
     receiver.disconnectFromBroker();
+  }
+
+  /**
+   * Destroys this messenger object.
+   * 
+   * @param deleteBrokerData
+   *          should the data available on the queue be deleted. True is yes and false is no.
+   */
+  public void destroy(boolean deleteBrokerData)
+  {
+    if (deleteBrokerData)
+    {
+      ReceiveController receiver = this.objCommunication.getReceiver();
+      receiver.deleteBrokerData();
+    }
+    this.closeConnection();
+    this.bIsAlive = false;
+  }
+
+  /**
+   * Check if this Messenger instance isn't destroyed.
+   * 
+   * @return true if alive, false if destroyed.
+   */
+  public boolean checkAliveness()
+  {
+    return this.bIsAlive;
   }
 
   /**
@@ -158,7 +187,7 @@ public class Messenger
    * 
    * @return an instance of the CommunicationController class.
    */
-  public CommunicationController getController()
+  public CommunicationController getCommunication()
   {
     return this.objCommunication;
   }

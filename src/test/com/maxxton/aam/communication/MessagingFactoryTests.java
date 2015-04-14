@@ -1,20 +1,35 @@
 package com.maxxton.aam.communication;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+/**
+ * Run a list of tests against the MessagingFactory class.
+ * 
+ * @author Robin Hermans
+ * @copyright Maxxton 2015
+ */
 public class MessagingFactoryTests
 {
 
-  @Before
-  public void setup()
+  /**
+   * Setup method called before running the tests to construct the testing environment.
+   */
+  @BeforeClass
+  public static void setup()
   {
     // TODO : Load custom configuration file.
   }
 
+  /**
+   * Test the functionality of the Singleton method.
+   * 
+   * @throws Exception
+   *           reason of failure given by the test.
+   */
   @Test
   public void testSingleton() throws Exception
   {
@@ -31,6 +46,12 @@ public class MessagingFactoryTests
     System.out.println("done.");
   }
 
+  /**
+   * Test the functionality of the creational method.
+   * 
+   * @throws Exception
+   *           reason of failure given by the test.
+   */
   @Test
   public void testCreationalPattern() throws Exception
   {
@@ -52,17 +73,18 @@ public class MessagingFactoryTests
 
     assertEquals("The instances returned by the creational method are not the same.", msgr, sameMsgr);
 
-    msgr.closeConnection();
-    otherMsgr.closeConnection();
-    sameMsgr.closeConnection();
-
     System.out.println("done.");
   }
 
-  @After
-  public void cleanup()
+  /**
+   * Static method called after running the test to cleanup.
+   */
+  @AfterClass
+  public static void cleanup()
   {
-    // TODO : Cleanup queues and close connection.
+    MessagingFactory msgFactory = MessagingFactory.getInstance();
+    msgFactory.createMessenger("test").destroy(true);
+    msgFactory.createMessenger("other").destroy(true);
   }
 
 }

@@ -28,6 +28,7 @@ public class ReceiveController implements MessageListener
   private Callback objCallback;
   private SimpleMessageListenerContainer objListener;
   private CachingConnectionFactory objConnection;
+  private RabbitAdmin objAdmin;
 
   /**
    * ReceiveController constructor Initiates elements defined in this class
@@ -55,11 +56,11 @@ public class ReceiveController implements MessageListener
     // TODO : change static defined name to dynamically declared configuration variable
     String receiver = this.objResources.getHost().getMessengerName();
 
-    RabbitAdmin admin = new RabbitAdmin(this.objConnection);
+    objAdmin = new RabbitAdmin(this.objConnection);
     Queue queue = new Queue(receiver + ".queue", true, false, false);
-    admin.declareQueue(queue);
+    objAdmin.declareQueue(queue);
     Binding binding = new Binding(queue.getName(), DestinationType.QUEUE, "amq.direct", receiver + ".route", null);
-    admin.declareBinding(binding);
+    objAdmin.declareBinding(binding);
   }
 
   /**
@@ -106,6 +107,15 @@ public class ReceiveController implements MessageListener
     }
 
     this.objConnection.destroy();
+  }
+
+  /**
+   * Deletes the data available on the broker for the current messenger name.
+   */
+  public void deleteBrokerData()
+  {
+    String receiver = this.objResources.getHost().getMessengerName();
+    objAdmin.deleteQueue(receiver + ".queue");
   }
 
   /**
@@ -250,7 +260,11 @@ public class ReceiveController implements MessageListener
           }
           else
           {
-            this.objContainer.addOddMessage(message);
+            if (properties.getRedelivered())
+            {
+              // TODO : handle id which where not recognized by the messenger (maybe due client/broker failure, messages where resent).
+              this.objContainer.addOddMessage(message);
+            }
           }
         }
         else

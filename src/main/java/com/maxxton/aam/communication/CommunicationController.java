@@ -71,7 +71,7 @@ public class CommunicationController
    * @param baseMessage
    *          the message to be send.
    * @param responseTo
-   *          correlationId where the message is a response to.\
+   *          correlationId where the message is a response to.
    * @return outcome of the send method. True for success and false for failed.
    */
   public boolean packAndSend(String receiver, BaseMessage baseMessage, String responseTo)
@@ -103,6 +103,7 @@ public class CommunicationController
    */
   public void setSender(SendController sender)
   {
+    this.objSender.disconnectFromBroker();
     this.objSender = sender;
   }
 
@@ -124,6 +125,7 @@ public class CommunicationController
    */
   public void setReceiver(ReceiveController receiver)
   {
+    this.objReceiver.disconnectFromBroker();
     this.objReceiver = receiver;
   }
 

@@ -57,6 +57,11 @@ public class MessagingFactory
     if (this.mMessengerMap.containsKey(name))
     {
       messenger = this.mMessengerMap.get(name.toLowerCase());
+      if (!messenger.checkAliveness())
+      {
+        messenger = new Messenger(name.toLowerCase());
+        this.mMessengerMap.put(name.toLowerCase(), messenger);
+      }
     }
     else
     {
