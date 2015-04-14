@@ -179,7 +179,7 @@ public class DataContainer
    */
   public void setSendMessages(Set<Message> messages)
   {
-    this.seReceivedMessages = messages;
+    this.seSendMessages = messages;
   }
 
   /**
@@ -189,7 +189,7 @@ public class DataContainer
    */
   public Set<Message> getSendMessages()
   {
-    return this.seReceivedMessages;
+    return this.seSendMessages;
   }
 
   /**
