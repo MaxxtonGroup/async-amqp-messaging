@@ -99,15 +99,15 @@ public class SendController
    */
   public boolean sendMessage(String receiver, Message message)
   {
-    RabbitTemplate template = new RabbitTemplate(this.objConnection);
-    template.setExchange("amq.direct");
-    template.setRoutingKey(receiver + ".route");
+    objTemplate = new RabbitTemplate(this.objConnection);
+    objTemplate.setExchange("amq.direct");
+    objTemplate.setRoutingKey(receiver + ".route");
 
     boolean exists = this.doesReceiverExist(receiver);
 
     if (exists)
     {
-      template.send(message);
+      objTemplate.send(message);
       this.objContainer.addSendMessage(message);
     }
     return exists;

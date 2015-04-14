@@ -97,7 +97,7 @@ public class Messenger
    */
   public void setReceiveCallback(Callback callback)
   {
-    this.objCommunication.setCallback(callback);
+    this.objCommunication.getReceiver().setCallback(callback);
   }
 
   /**

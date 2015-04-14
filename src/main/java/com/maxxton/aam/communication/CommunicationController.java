@@ -6,7 +6,6 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 
 import com.maxxton.aam.messages.BaseMessage;
-import com.maxxton.aam.resources.Callback;
 import com.maxxton.aam.resources.Resources;
 
 /**
@@ -82,17 +81,6 @@ public class CommunicationController
     byte[] messageBytes = MessageSerializer.serialize(baseMessage);
     Message message = new Message(messageBytes, properties);
     return objSender.sendMessage(receiver, message);
-  }
-
-  /**
-   * Sets the callback object.
-   * 
-   * @param callback
-   *          instance of the callback object.
-   */
-  public void setCallback(Callback callback)
-  {
-    this.objReceiver.setCallback(callback);
   }
 
   /**

@@ -2,7 +2,9 @@ package com.maxxton.aam.communication;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import com.maxxton.aam.resources.Resources;
 
@@ -14,6 +16,7 @@ import static org.junit.Assert.*;
  * @author Robin Hermans
  * @copyright Maxxton 2015
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class MessengerTests
 {
 
@@ -112,10 +115,12 @@ public class MessengerTests
     sender.destroy(false);
 
     Messenger receiver = new Messenger("other");
+    
+    Thread.sleep(50);
 
     String msg = (String) receiver.receiveMessage();
 
-    assertNull("No message has been received.", msg);
+    assertNotNull("No message has been received.", msg);
 
     receiver.destroy(false);
 
