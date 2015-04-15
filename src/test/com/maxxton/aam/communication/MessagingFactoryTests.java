@@ -1,7 +1,7 @@
 package com.maxxton.aam.communication;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -18,13 +18,19 @@ import static org.junit.Assert.*;
 public class MessagingFactoryTests
 {
 
+  private MessagingFactory objMessageFactory;
+
   /**
    * Setup method called before running the tests to construct the testing environment.
    */
-  @BeforeClass
-  public static void setup()
+  @Before
+  public void setup()
   {
-    // TODO : Load custom configuration file.
+    if (objMessageFactory == null)
+    {
+      objMessageFactory = MessagingFactory.getInstance();
+      assertNotNull("The messagingfactory cannot be NULL.", objMessageFactory);
+    }
   }
 
   /**
@@ -38,13 +44,10 @@ public class MessagingFactoryTests
   {
     System.out.print("MessagingFactory : Testing singleton pattern...");
 
-    MessagingFactory msgFactory = MessagingFactory.getInstance();
-    assertNotNull("The messagingfactory cannot be NULL.", msgFactory);
-
     MessagingFactory otherFactory = MessagingFactory.getInstance();
     assertNotNull("The messagingfactory cannot be NULL.", otherFactory);
 
-    assertEquals("The instances returned by the singleton are not the same.", msgFactory, otherFactory);
+    assertEquals("The instances returned by the singleton are not the same.", objMessageFactory, otherFactory);
 
     System.out.println("done.");
   }
@@ -60,18 +63,15 @@ public class MessagingFactoryTests
   {
     System.out.print("MessagingFactory : Testing creational pattern...");
 
-    MessagingFactory msgFactory = MessagingFactory.getInstance();
-    assertNotNull("The messagingfactory cannot be NULL.", msgFactory);
-
-    Messenger msgr = msgFactory.createMessenger("test");
+    Messenger msgr = objMessageFactory.createMessenger("test");
     assertNotNull("The messenger cannot be NULL.", msgr);
 
-    Messenger otherMsgr = msgFactory.createMessenger("other");
+    Messenger otherMsgr = objMessageFactory.createMessenger("other");
     assertNotNull("The other messenger cannot be NULL.", otherMsgr);
 
     assertNotEquals("The instances returned by the creational method are the same.", msgr, otherMsgr);
 
-    Messenger sameMsgr = msgFactory.createMessenger("test");
+    Messenger sameMsgr = objMessageFactory.createMessenger("test");
     assertNotNull("The same messenger cannot be NULL.", sameMsgr);
 
     assertEquals("The instances returned by the creational method are not the same.", msgr, sameMsgr);
@@ -80,14 +80,32 @@ public class MessagingFactoryTests
   }
 
   /**
-   * Static method called after running the test to cleanup.
+   * Test the functionality of the destroy method.
+   *
+   * @throws Exception
+   *           reason of failure given by the test.
    */
-  @AfterClass
-  public static void cleanup()
+  @Test
+  public void testDestroy() throws Exception
   {
-    MessagingFactory msgFactory = MessagingFactory.getInstance();
-    msgFactory.createMessenger("test").destroy(true);
-    msgFactory.createMessenger("other").destroy(true);
+    System.out.print("MessagingFactory : Testing destroy method...");
+
+    Messenger msgr = this.objMessageFactory.createMessenger("test");
+    this.objMessageFactory.destroyMessenger("test");
+    Messenger otherMsgr = this.objMessageFactory.createMessenger("test");
+
+    assertNotEquals("The Messenger instance should not be the same.", msgr, otherMsgr);
+
+    System.out.println("done.");
+  }
+
+  /**
+   * Cleanup method called after running the test to cleanup.
+   */
+  @After
+  public void cleanup()
+  {
+
   }
 
 }

@@ -34,6 +34,9 @@ public class SendController
     this.objContainer = DataContainer.getInstance(this.objResources.getHost().getMessengerName());
 
     this.connectToBroker();
+    this.objTemplate = new RabbitTemplate(this.objConnection);
+    this.objTemplate.setExchange("amq.direct");
+    this.objTemplate.setRoutingKey(this.objResources.getHost().getMessengerName() + ".route");
   }
 
   /**
@@ -47,15 +50,8 @@ public class SendController
       this.objConnection = new CachingConnectionFactory("localhost");
       this.objConnection.setUsername("username");
       this.objConnection.setPassword("password");
+      this.objConnection.setChannelCacheSize(25);
     }
-  }
-
-  /**
-   * Stops the message listener and closes the connection.
-   */
-  public void disconnectFromBroker()
-  {
-    this.objConnection.destroy();
   }
 
   /**
@@ -99,7 +95,6 @@ public class SendController
    */
   public boolean sendMessage(String receiver, Message message)
   {
-    objTemplate = new RabbitTemplate(this.objConnection);
     objTemplate.setExchange("amq.direct");
     objTemplate.setRoutingKey(receiver + ".route");
 

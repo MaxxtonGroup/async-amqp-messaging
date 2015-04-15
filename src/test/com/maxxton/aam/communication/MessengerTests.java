@@ -1,7 +1,7 @@
 package com.maxxton.aam.communication;
 
 import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -20,30 +20,16 @@ import static org.junit.Assert.*;
 public class MessengerTests
 {
 
+  private Messenger objMessenger;
+
   /**
    * Setup method called before running the tests to construct the testing environment.
    */
-  @BeforeClass
-  public static void setup()
+  @Before
+  public void setup()
   {
-    // TODO : load custom configuration file
-  }
-
-  /**
-   * Test the functionality of the constructor method.
-   * 
-   * @throws Exception
-   *           reason of failure given by the test.
-   */
-  @Test
-  public void testConstructor() throws Exception
-  {
-    System.out.print("Messenger : Testing constructor...");
-
-    Messenger msgr = new Messenger("test");
-    assertNotNull("The messenger cannot be NULL.", msgr);
-
-    System.out.println("done.");
+    this.objMessenger = new Messenger("test");
+    assertNotNull("The messenger cannot be NULL.", this.objMessenger);
   }
 
   /**
@@ -57,22 +43,14 @@ public class MessengerTests
   {
     System.out.print("Messenger : Testing resources setter and getter...");
 
-    Messenger msgr = new Messenger("test");
-    assertNotNull("The messenger cannot be NULL.", msgr);
-
-    Resources resources = new Resources();
-    msgr.setResources(resources);
-    Resources otherResources = msgr.getResources();
-
-    assertEquals("The Resources instances are not the same.", resources, otherResources);
-
-    msgr.destroy(false);
+    Resources resources = this.objMessenger.getResources();
+    assertNotNull("The resources instance cannot be null.", resources);
 
     System.out.println("done.");
   }
 
   /**
-   * Test the functionality of the CommunicationController class getter and setter.
+   * Test the functionality of the CommunicationController class getter.
    * 
    * @throws Exception
    *           reason of failure given by the test.
@@ -80,18 +58,10 @@ public class MessengerTests
   @Test
   public void testCommunicationController() throws Exception
   {
-    System.out.print("Messenger : Testing communicationcontroller setter and getter...");
+    System.out.print("Messenger : Testing communicationcontroller getter...");
 
-    Messenger msgr = new Messenger("test");
-    assertNotNull("The messenger cannot be NULL.", msgr);
-
-    CommunicationController communication = new CommunicationController(msgr.getResources());
-    msgr.setCommunication(communication);
-    CommunicationController otherCommunication = msgr.getCommunication();
-
-    assertEquals("The CommunicationController instances are not the same.", communication, otherCommunication);
-
-    msgr.destroy(false);
+    CommunicationController communication = this.objMessenger.getCommunication();
+    assertNotNull("The communicationcontroller instance cannot be null.", communication);
 
     System.out.println("done.");
   }
@@ -107,22 +77,16 @@ public class MessengerTests
   {
     System.out.print("Messenger : Testing sending and receiving...");
 
-    Messenger sender = new Messenger("test");
-
     // TODO : change test to match MessageType option (currently null).
-    sender.sendMessage(null, "other", "Hello World");
-
-    sender.destroy(false);
+    this.objMessenger.sendMessage(null, "other", "Hello World");
 
     Messenger receiver = new Messenger("other");
 
-    Thread.sleep(50);
+    Thread.sleep(500);
 
     String msg = (String) receiver.receiveMessage();
 
     assertNotNull("No message has been received.", msg);
-
-    receiver.destroy(false);
 
     System.out.println("done.");
   }

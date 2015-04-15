@@ -93,29 +93,8 @@ public class ReceiveController implements MessageListener
       this.objConnection = new CachingConnectionFactory("localhost");
       this.objConnection.setUsername("username");
       this.objConnection.setPassword("password");
+      this.objConnection.setChannelCacheSize(25);
     }
-  }
-
-  /**
-   * Stops the message listener and closes the connection.
-   */
-  public void disconnectFromBroker()
-  {
-    if (objListener.isRunning())
-    {
-      objListener.destroy();
-    }
-
-    this.objConnection.destroy();
-  }
-
-  /**
-   * Deletes the data available on the broker for the current messenger name.
-   */
-  public void deleteBrokerData()
-  {
-    String receiver = this.objResources.getHost().getMessengerName();
-    objAdmin.deleteQueue(receiver + ".queue");
   }
 
   /**

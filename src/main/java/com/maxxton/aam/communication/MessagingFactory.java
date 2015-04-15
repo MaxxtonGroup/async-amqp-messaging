@@ -57,11 +57,6 @@ public class MessagingFactory
     if (this.mMessengerMap.containsKey(name))
     {
       messenger = this.mMessengerMap.get(name.toLowerCase());
-      if (!messenger.checkAliveness())
-      {
-        messenger = new Messenger(name.toLowerCase());
-        this.mMessengerMap.put(name.toLowerCase(), messenger);
-      }
     }
     else
     {
@@ -70,4 +65,21 @@ public class MessagingFactory
     }
     return messenger;
   }
+
+  /**
+   * Destroys the instance of a given Messenger name.
+   *
+   * @param name
+   *          the messenger name
+   */
+  public boolean destroyMessenger(String name)
+  {
+    if (this.mMessengerMap.containsKey(name))
+    {
+      this.mMessengerMap.remove(name);
+      return true;
+    }
+    return false;
+  }
+
 }

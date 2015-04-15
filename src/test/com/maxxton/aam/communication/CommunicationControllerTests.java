@@ -1,7 +1,7 @@
 package com.maxxton.aam.communication;
 
 import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -22,33 +22,23 @@ import static org.junit.Assert.*;
 public class CommunicationControllerTests
 {
 
+  private Resources objResources;
+  private CommunicationController objCommunication;
+
   /**
    * Setup method called before running the tests to construct the testing environment.
    */
-  @BeforeClass
-  public static void setup()
+  @Before
+  public void setup()
   {
-    // TODO : Load custom configuration file.
-  }
+    if (objCommunication == null)
+    {
+      this.objResources = new Resources();
+      this.objResources.getHost().setMessengerName("test");
+      this.objCommunication = new CommunicationController(this.objResources);
 
-  /**
-   * Test the constructor of the CommunicationController class.
-   *
-   * @throws Exception
-   *           reason of failure given by the test.
-   */
-  @Test
-  public void testConstructor() throws Exception
-  {
-    System.out.print("CommunicationController : Testing constructor...");
-
-    Resources objResources = new Resources();
-    objResources.getHost().setMessengerName("test");
-    CommunicationController comController = new CommunicationController(objResources);
-
-    assertNotNull("The CommunicationController cannot be Null", comController);
-
-    System.out.println("done.");
+      assertNotNull("The CommunicationController cannot be Null", this.objCommunication);
+    }
   }
 
   /**
@@ -62,12 +52,9 @@ public class CommunicationControllerTests
   {
     System.out.print("CommunicationController : Testing sendcontroller setter and getter...");
 
-    Resources objResources = new Resources();
-    objResources.getHost().setMessengerName("test");
-    CommunicationController comController = new CommunicationController(objResources);
     SendController testSender = new SendController(objResources);
-    comController.setSender(testSender);
-    SendController otherSender = comController.getSender();
+    this.objCommunication.setSender(testSender);
+    SendController otherSender = this.objCommunication.getSender();
 
     assertEquals("The SendController instances are not the same.", testSender, otherSender);
 
@@ -85,12 +72,9 @@ public class CommunicationControllerTests
   {
     System.out.print("CommunicationController : Testing receivecontroller setter and getter...");
 
-    Resources objResources = new Resources();
-    objResources.getHost().setMessengerName("test");
-    CommunicationController comController = new CommunicationController(objResources);
     ReceiveController testReceiver = new ReceiveController(objResources);
-    comController.setReceiver(testReceiver);
-    ReceiveController otherReceiver = comController.getReceiver();
+    this.objCommunication.setReceiver(testReceiver);
+    ReceiveController otherReceiver = this.objCommunication.getReceiver();
 
     assertEquals("The ReceiveController instance are not the same.", testReceiver, otherReceiver);
 
@@ -108,19 +92,15 @@ public class CommunicationControllerTests
   {
     System.out.print("CommunicationController : Testing sending and receiving a message...");
 
-    Resources objResourcesTest = new Resources();
-    objResourcesTest.getHost().setMessengerName("test");
-    CommunicationController comControllerTest = new CommunicationController(objResourcesTest);
-
     BaseMessage msgTest = new GenerateMessage();
     msgTest.setPayload("Hello World");
-    comControllerTest.packAndSend("other", msgTest);
+    this.objCommunication.packAndSend("other", msgTest);
 
     Resources objResourcesOther = new Resources();
     objResourcesOther.getHost().setMessengerName("other");
     CommunicationController comControllerOther = new CommunicationController(objResourcesOther);
 
-    Thread.sleep(50);
+    Thread.sleep(500);
 
     BaseMessage msgOther = comControllerOther.unpackAndReceive();
 

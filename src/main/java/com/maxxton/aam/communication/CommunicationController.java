@@ -91,7 +91,6 @@ public class CommunicationController
    */
   public void setSender(SendController sender)
   {
-    this.objSender.disconnectFromBroker();
     this.objSender = sender;
   }
 
@@ -113,7 +112,6 @@ public class CommunicationController
    */
   public void setReceiver(ReceiveController receiver)
   {
-    this.objReceiver.disconnectFromBroker();
     this.objReceiver = receiver;
   }
 

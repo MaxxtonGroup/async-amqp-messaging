@@ -17,7 +17,6 @@ public class Messenger
 
   private Resources objResources;
   private CommunicationController objCommunication;
-  private boolean bIsAlive;
 
   /**
    * Constructor for the Messenger class.
@@ -27,12 +26,13 @@ public class Messenger
    */
   public Messenger(String messengerName)
   {
-    this.objResources = new Resources();
-    this.objResources.getHost().setMessengerName(messengerName);
+    Resources resources = new Resources();
+    resources.getHost().setMessengerName(messengerName);
     // TODO : setup + initialize the resources.
+    this.setResources(resources);
 
-    this.objCommunication = new CommunicationController(objResources);
-    this.bIsAlive = true;
+    CommunicationController controller = new CommunicationController(this.getResources());
+    this.setCommunication(controller);
   }
 
   /**
@@ -101,48 +101,6 @@ public class Messenger
   }
 
   /**
-   * Closes the connection to the broker.
-   */
-  private void closeConnection()
-  {
-    SendController sender = this.objCommunication.getSender();
-    ReceiveController receiver = this.objCommunication.getReceiver();
-    sender.disconnectFromBroker();
-    receiver.disconnectFromBroker();
-  }
-
-  /**
-   * Destroys this messenger object.
-   * 
-   * @param deleteBrokerData
-   *          should the data available on the queue be deleted. True is yes and false is no.
-   */
-  public void destroy(boolean deleteBrokerData)
-  {
-    if (deleteBrokerData)
-    {
-      SendController sender = this.objCommunication.getSender();
-      if (sender.doesReceiverExist(objResources.getHost().getMessengerName()))
-      {
-        ReceiveController receiver = this.objCommunication.getReceiver();
-        receiver.deleteBrokerData();
-      }
-    }
-    this.closeConnection();
-    this.bIsAlive = false;
-  }
-
-  /**
-   * Check if this Messenger instance isn't destroyed.
-   * 
-   * @return true if alive, false if destroyed.
-   */
-  public boolean checkAliveness()
-  {
-    return this.bIsAlive;
-  }
-
-  /**
    * Load a custom configuration to override the default one.
    * 
    * @param configFile
@@ -159,7 +117,7 @@ public class Messenger
    * @param resources
    *          an instance of the Resources class.
    */
-  public void setResources(Resources resources)
+  private void setResources(Resources resources)
   {
     this.objResources = resources;
   }
@@ -180,9 +138,8 @@ public class Messenger
    * @param communication
    *          an instance of the CommunicationController.
    */
-  public void setCommunication(CommunicationController communication)
+  private void setCommunication(CommunicationController communication)
   {
-    this.closeConnection();
     this.objCommunication = communication;
   }
 

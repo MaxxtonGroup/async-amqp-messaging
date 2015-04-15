@@ -32,8 +32,11 @@ public class DataContainerTests
   @Before
   public void setup()
   {
-    objContainer = DataContainer.getInstance("test");
-    assertNotNull("The datacontainer cannot be Null", objContainer);
+    if (this.objContainer == null)
+    {
+      this.objContainer = DataContainer.getInstance("test");
+      assertNotNull("The datacontainer cannot be Null", this.objContainer);
+    }
   }
 
   /**
@@ -53,8 +56,8 @@ public class DataContainerTests
     DataContainer dataContainerSame = DataContainer.getInstance("test");
     assertNotNull("The datacontainer cannot be Null", dataContainerSame);
 
-    assertEquals("The datacontainer instances are not the same.", objContainer, dataContainerSame);
-    assertNotEquals("The datacontainer instances are not different.", objContainer, dataContainerOther);
+    assertEquals("The datacontainer instances are not the same.", this.objContainer, dataContainerSame);
+    assertNotEquals("The datacontainer instances are not different.", this.objContainer, dataContainerOther);
 
     System.out.println("done.");
   }
@@ -70,7 +73,7 @@ public class DataContainerTests
   {
     System.out.print("DataContainer : Testing generation of random id...");
 
-    String id = objContainer.getUniqueId();
+    String id = this.objContainer.getUniqueId();
     assertNotNull("The unique id given cannot be Null", id);
     assertNotEquals("The unique id given cannot be empty", id, "");
 
@@ -94,16 +97,16 @@ public class DataContainerTests
     ids.add(idOne);
     ids.add(idTwo);
 
-    objContainer.setIdentifiers(ids);
+    this.objContainer.setIdentifiers(ids);
 
-    boolean owned = objContainer.isOwnedByMe(idOne);
+    boolean owned = this.objContainer.isOwnedByMe(idOne);
     assertTrue("The id should be owned by the datacontainer class.", owned);
 
-    owned = objContainer.isOwnedByMe(idTwo);
+    owned = this.objContainer.isOwnedByMe(idTwo);
     assertTrue("The id should be owned by the datacontainer class.", owned);
 
     String idThree = "1029384756";
-    owned = objContainer.isOwnedByMe(idThree);
+    owned = this.objContainer.isOwnedByMe(idThree);
     assertFalse("The id should not be owned by the datacontainer class.", owned);
 
     System.out.println("done.");
@@ -124,13 +127,13 @@ public class DataContainerTests
     Set<String> alterIds = new HashSet<String>();
     for (int i = 0; i < 10; i++)
     {
-      String uuid = objContainer.getUniqueId();
+      String uuid = this.objContainer.getUniqueId();
       ids.add(uuid);
       alterIds.add(uuid);
     }
 
-    objContainer.setIdentifiers(ids);
-    Set<String> idsOther = objContainer.getIdentifiers();
+    this.objContainer.setIdentifiers(ids);
+    Set<String> idsOther = this.objContainer.getIdentifiers();
 
     assertNotNull("The set with identifiers cannot be Null", idsOther);
     assertEquals("The sets with ids are not the same.", ids, idsOther);
@@ -139,9 +142,9 @@ public class DataContainerTests
     Iterator<String> iterator = ids.iterator();
 
     String removedId = iterator.next();
-    objContainer.removeId(removedId);
+    this.objContainer.removeId(removedId);
 
-    idsOther = objContainer.getIdentifiers();
+    idsOther = this.objContainer.getIdentifiers();
 
     assertNotNull("The set with identifiers cannot be Null", idsOther);
     assertNotEquals("The sets with identifiers are not the same.", alterIds, idsOther);
@@ -166,19 +169,19 @@ public class DataContainerTests
     Message msgOne = new Message("Hello First World".getBytes(), new MessageProperties());
     Message msgTwo = new Message("Hello Second World".getBytes(), new MessageProperties());
 
-    objContainer.addSendMessage(msgOne);
-    objContainer.addSendMessage(msgTwo);
+    this.objContainer.addSendMessage(msgOne);
+    this.objContainer.addSendMessage(msgTwo);
 
     Set<Message> sendMessages = new HashSet<Message>();
     sendMessages.add(msgOne);
     sendMessages.add(msgTwo);
 
-    Set<Message> otherMessages = objContainer.getSendMessages();
+    Set<Message> otherMessages = this.objContainer.getSendMessages();
 
     assertNotNull("The set with message cannot be Null.", otherMessages);
     assertEquals("The sets with messages where not the same.", otherMessages, sendMessages);
 
-    objContainer.removeSendMessage(msgOne);
+    this.objContainer.removeSendMessage(msgOne);
     assertNotEquals("The sets with messages cannot be the same.", otherMessages, sendMessages);
 
     sendMessages.remove(msgOne);
@@ -201,19 +204,19 @@ public class DataContainerTests
     Message msgOne = new Message("Hello First World".getBytes(), new MessageProperties());
     Message msgTwo = new Message("Hello Second World".getBytes(), new MessageProperties());
 
-    objContainer.addReceivedMessage(msgOne);
-    objContainer.addReceivedMessage(msgTwo);
+    this.objContainer.addReceivedMessage(msgOne);
+    this.objContainer.addReceivedMessage(msgTwo);
 
     Set<Message> receivedMessages = new HashSet<Message>();
     receivedMessages.add(msgOne);
     receivedMessages.add(msgTwo);
 
-    Set<Message> otherMessages = objContainer.getReceivedMessages();
+    Set<Message> otherMessages = this.objContainer.getReceivedMessages();
 
     assertNotNull("The set with message cannot be Null.", otherMessages);
     assertEquals("The sets with messages where not the same.", otherMessages, receivedMessages);
 
-    objContainer.removeReceivedMessage(msgOne);
+    this.objContainer.removeReceivedMessage(msgOne);
     assertNotEquals("The sets with messages cannot be the same.", otherMessages, receivedMessages);
 
     receivedMessages.remove(msgOne);
@@ -236,19 +239,19 @@ public class DataContainerTests
     Message msgOne = new Message("Hello First World".getBytes(), new MessageProperties());
     Message msgTwo = new Message("Hello Second World".getBytes(), new MessageProperties());
 
-    objContainer.addOddMessage(msgOne);
-    objContainer.addOddMessage(msgTwo);
+    this.objContainer.addOddMessage(msgOne);
+    this.objContainer.addOddMessage(msgTwo);
 
     Set<Message> oddMessages = new HashSet<Message>();
     oddMessages.add(msgOne);
     oddMessages.add(msgTwo);
 
-    Set<Message> otherMessages = objContainer.getOddMessages();
+    Set<Message> otherMessages = this.objContainer.getOddMessages();
 
     assertNotNull("The set with message cannot be Null.", otherMessages);
     assertEquals("The sets with messages where not the same.", otherMessages, oddMessages);
 
-    objContainer.removeOddMessage(msgOne);
+    this.objContainer.removeOddMessage(msgOne);
     assertNotEquals("The sets with messages cannot be the same.", otherMessages, oddMessages);
 
     oddMessages.remove(msgOne);
@@ -262,7 +265,7 @@ public class DataContainerTests
   {
     System.out.print("DataContainer : Testing getter for name...");
 
-    String name = objContainer.getName();
+    String name = this.objContainer.getName();
     assertEquals("The datacontainer's name was not the same as set.", name, "test");
 
     assertNotEquals("The datacontainer's name should not match given name", name, "other");
@@ -276,7 +279,7 @@ public class DataContainerTests
   @After
   public void cleanup()
   {
-    objContainer.destroy();
+    this.objContainer.destroy();
   }
 
 }
