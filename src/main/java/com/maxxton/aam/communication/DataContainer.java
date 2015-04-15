@@ -19,6 +19,7 @@ public class DataContainer
 {
   private static Map<String, DataContainer> mInstances = new HashMap<String, DataContainer>();
 
+  private String sName;
   private Set<String> seIdentifiers;
   private Set<Message> seSendMessages;
   private Set<Message> seReceivedMessages;
@@ -54,11 +55,46 @@ public class DataContainer
         if (container == null)
         {
           container = new DataContainer();
+          container.setName(key);
           mInstances.put(key, container);
         }
       }
     }
     return container;
+  }
+
+  /**
+   * Destroys the DataContainer object and all it's data.
+   */
+  public void destroy()
+  {
+    this.seIdentifiers = new HashSet<String>();
+    this.seSendMessages = new HashSet<Message>();
+    this.seReceivedMessages = new HashSet<Message>();
+    this.seOddMessages = new HashSet<Message>();
+
+    mInstances.remove(this.sName);
+  }
+
+  /**
+   * Sets the name of this DataContainer instance.
+   *
+   * @param name
+   *          the name of this DataContainer
+   */
+  private void setName(String name)
+  {
+    this.sName = name;
+  }
+
+  /**
+   * Gets the name of this DataContainer instance.
+   *
+   * @return the name of this DataContainer instance.
+   */
+  public String getName()
+  {
+    return this.sName;
   }
 
   /**
@@ -247,7 +283,7 @@ public class DataContainer
         String messageId = (String) MessageSerializer.deserialize(message.getMessageProperties().getCorrelationId());
         if (messageId.equals(id))
         {
-          this.seSendMessages.remove(message);
+          this.seReceivedMessages.remove(message);
         }
       }
     }

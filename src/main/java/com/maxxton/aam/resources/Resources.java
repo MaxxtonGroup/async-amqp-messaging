@@ -9,7 +9,7 @@ package com.maxxton.aam.resources;
 public class Resources
 {
   private Host objHost;
-  
+
   /**
    * Constructor for the Resources class.
    */

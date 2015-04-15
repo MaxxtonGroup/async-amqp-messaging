@@ -67,7 +67,7 @@ public class SendController
    */
   public boolean doesReceiverExist(String receiver)
   {
-    if(objTemplate != null)
+    if (objTemplate != null)
     {
       return objTemplate.execute(new ChannelCallback<DeclareOk>()
       {

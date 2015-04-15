@@ -115,7 +115,7 @@ public class MessengerTests
     sender.destroy(false);
 
     Messenger receiver = new Messenger("other");
-    
+
     Thread.sleep(50);
 
     String msg = (String) receiver.receiveMessage();

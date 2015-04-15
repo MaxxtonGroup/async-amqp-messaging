@@ -122,7 +122,7 @@ public class Messenger
     if (deleteBrokerData)
     {
       SendController sender = this.objCommunication.getSender();
-      if(sender.doesReceiverExist(objResources.getHost().getMessengerName()))
+      if (sender.doesReceiverExist(objResources.getHost().getMessengerName()))
       {
         ReceiveController receiver = this.objCommunication.getReceiver();
         receiver.deleteBrokerData();
