@@ -76,12 +76,14 @@ public class Messenger
   /**
    * Checks if there are any message stored in the DataContainer. Returns BaseMessage on true and null on false.
    * 
+   * @param millis
+   *          timeout given in milliseconds.
    * @return an instance of the BaseMessage class.
    */
   // TODO : create generic type to support passing the more relevant data.
-  public Object receiveMessage()
+  public Object receiveMessage(long millis)
   {
-    BaseMessage message = this.objCommunication.unpackAndReceive();
+    BaseMessage message = this.objCommunication.unpackAndReceive(millis);
     if (message != null)
     {
       return message.getPayload();

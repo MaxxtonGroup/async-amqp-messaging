@@ -1,11 +1,15 @@
-package com.maxxton.aam.communication;
+package com.maxxton.test.communication;
 
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import com.maxxton.aam.communication.CommunicationController;
+import com.maxxton.aam.communication.ReceiveController;
+import com.maxxton.aam.communication.SendController;
 import com.maxxton.aam.messages.BaseMessage;
 import com.maxxton.aam.messages.GenerateMessage;
 import com.maxxton.aam.resources.Resources;
@@ -31,7 +35,7 @@ public class CommunicationControllerTests
   @Before
   public void setup()
   {
-    if (objCommunication == null)
+    if (this.objCommunication == null)
     {
       this.objResources = new Resources();
       this.objResources.getHost().setMessengerName("test");
@@ -91,18 +95,16 @@ public class CommunicationControllerTests
   public void testSendAndReceive() throws Exception
   {
     System.out.print("CommunicationController : Testing sending and receiving a message...");
+    
+    Resources objResourcesOther = new Resources();
+    objResourcesOther.getHost().setMessengerName("other");
+    CommunicationController comControllerOther = new CommunicationController(objResourcesOther);
 
     BaseMessage msgTest = new GenerateMessage();
     msgTest.setPayload("Hello World");
     this.objCommunication.packAndSend("other", msgTest);
 
-    Resources objResourcesOther = new Resources();
-    objResourcesOther.getHost().setMessengerName("other");
-    CommunicationController comControllerOther = new CommunicationController(objResourcesOther);
-
-    Thread.sleep(500);
-
-    BaseMessage msgOther = comControllerOther.unpackAndReceive();
+    BaseMessage msgOther = comControllerOther.unpackAndReceive(1500);
 
     assertEquals("The GenerateMessage instances are not the same.", msgTest, msgOther);
 
@@ -112,8 +114,8 @@ public class CommunicationControllerTests
   /**
    * Static method called after running the test to cleanup.
    */
-  @AfterClass
-  public static void cleanup()
+  @After
+  public void cleanup()
   {
     // TODO : cleanup queues and close connection.
   }

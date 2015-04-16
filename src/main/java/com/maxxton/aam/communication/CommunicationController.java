@@ -35,11 +35,13 @@ public class CommunicationController
   /**
    * Poll for a message from the ReceiveController. In case there is one, unpack it and return it. Returns null if no message is available.
    * 
+   * @param millis
+   *          timeout given in milliseconds.
    * @return an unpacked instance which inherits BaseMessage.
    */
-  public BaseMessage unpackAndReceive()
+  public BaseMessage unpackAndReceive(long millis)
   {
-    Message message = this.objReceiver.receiveMessage();
+    Message message = this.objReceiver.receiveMessage(millis);
     if (message != null)
     {
       BaseMessage baseMessage = (BaseMessage) MessageSerializer.deserialize(message.getBody());

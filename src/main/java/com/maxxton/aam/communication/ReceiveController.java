@@ -100,11 +100,42 @@ public class ReceiveController implements MessageListener
   /**
    * Get the oldest message available from the DataContainer.
    * 
-   * @return Message The received message
+   * @param millis
+   *          timeout given in milliseconds.
+   * @return The received message
    */
-  public Message receiveMessage()
+  public Message receiveMessage(long millis)
   {
     Message message = this.objContainer.popReceivedMessage();
+    while (message == null && millis > 0)
+    {
+      long modulo = millis % 100;
+      if (modulo > 0)
+      {
+        millis = millis - modulo;
+        try
+        {
+          Thread.sleep(modulo);
+        }
+        catch (InterruptedException e)
+        {
+          e.printStackTrace();
+        }
+      }
+      else
+      {
+        millis = millis - 100;
+        try
+        {
+          Thread.sleep(100);
+        }
+        catch (InterruptedException e)
+        {
+          e.printStackTrace();
+        }
+      }
+      message = this.objContainer.popReceivedMessage();
+    }
     return message;
   }
 

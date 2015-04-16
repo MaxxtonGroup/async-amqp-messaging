@@ -1,4 +1,4 @@
-package com.maxxton.aam.communication;
+package com.maxxton.test.communication;
 
 import org.junit.After;
 import org.junit.Before;
@@ -10,6 +10,10 @@ import org.springframework.amqp.core.MessageProperties;
 
 import static org.junit.Assert.*;
 
+import com.maxxton.aam.communication.DataContainer;
+import com.maxxton.aam.communication.MessageSerializer;
+import com.maxxton.aam.communication.ReceiveController;
+import com.maxxton.aam.communication.SendController;
 import com.maxxton.aam.messages.BaseMessage;
 import com.maxxton.aam.messages.GenerateMessage;
 import com.maxxton.aam.resources.Resources;
@@ -64,7 +68,7 @@ public class SendControllerTests
     assertTrue("The other receiving instance should exist.", exists);
 
     exists = objController.doesReceiverExist("none");
-    assertFalse("The other receiving instance should exist.", exists);
+    assertFalse("The other receiving instance not should exist.", exists);
 
     System.out.println("done.");
   }

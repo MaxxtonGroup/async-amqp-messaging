@@ -1,10 +1,13 @@
-package com.maxxton.aam.communication;
+package com.maxxton.test.communication;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+
+import com.maxxton.aam.communication.MessagingFactory;
+import com.maxxton.aam.communication.Messenger;
 
 import static org.junit.Assert.*;
 

@@ -1,4 +1,4 @@
-package com.maxxton.aam.communication;
+package com.maxxton.test.communication;
 
 import static org.junit.Assert.*;
 
@@ -7,6 +7,8 @@ import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+
+import com.maxxton.aam.communication.MessageSerializer;
 
 /**
  * Run a list of test against the MessageSerializer class.

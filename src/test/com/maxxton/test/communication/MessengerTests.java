@@ -1,4 +1,4 @@
-package com.maxxton.aam.communication;
+package com.maxxton.test.communication;
 
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -6,6 +6,8 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import com.maxxton.aam.communication.CommunicationController;
+import com.maxxton.aam.communication.Messenger;
 import com.maxxton.aam.resources.Resources;
 
 import static org.junit.Assert.*;
@@ -82,9 +84,7 @@ public class MessengerTests
 
     Messenger receiver = new Messenger("other");
 
-    Thread.sleep(500);
-
-    String msg = (String) receiver.receiveMessage();
+    String msg = (String) receiver.receiveMessage(1000);
 
     assertNotNull("No message has been received.", msg);
 
