@@ -50,7 +50,7 @@ public class SendControllerTests
    *           reason of failure given by the test.
    */
   @Test
-  public void testReceiverexists() throws Exception
+  public void testReceiverExists() throws Exception
   {
     System.out.print("SendController : Testing receiver exists method...");
 
@@ -70,7 +70,7 @@ public class SendControllerTests
   }
 
   /**
-   * Test the send and receive method for messages.
+   * Test the send method for messages.
    *
    * @throws Exception
    *           reason of failure given by the test.
@@ -113,6 +113,11 @@ public class SendControllerTests
     String uuid = this.objController.generateUniqueId();
     assertNotNull("The unique identifier cannot be null.", uuid);
 
+    String otherUuid = this.objController.generateUniqueId();
+    assertNotNull("The unique identifier cannot be null.", otherUuid);
+
+    assertNotEquals("The unique identigiers cannot be the same.", uuid, otherUuid);
+
     System.out.println("done.");
   }
 
@@ -152,6 +157,18 @@ public class SendControllerTests
   public void testResources() throws Exception
   {
     System.out.print("SendController : Testing getter and setter for the resources instance...");
+
+    Resources testResources = this.objController.getResources();
+    assertNotNull("The resources instance cannot be null.", testResources);
+
+    Resources otherResources = new Resources();
+    this.objController.setResources(otherResources);
+
+    Resources sameResources = this.objController.getResources();
+    assertNotNull("The resources instance cannot be null.", sameResources);
+
+    assertNotEquals("The resource instances should not be the same", testResources, sameResources);
+    assertEquals("The resource instances should be the same.", otherResources, sameResources);
 
     System.out.println("done.");
   }

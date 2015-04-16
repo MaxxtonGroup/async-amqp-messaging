@@ -35,8 +35,6 @@ public class SendController
 
     this.connectToBroker();
     this.objTemplate = new RabbitTemplate(this.objConnection);
-    this.objTemplate.setExchange("amq.direct");
-    this.objTemplate.setRoutingKey(this.objResources.getHost().getMessengerName() + ".route");
   }
 
   /**
