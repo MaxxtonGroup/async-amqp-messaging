@@ -1,5 +1,11 @@
 package com.maxxton.test.communication;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -13,8 +19,6 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 
 import com.maxxton.aam.communication.DataContainer;
-
-import static org.junit.Assert.*;
 
 /**
  * Run a list of tests against the DataContainer class.

@@ -1,5 +1,9 @@
 package com.maxxton.test.communication;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -8,8 +12,6 @@ import org.junit.runners.MethodSorters;
 
 import com.maxxton.aam.communication.MessagingFactory;
 import com.maxxton.aam.communication.Messenger;
-
-import static org.junit.Assert.*;
 
 /**
  * Run a list of tests against the MessagingFactory class.

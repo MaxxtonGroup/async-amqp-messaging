@@ -1,7 +1,9 @@
 package com.maxxton.test.communication;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -13,8 +15,6 @@ import com.maxxton.aam.communication.SendController;
 import com.maxxton.aam.messages.BaseMessage;
 import com.maxxton.aam.messages.GenerateMessage;
 import com.maxxton.aam.resources.Resources;
-
-import static org.junit.Assert.*;
 
 /**
  * Run a list of tests against the CommuncationController class.
@@ -95,7 +95,7 @@ public class CommunicationControllerTests
   public void testSendAndReceive() throws Exception
   {
     System.out.print("CommunicationController : Testing sending and receiving a message...");
-    
+
     Resources objResourcesOther = new Resources();
     objResourcesOther.getHost().setMessengerName("other");
     CommunicationController comControllerOther = new CommunicationController(objResourcesOther);
