@@ -6,7 +6,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
