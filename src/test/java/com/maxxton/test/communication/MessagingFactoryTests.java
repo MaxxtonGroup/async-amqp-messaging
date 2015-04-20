@@ -75,7 +75,7 @@ public class MessagingFactoryTests
 
     Messenger sameMsgr = objMessageFactory.createMessenger("test");
     assertNotNull("The same messenger cannot be NULL.", sameMsgr);
-    
+
     Messenger notAllowedName = objMessageFactory.createMessenger("a1.3'34lsad39)(");
     assertNull("The messenger has a not allowed name and should not be created.", notAllowedName);
 

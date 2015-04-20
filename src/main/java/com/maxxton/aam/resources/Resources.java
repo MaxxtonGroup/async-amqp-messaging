@@ -17,9 +17,17 @@ public class Resources
    */
   public Resources()
   {
-    this.objHost = new Host();
-    this.objMessageFactory = new MessageFactory();
-    this.objMonitor = new Monitor();
+    Host host = new Host();
+    // TODO : Configure Host
+    this.setHost(host);
+
+    MessageFactory messageFactory = new MessageFactory();
+    // TODO : Configure MessageFactory
+    this.setMessageFactory(messageFactory);
+
+    Monitor monitor = new Monitor();
+    // TODO : Configure Monitor
+    this.setMonitor(monitor);
   }
 
   /**
@@ -33,6 +41,17 @@ public class Resources
   }
 
   /**
+   * Sets the Host instance.
+   *
+   * @param host
+   *          instance of the Host class.
+   */
+  private void setHost(Host host)
+  {
+    this.objHost = host;
+  }
+
+  /**
    * Gets the MessagingFactory class.
    *
    * @return an instance of the MessageFactory class.
@@ -43,6 +62,17 @@ public class Resources
   }
 
   /**
+   * Sets the MessageFactory instance.
+   *
+   * @param messageFactory
+   *          instance of the MessageFactory class.
+   */
+  private void setMessageFactory(MessageFactory messageFactory)
+  {
+    this.objMessageFactory = messageFactory;
+  }
+
+  /**
    * Gets the Monitor class.
    *
    * @return an instance of the Monitor class.
@@ -50,5 +80,16 @@ public class Resources
   public Monitor getMonitor()
   {
     return this.objMonitor;
+  }
+
+  /**
+   * Sets the Monitor class.
+   *
+   * @param monitor
+   *          instance of the Monitor class.
+   */
+  private void setMonitor(Monitor monitor)
+  {
+    this.objMonitor = monitor;
   }
 }
