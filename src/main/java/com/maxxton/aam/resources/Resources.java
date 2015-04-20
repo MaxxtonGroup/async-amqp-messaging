@@ -9,6 +9,8 @@ package com.maxxton.aam.resources;
 public class Resources
 {
   private Host objHost;
+  private MessageFactory objMessageFactory;
+  private Monitor objMonitor;
 
   /**
    * Constructor for the Resources class.
@@ -16,6 +18,8 @@ public class Resources
   public Resources()
   {
     this.objHost = new Host();
+    this.objMessageFactory = new MessageFactory();
+    this.objMonitor = new Monitor();
   }
 
   /**
@@ -26,5 +30,25 @@ public class Resources
   public Host getHost()
   {
     return this.objHost;
+  }
+
+  /**
+   * Gets the MessagingFactory class.
+   *
+   * @return an instance of the MessageFactory class.
+   */
+  public MessageFactory getMessageFactory()
+  {
+    return this.objMessageFactory;
+  }
+
+  /**
+   * Gets the Monitor class.
+   *
+   * @return an instance of the Monitor class.
+   */
+  public Monitor getMonitor()
+  {
+    return this.objMonitor;
   }
 }

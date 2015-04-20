@@ -25,8 +25,9 @@ All are listed below.
 
 | Name          | Version        |
 | ------------- |:--------------:|
-| Spring Rabbit | 1.4.3.RELEASED |
+| Spring Rabbit | 1.4.3.RELEASE  |
 | SLF4J API     | 1.7.10         |
+| JUnit			| RELEASE        |
 
 Throughout the development of the project this list may grow.
 
@@ -35,13 +36,13 @@ Installation
 There are two ways to install and configure the library to work for your project.
 One uses the JAR file specified in the release and the other one the source code.
 
-### Option One
+##### Option One
 * Download the jar file from [the latest release](https://github.com/MaxxtonGroup/async-amqp-messaging/releases).
 * In Eclipse right click your project and select **Properties**.
 * Goto **Java Build Path** and select the tab **Libraries**.
 * Click **Add External JARs** and locate the previously downloaded JAR file. (Moving the file in your project space is recommended).
 
-### Option Two
+##### Option Two
 * Clone the project using a Git tool or download the sources ZIP file.
 * Unpack the sources and place them where you like.
 * Right click the **Package Explorer**.

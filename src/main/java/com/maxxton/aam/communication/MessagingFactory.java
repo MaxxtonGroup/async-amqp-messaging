@@ -53,15 +53,18 @@ public class MessagingFactory
    */
   public Messenger createMessenger(String name)
   {
-    Messenger messenger;
-    if (this.mMessengerMap.containsKey(name))
+    Messenger messenger = null;
+    if(name.matches("[a-zA-Z]+"))
     {
-      messenger = this.mMessengerMap.get(name.toLowerCase());
-    }
-    else
-    {
-      messenger = new Messenger(name.toLowerCase());
-      this.mMessengerMap.put(name.toLowerCase(), messenger);
+       if (this.mMessengerMap.containsKey(name))
+      {
+        messenger = this.mMessengerMap.get(name.toLowerCase());
+      }
+      else
+      {
+        messenger = new Messenger(name.toLowerCase());
+        this.mMessengerMap.put(name.toLowerCase(), messenger);
+      }
     }
     return messenger;
   }

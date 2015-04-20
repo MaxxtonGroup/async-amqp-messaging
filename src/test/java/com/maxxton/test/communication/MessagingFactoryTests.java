@@ -1,9 +1,6 @@
 package com.maxxton.test.communication;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-
+import static org.junit.Assert.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -78,6 +75,9 @@ public class MessagingFactoryTests
 
     Messenger sameMsgr = objMessageFactory.createMessenger("test");
     assertNotNull("The same messenger cannot be NULL.", sameMsgr);
+    
+    Messenger notAllowedName = objMessageFactory.createMessenger("a1.3'34lsad39)(");
+    assertNull("The messenger has a not allowed name and should not be created.", notAllowedName);
 
     assertEquals("The instances returned by the creational method are not the same.", msgr, sameMsgr);
 
