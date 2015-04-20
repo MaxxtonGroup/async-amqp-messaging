@@ -305,16 +305,24 @@ public class DataContainer
    */
   public void removeReceivedMessageById(String id)
   {
-    for (Message message : this.seReceivedMessages)
+    this.rwReceivedLock.readLock().lock();
+    try
     {
-      if (message.getMessageProperties().getCorrelationId() != null && message.getMessageProperties().getCorrelationId().length > 0)
+      for (Message message : this.seReceivedMessages)
       {
-        String messageId = (String) MessageSerializer.deserialize(message.getMessageProperties().getCorrelationId());
-        if (messageId.equals(id))
+        if (message.getMessageProperties().getCorrelationId() != null && message.getMessageProperties().getCorrelationId().length > 0)
         {
-          this.seReceivedMessages.remove(message);
+          String messageId = (String) MessageSerializer.deserialize(message.getMessageProperties().getCorrelationId());
+          if (messageId.equals(id))
+          {
+            this.removeReceivedMessage(message);
+          }
         }
       }
+    }
+    finally
+    {
+      this.rwReceivedLock.readLock().unlock();
     }
   }
 
@@ -326,7 +334,15 @@ public class DataContainer
    */
   public void setReceivedMessages(Set<Message> messages)
   {
-    this.seReceivedMessages = messages;
+    this.rwReceivedLock.writeLock().lock();
+    try
+    {
+      this.seReceivedMessages = messages;
+    }
+    finally
+    {
+      this.rwReceivedLock.writeLock().unlock();
+    }
   }
 
   /**
@@ -336,7 +352,15 @@ public class DataContainer
    */
   public Set<Message> getReceivedMessages()
   {
-    return this.seReceivedMessages;
+    this.rwReceivedLock.readLock().lock();
+    try
+    {
+      return this.seReceivedMessages;
+    }
+    finally
+    {
+      this.rwReceivedLock.readLock().unlock();
+    }
   }
 
   /**
