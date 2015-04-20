@@ -19,7 +19,7 @@ import org.springframework.amqp.core.Message;
 public class DataContainer
 {
   private static Map<String, DataContainer> mInstances = new HashMap<String, DataContainer>();
-  
+
   private final ReentrantReadWriteLock rwReceivedLock = new ReentrantReadWriteLock(true);
 
   private String sName;
@@ -258,7 +258,7 @@ public class DataContainer
    * @return the oldest message from the array
    */
   public Message popReceivedMessage()
-  { 
+  {
     this.rwReceivedLock.readLock().lock();
     Message message = null;
     try
@@ -273,7 +273,7 @@ public class DataContainer
     {
       this.rwReceivedLock.readLock().unlock();
     }
-    
+
     this.removeReceivedMessage(message);
     return message;
   }
@@ -285,7 +285,7 @@ public class DataContainer
    *          the Message object.
    */
   public void removeReceivedMessage(Message message)
-  { 
+  {
     this.rwReceivedLock.writeLock().lock();
     try
     {
