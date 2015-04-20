@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.springframework.amqp.core.Message;
 
@@ -18,6 +19,8 @@ import org.springframework.amqp.core.Message;
 public class DataContainer
 {
   private static Map<String, DataContainer> mInstances = new HashMap<String, DataContainer>();
+  
+  private final ReentrantReadWriteLock rwReceivedLock = new ReentrantReadWriteLock(true);
 
   private String sName;
   private Set<String> seIdentifiers;
@@ -168,6 +171,7 @@ public class DataContainer
    */
   public void addSendMessage(Message message)
   {
+    // TODO : Fix overflowing send messages Set!
     this.seSendMessages.add(message);
     if (message.getMessageProperties().getCorrelationId() != null && message.getMessageProperties().getCorrelationId().length > 0)
     {
@@ -236,8 +240,16 @@ public class DataContainer
    */
   public void addReceivedMessage(Message message)
   {
-    // TODO : Make sure that messages which the same correlationId override each other
-    this.seReceivedMessages.add(message);
+    this.rwReceivedLock.writeLock().lock();
+    try
+    {
+      // TODO : Make sure that messages which the same correlationId override each other
+      this.seReceivedMessages.add(message);
+    }
+    finally
+    {
+      this.rwReceivedLock.writeLock().unlock();
+    }
   }
 
   /**
@@ -246,14 +258,23 @@ public class DataContainer
    * @return the oldest message from the array
    */
   public Message popReceivedMessage()
-  {
-    Iterator<Message> it = this.seReceivedMessages.iterator();
+  { 
+    this.rwReceivedLock.readLock().lock();
     Message message = null;
-    while (it.hasNext())
+    try
     {
-      message = (Message) it.next();
+      Iterator<Message> it = this.seReceivedMessages.iterator();
+      while (it.hasNext())
+      {
+        message = (Message) it.next();
+      }
     }
-    this.seReceivedMessages.remove(message);
+    finally
+    {
+      this.rwReceivedLock.readLock().unlock();
+    }
+    
+    this.removeReceivedMessage(message);
     return message;
   }
 
@@ -264,8 +285,16 @@ public class DataContainer
    *          the Message object.
    */
   public void removeReceivedMessage(Message message)
-  {
-    this.seReceivedMessages.remove(message);
+  { 
+    this.rwReceivedLock.writeLock().lock();
+    try
+    {
+      this.seReceivedMessages.remove(message);
+    }
+    finally
+    {
+      this.rwReceivedLock.writeLock().unlock();
+    }
   }
 
   /**
