@@ -1,7 +1,6 @@
 package com.maxxton.aam.communication;
 
 import com.maxxton.aam.messages.BaseMessage;
-import com.maxxton.aam.messages.GenerationMessage;
 import com.maxxton.aam.messages.MessageType;
 import com.maxxton.aam.resources.Callback;
 import com.maxxton.aam.resources.MessageFactory;
