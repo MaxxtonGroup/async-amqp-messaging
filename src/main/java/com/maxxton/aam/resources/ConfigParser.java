@@ -1,6 +1,9 @@
 package com.maxxton.aam.resources;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
 
 /**
  * ConfigParser class Used by multiple classes to load configuration files. Contains mostly static classes as it is a utility class.
@@ -16,19 +19,17 @@ public class ConfigParser
    * @param sFile
    *          path to the configuration file
    */
-  public static void parseConfig(String sFile)
+  public static Properties parseConfig(String sFile)
   {
     File objFile = new File(sFile);
-    if (objFile.exists() && !objFile.isDirectory())
+    if (!objFile.isDirectory() && objFile.exists())
     {
       switch (ConfigParser.getExtension(sFile))
       {
         case "properties":
-          ConfigParser.parseProperties(objFile);
-          break;
+          return ConfigParser.parseProperties(objFile);
         case "xml":
-          ConfigParser.parseXml(objFile);
-          break;
+          return ConfigParser.parseXml(objFile);
         default:
           // TODO : Notify through logger that the configuration file given is unsupported.
           break;
@@ -36,8 +37,9 @@ public class ConfigParser
     }
     else
     {
-      // TODO : Notify through logger that the configuration file given is unsupported.
+      // TODO : Notify through logger that the configuration file given is invalid.
     }
+    return null;
   }
 
   /**
@@ -62,10 +64,22 @@ public class ConfigParser
    *
    * @param objFile
    *          configuration file to be parsed.
+   * @return
    */
-  private static void parseProperties(File objFile)
+  private static Properties parseProperties(File objFile)
   {
-
+    try
+    {
+      Properties properties = new Properties();
+      properties.load(new FileInputStream(objFile));
+      return properties;
+    }
+    catch (IOException e)
+    {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    return null;
   }
 
   /**
@@ -73,9 +87,21 @@ public class ConfigParser
    *
    * @param objFile
    *          configuration file to be parsed.
+   * @return
    */
-  private static void parseXml(File objFile)
+  private static Properties parseXml(File objFile)
   {
-
+    try
+    {
+      Properties properties = new Properties();
+      properties.loadFromXML(new FileInputStream(objFile));
+      return properties;
+    }
+    catch (IOException e)
+    {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    return null;
   }
 }

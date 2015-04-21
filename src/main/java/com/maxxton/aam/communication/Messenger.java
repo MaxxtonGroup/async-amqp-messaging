@@ -27,7 +27,7 @@ public class Messenger
   public Messenger(String messengerName)
   {
     Resources resources = new Resources();
-    resources.getHost().setMessengerName(messengerName);
+    resources.getConfiguration().setName(messengerName);
     // TODO : setup + initialize the resources.
     this.setResources(resources);
 
@@ -67,9 +67,9 @@ public class Messenger
   public boolean sendMessage(MessageType messageType, String receiver, Object payload, String responseTo)
   {
     // TODO : request new message instance from MessageFactory by specifying the MessageType given.
-    
+
     BaseMessage message = MessageFactory.createMessage(messageType);
-    if(message != null)
+    if (message != null)
     {
       message.setPayload(payload);
       return this.objCommunication.packAndSend(receiver.toLowerCase(), message, responseTo);

@@ -40,7 +40,7 @@ public class ReceiveController implements MessageListener
   {
     // TODO : Change the key to the appropriate one as mentioned in the configuration class.
     this.objResources = resources;
-    this.objContainer = DataContainer.getInstance(this.objResources.getHost().getMessengerName());
+    this.objContainer = DataContainer.getInstance(this.objResources.getConfiguration().getName());
     this.objCallback = null;
 
     this.connectToBroker();
@@ -54,7 +54,7 @@ public class ReceiveController implements MessageListener
   private void configureQueue()
   {
     // TODO : change static defined name to dynamically declared configuration variable
-    String receiver = this.objResources.getHost().getMessengerName();
+    String receiver = this.objResources.getConfiguration().getName();
 
     objAdmin = new RabbitAdmin(this.objConnection);
     Queue queue = new Queue(receiver + ".queue", false, false, false);
@@ -71,7 +71,7 @@ public class ReceiveController implements MessageListener
   private SimpleMessageListenerContainer configureMessageListener()
   {
     // TODO : change static defined name to dynamically declared configuration variable
-    String receiver = this.objResources.getHost().getMessengerName();
+    String receiver = this.objResources.getConfiguration().getName();
 
     SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
     container.setConnectionFactory(this.objConnection);
@@ -89,10 +89,16 @@ public class ReceiveController implements MessageListener
   {
     if (this.objConnection == null)
     {
-      // TODO : change static information to dynamically loaded
-      this.objConnection = new CachingConnectionFactory("localhost");
-      this.objConnection.setUsername("username");
-      this.objConnection.setPassword("password");
+      this.objConnection = new CachingConnectionFactory();
+      String host = this.objResources.getConfiguration().getHost();
+      String addresses = "";
+      for (int port : this.objResources.getConfiguration().getPorts())
+      {
+        addresses = addresses + host + ":" + port + ",";
+      }
+      this.objConnection.setAddresses(addresses);
+      this.objConnection.setUsername(this.objResources.getConfiguration().getUsername());
+      this.objConnection.setPassword(this.objResources.getConfiguration().getPassword());
       this.objConnection.setChannelCacheSize(25);
     }
   }

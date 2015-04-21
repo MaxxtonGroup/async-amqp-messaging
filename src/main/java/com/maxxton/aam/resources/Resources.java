@@ -8,7 +8,7 @@ package com.maxxton.aam.resources;
  */
 public class Resources
 {
-  private Host objHost;
+  private Configuration objConfiguration;
   private MessageFactory objMessageFactory;
   private Monitor objMonitor;
 
@@ -17,9 +17,9 @@ public class Resources
    */
   public Resources()
   {
-    Host host = new Host();
+    Configuration config = new Configuration();
     // TODO : Configure Host
-    this.setHost(host);
+    this.setConfiguration(config);
 
     MessageFactory messageFactory = new MessageFactory();
     // TODO : Configure MessageFactory
@@ -35,9 +35,9 @@ public class Resources
    * 
    * @return an instance of the Host class.
    */
-  public Host getHost()
+  public Configuration getConfiguration()
   {
-    return this.objHost;
+    return this.objConfiguration;
   }
 
   /**
@@ -46,9 +46,9 @@ public class Resources
    * @param host
    *          instance of the Host class.
    */
-  private void setHost(Host host)
+  private void setConfiguration(Configuration configuration)
   {
-    this.objHost = host;
+    this.objConfiguration = configuration;
   }
 
   /**

@@ -44,7 +44,7 @@ public class SendControllerTests
     if (objResources == null)
     {
       this.objResources = new Resources();
-      this.objResources.getHost().setMessengerName("test");
+      this.objResources.getConfiguration().setName("test");
       this.objController = new SendController(this.objResources);
 
       assertNotNull("The sendcontroller instance cannot be null.", this.objController);
@@ -63,7 +63,7 @@ public class SendControllerTests
     System.out.print("SendController : Testing receiver exists method...");
 
     Resources resources = new Resources();
-    resources.getHost().setMessengerName("other");
+    resources.getConfiguration().setName("other");
 
     ReceiveController otherSender = new ReceiveController(resources);
     assertNotNull("The other sendcontroller instance cannot be null.", otherSender);
@@ -89,7 +89,7 @@ public class SendControllerTests
     System.out.print("SendController : Testing sending a message...");
 
     Resources otherResources = new Resources();
-    otherResources.getHost().setMessengerName("other");
+    otherResources.getConfiguration().setName("other");
     new ReceiveController(otherResources);
 
     MessageProperties props = new MessageProperties();

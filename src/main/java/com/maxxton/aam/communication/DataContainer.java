@@ -210,20 +210,20 @@ public class DataContainer
    */
   public void addSendMessage(Message message)
   {
-//    TODO : find solution for overflowing send messages set (run thread that cleans periodically).
-//    this.rwSendLock.writeLock().lock();
-//    try
-//    {
-//      this.seSendMessages.add(message);
-//      if (message.getMessageProperties().getCorrelationId() != null && message.getMessageProperties().getCorrelationId().length > 0)
-//      {
-//        this.addIdentifier(message.getMessageProperties().getCorrelationId().toString());
-//      }
-//    }
-//    finally
-//    {
-//      this.rwSendLock.writeLock().unlock();
-//    }
+    // TODO : find solution for overflowing send messages set (run thread that cleans periodically).
+    // this.rwSendLock.writeLock().lock();
+    // try
+    // {
+    // this.seSendMessages.add(message);
+    // if (message.getMessageProperties().getCorrelationId() != null && message.getMessageProperties().getCorrelationId().length > 0)
+    // {
+    // this.addIdentifier(message.getMessageProperties().getCorrelationId().toString());
+    // }
+    // }
+    // finally
+    // {
+    // this.rwSendLock.writeLock().unlock();
+    // }
   }
 
   /**
