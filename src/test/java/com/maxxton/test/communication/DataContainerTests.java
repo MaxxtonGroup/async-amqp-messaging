@@ -148,7 +148,7 @@ public class DataContainerTests
     Iterator<String> iterator = ids.iterator();
 
     String removedId = iterator.next();
-    this.objContainer.removeId(removedId);
+    this.objContainer.removeIdentifier(removedId);
 
     idsOther = this.objContainer.getIdentifiers();
 

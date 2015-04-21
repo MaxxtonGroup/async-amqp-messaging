@@ -8,5 +8,9 @@ package com.maxxton.aam.messages;
  */
 public enum MessageType
 {
-
+  GENERATION_MESSAGE,
+  INFORMATION_MESSAGE,
+  RESPONSE_MESSAGE,
+  STATUS_MESSAGE,
+  SYNCHRONIZION_MESSAGE
 }

@@ -33,6 +33,7 @@ public class MessageSerializer
     }
     catch (IOException e)
     {
+      // TODO : Change to methods from Monitor class.
       e.printStackTrace();
     }
     return bytes;
@@ -57,7 +58,7 @@ public class MessageSerializer
     }
     catch (IOException | ClassNotFoundException e)
     {
-      // TODO Auto-generated catch block
+      // TODO : Change to methods from Monitor class.
       e.printStackTrace();
     }
     return object;

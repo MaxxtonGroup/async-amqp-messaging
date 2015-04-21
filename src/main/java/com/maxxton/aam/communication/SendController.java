@@ -74,6 +74,8 @@ public class SendController
           }
           catch (Exception e)
           {
+            // TODO : Change to methods from Monitor class.
+            e.printStackTrace();
             return null;
           }
         }

@@ -57,7 +57,7 @@ public class ReceiveController implements MessageListener
     String receiver = this.objResources.getHost().getMessengerName();
 
     objAdmin = new RabbitAdmin(this.objConnection);
-    Queue queue = new Queue(receiver + ".queue", true, false, false);
+    Queue queue = new Queue(receiver + ".queue", false, false, false);
     objAdmin.declareQueue(queue);
     Binding binding = new Binding(queue.getName(), DestinationType.QUEUE, "amq.direct", receiver + ".route", null);
     objAdmin.declareBinding(binding);
@@ -109,30 +109,21 @@ public class ReceiveController implements MessageListener
     Message message = this.objContainer.popReceivedMessage();
     while (message == null && millis > 0)
     {
-      long modulo = millis % 100;
-      if (modulo > 0)
+      long time = millis % 100;
+      if (time == 0)
       {
-        millis = millis - modulo;
-        try
-        {
-          Thread.sleep(modulo);
-        }
-        catch (InterruptedException e)
-        {
-          e.printStackTrace();
-        }
+        time = 10;
       }
-      else
+
+      millis = millis - time;
+      try
       {
-        millis = millis - 100;
-        try
-        {
-          Thread.sleep(100);
-        }
-        catch (InterruptedException e)
-        {
-          e.printStackTrace();
-        }
+        Thread.sleep(time);
+      }
+      catch (InterruptedException e)
+      {
+        // TODO : Change to methods from Monitor class.
+        e.printStackTrace();
       }
       message = this.objContainer.popReceivedMessage();
     }

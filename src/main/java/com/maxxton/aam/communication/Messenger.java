@@ -1,7 +1,7 @@
 package com.maxxton.aam.communication;
 
 import com.maxxton.aam.messages.BaseMessage;
-import com.maxxton.aam.messages.GenerateMessage;
+import com.maxxton.aam.messages.GenerationMessage;
 import com.maxxton.aam.messages.MessageType;
 import com.maxxton.aam.resources.Callback;
 import com.maxxton.aam.resources.Resources;
@@ -67,7 +67,7 @@ public class Messenger
   public boolean sendMessage(MessageType type, String receiver, Object payload, String responseTo)
   {
     // TODO : request new message instance from MessageFactory by specifying the MessageType given.
-    BaseMessage message = new GenerateMessage();
+    BaseMessage message = new GenerationMessage();
     message.setPayload(payload);
 
     return this.objCommunication.packAndSend(receiver.toLowerCase(), message, responseTo);

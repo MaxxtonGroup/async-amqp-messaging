@@ -6,7 +6,7 @@ package com.maxxton.aam.messages;
  * @author Robin Hermans
  * @copyright Maxxton 2015
  */
-public class GenerateMessage extends BaseMessage
+public class GenerationMessage extends BaseMessage
 {
 
   /**
@@ -14,7 +14,7 @@ public class GenerateMessage extends BaseMessage
    */
   private static final long serialVersionUID = -1667893027787920636L;
 
-  public GenerateMessage()
+  public GenerationMessage()
   {
 
   }

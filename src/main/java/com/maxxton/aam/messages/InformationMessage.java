@@ -6,7 +6,9 @@ package com.maxxton.aam.messages;
  * @author Robin Hermans
  * @copyright Maxxton 2015
  */
-public class InformationMessage
+public class InformationMessage extends BaseMessage
 {
+
+  private static final long serialVersionUID = 3610404050645830637L;
 
 }

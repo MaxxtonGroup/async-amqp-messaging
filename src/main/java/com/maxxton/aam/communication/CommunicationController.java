@@ -1,5 +1,6 @@
 package com.maxxton.aam.communication;
 
+import java.util.Date;
 import java.util.UUID;
 
 import org.springframework.amqp.core.Message;
@@ -79,6 +80,7 @@ public class CommunicationController
   {
     MessageProperties properties = new MessageProperties();
     properties.setCorrelationId(responseTo == null || responseTo == "" ? UUID.randomUUID().toString().getBytes() : responseTo.getBytes());
+    properties.setTimestamp(new Date());
 
     byte[] messageBytes = MessageSerializer.serialize(baseMessage);
     Message message = new Message(messageBytes, properties);

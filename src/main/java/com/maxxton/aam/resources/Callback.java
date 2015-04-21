@@ -12,7 +12,7 @@ public interface Callback
 {
 
   /**
-   * Method which can be implemented by overriding or using Lambda expressions.
+   * Method which can be implemented by overriding (using implements on custom callback class) or using Lambda expressions (see http://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html).
    *
    * @param message
    *          an instance of the Message class.

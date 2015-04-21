@@ -13,7 +13,7 @@ import com.maxxton.aam.communication.CommunicationController;
 import com.maxxton.aam.communication.ReceiveController;
 import com.maxxton.aam.communication.SendController;
 import com.maxxton.aam.messages.BaseMessage;
-import com.maxxton.aam.messages.GenerateMessage;
+import com.maxxton.aam.messages.GenerationMessage;
 import com.maxxton.aam.resources.Resources;
 
 /**
@@ -100,7 +100,7 @@ public class CommunicationControllerTests
     objResourcesOther.getHost().setMessengerName("other");
     CommunicationController comControllerOther = new CommunicationController(objResourcesOther);
 
-    BaseMessage msgTest = new GenerateMessage();
+    BaseMessage msgTest = new GenerationMessage();
     msgTest.setPayload("Hello World");
     this.objCommunication.packAndSend("other", msgTest);
 

@@ -16,32 +16,11 @@ public abstract class BaseMessage implements Serializable
    */
   private static final long serialVersionUID = -8763348067503641944L;
 
-  protected String strMessageId;
-
   protected Object objPayload;
 
-  protected MessageType mtMessageType;
+  protected MessageType objMessageType;
 
-  /**
-   * Sets the identifier of this message
-   * 
-   * @param messageId
-   *          message identifier as string
-   */
-  public void setMessageId(String messageId)
-  {
-    this.strMessageId = messageId;
-  }
-
-  /**
-   * Gets the identifier of this message
-   * 
-   * @return message identifier as string
-   */
-  public String getMessageId()
-  {
-    return this.strMessageId;
-  }
+  protected int intPriority;
 
   /**
    * Sets the payload object of the message.
@@ -65,47 +44,97 @@ public abstract class BaseMessage implements Serializable
   }
 
   /**
-   * Generates a hashcode from two class related variables.
-   * 
-   * @return hashcode result of the two variables as integer
+   * Gets the type of the message.
+   *
+   * @return enumeration of the MessageType
    */
-  @Override
-  public int hashCode()
+  public MessageType getMessageType()
   {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((mtMessageType == null) ? 0 : mtMessageType.hashCode());
-    result = prime * result + ((strMessageId == null) ? 0 : strMessageId.hashCode());
-    return result;
+    return this.objMessageType;
   }
 
   /**
-   * Method used by a set to check for duplicates.
-   * 
-   * @param obj
-   *          object to be compared against the current one
-   * @return true if the object matches the criteria, false if it doesn't
+   * Sets the type of the message.
+   *
+   * @param messageType
+   *          enumeration of the MessageType.
    */
-  @Override
-  public boolean equals(Object obj)
+  public void setMessageType(MessageType messageType)
   {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (!(obj instanceof BaseMessage))
-      return false;
-    BaseMessage other = (BaseMessage) obj;
-    if (mtMessageType != other.mtMessageType)
-      return false;
-    if (strMessageId == null)
-    {
-      if (other.strMessageId != null)
-        return false;
-    }
-    else if (!strMessageId.equals(other.strMessageId))
-      return false;
-    return true;
+    this.objMessageType = messageType;
   }
+
+  /**
+   * Gets the message priority.
+   *
+   * @return the priority of the message.
+   */
+  public int getPriority()
+  {
+    return this.intPriority;
+  }
+
+  /**
+   * Sets the message priority.
+   *
+   * @param priority
+   *          integer ranging from 0 till 9.
+   */
+  public void setPriority(int priority)
+  {
+    this.intPriority = priority;
+    if (this.intPriority > 9)
+    {
+      this.intPriority = 9;
+    }
+    if (this.intPriority < 0)
+    {
+      this.intPriority = 0;
+    }
+  }
+
+  // /**
+  // * Generates a hashcode from two class related variables.
+  // *
+  // * @return hashcode result of the two variables as integer
+  // */
+  // @Override
+  // public int hashCode()
+  // {
+  // final int prime = 31;
+  // int result = 1;
+  // result = prime * result + ((mtMessageType == null) ? 0 : mtMessageType.hashCode());
+  // result = prime * result + ((strMessageId == null) ? 0 : strMessageId.hashCode());
+  // return result;
+  // }
+  //
+  // /**
+  // * Method used by a set to check for duplicates.
+  // *
+  // * @param obj
+  // * object to be compared against the current one
+  // * @return true if the object matches the criteria, false if it doesn't
+  // */
+  // @Override
+  // public boolean equals(Object obj)
+  // {
+  // if (this == obj)
+  // return true;
+  // if (obj == null)
+  // return false;
+  // if (!(obj instanceof BaseMessage))
+  // return false;
+  // BaseMessage other = (BaseMessage) obj;
+  // if (mtMessageType != other.mtMessageType)
+  // return false;
+  // if (strMessageId == null)
+  // {
+  // if (other.strMessageId != null)
+  // return false;
+  // }
+  // else if (!strMessageId.equals(other.strMessageId))
+  // return false;
+  // return true;
+  // }
 
 }

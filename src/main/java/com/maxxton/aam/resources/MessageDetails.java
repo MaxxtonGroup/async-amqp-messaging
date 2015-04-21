@@ -1,5 +1,7 @@
 package com.maxxton.aam.resources;
 
+import com.maxxton.aam.messages.MessageType;
+
 /**
  * Data holding class based on the Tuple class.
  *
@@ -9,6 +11,7 @@ package com.maxxton.aam.resources;
 public class MessageDetails
 {
   private final String strResponseId;
+  private final MessageType objMessageType;
   private final Object objPayload;
 
   /**
@@ -19,9 +22,10 @@ public class MessageDetails
    * @param payload
    *          object which was in the payload of the message.
    */
-  public MessageDetails(String responseId, Object payload)
+  public MessageDetails(String responseId, MessageType messageType, Object payload)
   {
     this.strResponseId = responseId;
+    this.objMessageType = messageType;
     this.objPayload = payload;
   }
 
@@ -33,6 +37,16 @@ public class MessageDetails
   public String getResponseId()
   {
     return this.strResponseId;
+  }
+
+  /**
+   * Gets the message type.
+   *
+   * @return the MessageType of this message.
+   */
+  public MessageType getMessageType()
+  {
+    return this.objMessageType;
   }
 
   /**

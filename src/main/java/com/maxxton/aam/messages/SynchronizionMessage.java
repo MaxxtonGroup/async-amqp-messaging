@@ -6,7 +6,8 @@ package com.maxxton.aam.messages;
  * @author Robin Hermans
  * @copyright Maxxton 2015
  */
-public class SynchronizeMessage
+public class SynchronizionMessage extends BaseMessage
 {
+  private static final long serialVersionUID = -6692707861775598005L;
 
 }

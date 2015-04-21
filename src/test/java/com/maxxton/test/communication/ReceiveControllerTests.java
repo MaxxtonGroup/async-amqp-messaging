@@ -15,7 +15,7 @@ import com.maxxton.aam.communication.MessageSerializer;
 import com.maxxton.aam.communication.ReceiveController;
 import com.maxxton.aam.communication.SendController;
 import com.maxxton.aam.messages.BaseMessage;
-import com.maxxton.aam.messages.GenerateMessage;
+import com.maxxton.aam.messages.GenerationMessage;
 import com.maxxton.aam.resources.Resources;
 
 /**
@@ -62,7 +62,7 @@ public class ReceiveControllerTests
 
     MessageProperties props = new MessageProperties();
     props.setCorrelationId(sender.generateUniqueId().getBytes());
-    BaseMessage baseMsg = new GenerateMessage();
+    BaseMessage baseMsg = new GenerationMessage();
     baseMsg.setPayload("Hello World");
     Message msg = new Message(MessageSerializer.serialize(baseMsg), props);
     boolean exists = sender.sendMessage("test", msg);

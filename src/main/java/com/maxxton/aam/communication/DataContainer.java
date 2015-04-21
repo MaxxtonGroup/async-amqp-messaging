@@ -20,7 +20,9 @@ public class DataContainer
 {
   private static Map<String, DataContainer> mInstances = new HashMap<String, DataContainer>();
 
+  private final ReentrantReadWriteLock rwSendLock = new ReentrantReadWriteLock(true);
   private final ReentrantReadWriteLock rwReceivedLock = new ReentrantReadWriteLock(true);
+  private final ReentrantReadWriteLock rwIdentifiersLock = new ReentrantReadWriteLock(true);
 
   private String sName;
   private Set<String> seIdentifiers;
@@ -121,11 +123,38 @@ public class DataContainer
    */
   public boolean isOwnedByMe(String id)
   {
-    if (this.seIdentifiers.contains(id))
+    this.rwIdentifiersLock.readLock().lock();
+    try
     {
-      return true;
+      if (this.seIdentifiers.contains(id))
+      {
+        return true;
+      }
+      return false;
     }
-    return false;
+    finally
+    {
+      this.rwIdentifiersLock.readLock().unlock();
+    }
+  }
+
+  /**
+   * Adds a given messageid to the set.
+   *
+   * @param id
+   *          identifier of the message
+   */
+  public void addIdentifier(String id)
+  {
+    this.rwIdentifiersLock.writeLock().lock();
+    try
+    {
+      this.seIdentifiers.add(id);
+    }
+    finally
+    {
+      this.rwIdentifiersLock.writeLock().unlock();
+    }
   }
 
   /**
@@ -134,11 +163,21 @@ public class DataContainer
    * @param id
    *          identifier of a message
    */
-  public void removeId(String id)
+  public void removeIdentifier(String id)
   {
-    if (this.seIdentifiers.contains(id))
+    this.rwIdentifiersLock.writeLock().lock();
+    this.rwIdentifiersLock.readLock().lock();
+    try
     {
-      this.seIdentifiers.remove(id);
+      if (this.seIdentifiers.contains(id))
+      {
+        this.seIdentifiers.remove(id);
+      }
+    }
+    finally
+    {
+      this.rwIdentifiersLock.readLock().unlock();
+      this.rwIdentifiersLock.writeLock().unlock();
     }
   }
 
@@ -171,12 +210,20 @@ public class DataContainer
    */
   public void addSendMessage(Message message)
   {
-    // TODO : Fix overflowing send messages Set!
-    this.seSendMessages.add(message);
-    if (message.getMessageProperties().getCorrelationId() != null && message.getMessageProperties().getCorrelationId().length > 0)
-    {
-      this.seIdentifiers.add(message.getMessageProperties().getCorrelationId().toString());
-    }
+//    TODO : find solution for overflowing send messages set (run thread that cleans periodically).
+//    this.rwSendLock.writeLock().lock();
+//    try
+//    {
+//      this.seSendMessages.add(message);
+//      if (message.getMessageProperties().getCorrelationId() != null && message.getMessageProperties().getCorrelationId().length > 0)
+//      {
+//        this.addIdentifier(message.getMessageProperties().getCorrelationId().toString());
+//      }
+//    }
+//    finally
+//    {
+//      this.rwSendLock.writeLock().unlock();
+//    }
   }
 
   /**
@@ -187,7 +234,15 @@ public class DataContainer
    */
   public void removeSendMessage(Message message)
   {
-    this.seSendMessages.remove(message);
+    this.rwSendLock.writeLock().lock();
+    try
+    {
+      this.seSendMessages.remove(message);
+    }
+    finally
+    {
+      this.rwSendLock.writeLock().unlock();
+    }
   }
 
   /**
@@ -198,16 +253,24 @@ public class DataContainer
    */
   public void removeSendMessageById(String id)
   {
-    for (Message message : this.seSendMessages)
+    this.rwSendLock.readLock().lock();
+    try
     {
-      if (message.getMessageProperties().getCorrelationId() != null && message.getMessageProperties().getCorrelationId().length > 0)
+      for (Message message : this.seSendMessages)
       {
-        String messageId = message.getMessageProperties().getCorrelationId().toString();
-        if (messageId.equals(id))
+        if (message.getMessageProperties().getCorrelationId() != null && message.getMessageProperties().getCorrelationId().length > 0)
         {
-          this.seSendMessages.remove(message);
+          String messageId = message.getMessageProperties().getCorrelationId().toString();
+          if (messageId.equals(id))
+          {
+            this.removeSendMessage(message);
+          }
         }
       }
+    }
+    finally
+    {
+      this.rwSendLock.readLock().unlock();
     }
   }
 
