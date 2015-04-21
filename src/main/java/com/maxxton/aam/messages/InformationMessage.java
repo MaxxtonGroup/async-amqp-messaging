@@ -8,7 +8,13 @@ package com.maxxton.aam.messages;
  */
 public class InformationMessage extends BaseMessage
 {
-
   private static final long serialVersionUID = 3610404050645830637L;
+  
+  public InformationMessage()
+  {
+    this.objMessageType = MessageType.INFORMATION_MESSAGE;
+    this.intPriority = 3;
+    this.objPayload = null;
+  }
 
 }

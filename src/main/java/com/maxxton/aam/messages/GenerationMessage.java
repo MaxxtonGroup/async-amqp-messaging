@@ -8,15 +8,13 @@ package com.maxxton.aam.messages;
  */
 public class GenerationMessage extends BaseMessage
 {
-
-  /**
-   * 
-   */
   private static final long serialVersionUID = -1667893027787920636L;
 
   public GenerationMessage()
   {
-
+    this.objMessageType = MessageType.GENERATION_MESSAGE;
+    this.intPriority = 2;
+    this.objPayload = null;
   }
 
 }

@@ -10,4 +10,10 @@ public class StatusMessage extends BaseMessage
 {
   private static final long serialVersionUID = 9125113113678252464L;
 
+  public StatusMessage()
+  {
+    this.objMessageType = MessageType.STATUS_MESSAGE;
+    this.intPriority = 1;
+    this.objPayload = null;
+  }
 }

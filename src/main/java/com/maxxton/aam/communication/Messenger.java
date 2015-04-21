@@ -4,6 +4,7 @@ import com.maxxton.aam.messages.BaseMessage;
 import com.maxxton.aam.messages.GenerationMessage;
 import com.maxxton.aam.messages.MessageType;
 import com.maxxton.aam.resources.Callback;
+import com.maxxton.aam.resources.MessageFactory;
 import com.maxxton.aam.resources.Resources;
 
 /**
@@ -64,13 +65,17 @@ public class Messenger
    *          correlationId where the message is a response to.
    * @return outcome of the send method. True for success and false for failed.
    */
-  public boolean sendMessage(MessageType type, String receiver, Object payload, String responseTo)
+  public boolean sendMessage(MessageType messageType, String receiver, Object payload, String responseTo)
   {
     // TODO : request new message instance from MessageFactory by specifying the MessageType given.
-    BaseMessage message = new GenerationMessage();
-    message.setPayload(payload);
-
-    return this.objCommunication.packAndSend(receiver.toLowerCase(), message, responseTo);
+    
+    BaseMessage message = MessageFactory.createMessage(messageType);
+    if(message != null)
+    {
+      message.setPayload(payload);
+      return this.objCommunication.packAndSend(receiver.toLowerCase(), message, responseTo);
+    }
+    return false;
   }
 
   /**

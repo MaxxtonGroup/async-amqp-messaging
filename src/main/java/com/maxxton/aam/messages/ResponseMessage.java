@@ -10,4 +10,10 @@ public class ResponseMessage extends BaseMessage
 {
   private static final long serialVersionUID = -7444536989688341484L;
 
+  public ResponseMessage()
+  {
+    this.objMessageType = MessageType.RESPONSE_MESSAGE;
+    this.intPriority = 1;
+    this.objPayload = null;
+  }
 }

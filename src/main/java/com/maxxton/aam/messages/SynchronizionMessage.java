@@ -10,4 +10,10 @@ public class SynchronizionMessage extends BaseMessage
 {
   private static final long serialVersionUID = -6692707861775598005L;
 
+  public SynchronizionMessage()
+  {
+    this.objMessageType = MessageType.SYNCHRONIZION_MESSAGE;
+    this.intPriority = 1;
+    this.objPayload = null;
+  }
 }
