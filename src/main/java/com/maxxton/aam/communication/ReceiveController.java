@@ -10,6 +10,7 @@ import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 
+import com.maxxton.aam.messages.BaseMessage;
 import com.maxxton.aam.messages.ResponseMessage;
 import com.maxxton.aam.messages.StatusMessage;
 import com.maxxton.aam.resources.Callback;
@@ -241,7 +242,9 @@ public class ReceiveController implements MessageListener
   {
     if (this.objCallback != null)
     {
-      // TODO : add custom callback support
+      this.objContainer.removeSendMessageById(correlationId);
+      BaseMessage messageBody = (BaseMessage) MessageSerializer.deserialize(message.getBody());
+      this.objCallback.handleMessage(messageBody);
     }
     else
     {
@@ -297,13 +300,5 @@ public class ReceiveController implements MessageListener
     {
       // TODO : Generate error based on 'CorrelationId is not set.'
     }
-  }
-
-  public void reloadConfiguration()
-  {
-    this.objListener.stop();
-    this.connectToBroker();
-    this.configureQueue();
-    this.objListener = this.configureMessageListener();
   }
 }

@@ -59,8 +59,12 @@ You can create a new Messenger object by running this code.
 ```
 MessagingFactory objFactory = MessagingFactory.getInstance();
 Messenger objMessenger = objFactory.createMessenger("my-messenger-name");
+objMessenger.loadConfiguration(getClass().getClassLoader().getResource("custom.properties").getPath());
+objMessenger.start();
 ```
-This creates a Messenger instance with the name **my-messenger-name**
+This creates a Messenger instance with the name **my-messenger-name**.
+It also loads a custom configuration properties file.
+Be sure to call the **start** method in oder to send and receive messages.
 Any calls to the same name will return the same object.
 
 License
