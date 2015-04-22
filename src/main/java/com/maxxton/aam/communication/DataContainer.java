@@ -6,6 +6,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.springframework.amqp.core.Message;
@@ -24,6 +28,9 @@ public class DataContainer
   private final ReentrantReadWriteLock rwReceivedLock = new ReentrantReadWriteLock(true);
   private final ReentrantReadWriteLock rwIdentifiersLock = new ReentrantReadWriteLock(true);
 
+  private final ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
+  private ScheduledFuture scheduledFeature;
+
   private String sName;
   private Set<String> seIdentifiers;
   private Set<Message> seSendMessages;
@@ -39,6 +46,15 @@ public class DataContainer
     this.seSendMessages = new HashSet<Message>();
     this.seReceivedMessages = new HashSet<Message>();
     this.seOddMessages = new HashSet<Message>();
+
+    this.scheduledFeature = scheduledExecutorService.scheduleAtFixedRate(new Runnable()
+    {
+      @Override
+      public void run()
+      {
+        garbageCleanup();
+      }
+    }, 30, 30, TimeUnit.SECONDS);
   }
 
   /**
@@ -69,10 +85,111 @@ public class DataContainer
   }
 
   /**
+   * Cleans up any HashSet with more than maximum allowed amount of object.
+   */
+  public void garbageCleanup()
+  {
+    System.out.print("Cleaning Up...");
+    this.identifierCleanup();
+    this.sendCleanup();
+    this.receiveCleanup();
+    System.out.println("done!");
+  }
+
+  /**
+   * Cleans up the HashSet with identifiers.
+   */
+  private void identifierCleanup()
+  {
+    if (this.seIdentifiers.size() > 500)
+    {
+      Iterator<String> it = this.seIdentifiers.iterator();
+      int count = 1;
+      this.rwIdentifiersLock.writeLock().lock();
+      try
+      {
+        while (it.hasNext())
+        {
+          it.next();
+          if (count > 500)
+          {
+            it.remove();
+          }
+          count++;
+        }
+      }
+      finally
+      {
+        this.rwIdentifiersLock.writeLock().unlock();
+      }
+    }
+  }
+
+  /**
+   * Cleans up the HashSet with send messages.
+   */
+  private void sendCleanup()
+  {
+    if (this.seSendMessages.size() > 500)
+    {
+      this.rwSendLock.writeLock().lock();
+      try
+      {
+        Iterator<Message> it = this.seSendMessages.iterator();
+        int count = 1;
+        while (it.hasNext())
+        {
+          it.next();
+          if (count > 500)
+          {
+            it.remove();
+          }
+          count++;
+        }
+      }
+      finally
+      {
+        this.rwSendLock.writeLock().unlock();
+      }
+    }
+  }
+
+  /**
+   * Cleans up the HashSet with received messages.
+   */
+  private void receiveCleanup()
+  {
+    if (this.seReceivedMessages.size() > 500)
+    {
+      this.rwReceivedLock.writeLock().lock();
+      try
+      {
+        Iterator<Message> it = this.seReceivedMessages.iterator();
+        int count = 1;
+        while (it.hasNext())
+        {
+          it.next();
+          if (count > 500)
+          {
+            it.remove();
+          }
+          count++;
+        }
+      }
+      finally
+      {
+        this.rwReceivedLock.writeLock().unlock();
+      }
+    }
+  }
+
+  /**
    * Destroys the DataContainer object and all it's data.
    */
   public void destroy()
   {
+    this.scheduledExecutorService.shutdown();
+
     this.seIdentifiers = new HashSet<String>();
     this.seSendMessages = new HashSet<Message>();
     this.seReceivedMessages = new HashSet<Message>();
@@ -211,19 +328,19 @@ public class DataContainer
   public void addSendMessage(Message message)
   {
     // TODO : find solution for overflowing send messages set (run thread that cleans periodically).
-    // this.rwSendLock.writeLock().lock();
-    // try
-    // {
-    // this.seSendMessages.add(message);
-    // if (message.getMessageProperties().getCorrelationId() != null && message.getMessageProperties().getCorrelationId().length > 0)
-    // {
-    // this.addIdentifier(message.getMessageProperties().getCorrelationId().toString());
-    // }
-    // }
-    // finally
-    // {
-    // this.rwSendLock.writeLock().unlock();
-    // }
+    this.rwSendLock.writeLock().lock();
+    try
+    {
+      this.seSendMessages.add(message);
+      if (message.getMessageProperties().getCorrelationId() != null && message.getMessageProperties().getCorrelationId().length > 0)
+      {
+        this.addIdentifier(message.getMessageProperties().getCorrelationId().toString());
+      }
+    }
+    finally
+    {
+      this.rwSendLock.writeLock().unlock();
+    }
   }
 
   /**
