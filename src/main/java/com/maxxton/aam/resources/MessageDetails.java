@@ -11,6 +11,8 @@ import com.maxxton.aam.messages.MessageType;
 public class MessageDetails
 {
   private final String strResponseId;
+  private final String strSender;
+  private final String strReceiver;
   private final MessageType objMessageType;
   private final Object objPayload;
 
@@ -22,9 +24,11 @@ public class MessageDetails
    * @param payload
    *          object which was in the payload of the message.
    */
-  public MessageDetails(String responseId, MessageType messageType, Object payload)
+  public MessageDetails(String responseId, String sender, String receiver, MessageType messageType, Object payload)
   {
     this.strResponseId = responseId;
+    this.strSender = sender;
+    this.strReceiver = receiver;
     this.objMessageType = messageType;
     this.objPayload = payload;
   }
@@ -37,6 +41,26 @@ public class MessageDetails
   public String getResponseId()
   {
     return this.strResponseId;
+  }
+
+  /**
+   * Gets the sender of the message.
+   *
+   * @return the sender of the message as string.
+   */
+  public String getSender()
+  {
+    return this.strSender;
+  }
+
+  /**
+   * Gets the receiver of the message.
+   *
+   * @return the receiver of the message as string.
+   */
+  public String getReceiver()
+  {
+    return this.strReceiver;
   }
 
   /**

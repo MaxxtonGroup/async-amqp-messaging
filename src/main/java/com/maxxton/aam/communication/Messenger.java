@@ -3,6 +3,7 @@ package com.maxxton.aam.communication;
 import com.maxxton.aam.messages.BaseMessage;
 import com.maxxton.aam.messages.MessageType;
 import com.maxxton.aam.resources.Callback;
+import com.maxxton.aam.resources.MessageDetails;
 import com.maxxton.aam.resources.MessageFactory;
 import com.maxxton.aam.resources.Resources;
 
@@ -72,6 +73,8 @@ public class Messenger
       if (message != null)
       {
         message.setPayload(payload);
+        message.setSender(this.objResources.getConfiguration().getName());
+        message.setReceiver(receiver.toLowerCase());
         return this.objCommunication.packAndSend(receiver.toLowerCase(), message, responseTo);
       }
     }
@@ -86,14 +89,15 @@ public class Messenger
    * @return an instance of the BaseMessage class.
    */
   // TODO : create generic type to support passing the more relevant data.
-  public Object receiveMessage(long millis)
+  public MessageDetails receiveMessage(long millis)
   {
     if (this.bIsStarted)
     {
       BaseMessage message = this.objCommunication.unpackAndReceive(millis);
       if (message != null)
       {
-        return message.getPayload();
+        MessageDetails details = new MessageDetails("", message.getSender(), message.getReceiver(), message.getMessageType(), message.getPayload());
+        return details;
       }
     }
     return null;

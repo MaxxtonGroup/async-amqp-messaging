@@ -22,6 +22,10 @@ public abstract class BaseMessage implements Serializable
 
   protected int intPriority;
 
+  protected String strSender;
+
+  protected String strReceiver;
+
   /**
    * Sets the payload object of the message.
    * 
@@ -91,6 +95,48 @@ public abstract class BaseMessage implements Serializable
     {
       this.intPriority = 0;
     }
+  }
+
+  /**
+   * Gets the receiver of the message.
+   *
+   * @return the receiver of the message as string.
+   */
+  public String getReceiver()
+  {
+    return this.strReceiver;
+  }
+
+  /**
+   * Sets the receiver of the message.
+   *
+   * @param receiver
+   *          the receiver of the message.
+   */
+  public void setReceiver(String receiver)
+  {
+    this.strReceiver = receiver;
+  }
+
+  /**
+   * Gets the sender of the message.
+   *
+   * @return the sender of the message as string.
+   */
+  public String getSender()
+  {
+    return this.strSender;
+  }
+
+  /**
+   * Sets the sender of the message.
+   *
+   * @param sender
+   *          the sender of the message.
+   */
+  public void setSender(String sender)
+  {
+    this.strSender = sender;
   }
 
   // /**

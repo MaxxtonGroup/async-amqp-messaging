@@ -89,11 +89,9 @@ public class DataContainer
    */
   public void garbageCleanup()
   {
-    System.out.print("Cleaning Up...");
     this.identifierCleanup();
     this.sendCleanup();
     this.receiveCleanup();
-    System.out.println("done!");
   }
 
   /**
