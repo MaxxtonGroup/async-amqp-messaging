@@ -5,6 +5,7 @@ import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.core.ChannelCallback;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
+import com.maxxton.aam.resources.Configuration;
 import com.maxxton.aam.resources.Resources;
 import com.rabbitmq.client.AMQP.Queue.DeclareOk;
 
@@ -45,15 +46,17 @@ public class SendController
     if (this.objConnection == null)
     {
       this.objConnection = new CachingConnectionFactory();
-      String host = this.objResources.getConfiguration().getHost();
+      
+      Configuration config = this.objResources.getConfiguration();
+      String host = config.getHost();
       String addresses = "";
-      for (int port : this.objResources.getConfiguration().getPorts())
+      for (int port : config.getPorts())
       {
         addresses = addresses + host + ":" + port + ", ";
       }
       this.objConnection.setAddresses(addresses);
-      this.objConnection.setUsername(this.objResources.getConfiguration().getUsername());
-      this.objConnection.setPassword(this.objResources.getConfiguration().getPassword());
+      this.objConnection.setUsername(config.getUsername());
+      this.objConnection.setPassword(config.getPassword());
       this.objConnection.setChannelCacheSize(25);
     }
   }
@@ -76,7 +79,9 @@ public class SendController
         {
           try
           {
-            return channel.queueDeclarePassive(receiver + ".queue");
+            Configuration config = objResources.getConfiguration();
+            String name = config.getQueuePrefix() + receiver + config.getQueueSuffix();
+            return channel.queueDeclarePassive(name);
           }
           catch (Exception e)
           {
@@ -101,8 +106,12 @@ public class SendController
    */
   public boolean sendMessage(String receiver, Message message)
   {
-    objTemplate.setExchange("amq.direct");
-    objTemplate.setRoutingKey(receiver + ".route");
+    Configuration config = objResources.getConfiguration();
+    String name = config.getBindingPrefix() + receiver + config.getBindingSuffix();
+    String exchange = config.getBindingExchange();
+    
+    objTemplate.setExchange(exchange);
+    objTemplate.setRoutingKey(name);
 
     boolean exists = this.doesReceiverExist(receiver);
 

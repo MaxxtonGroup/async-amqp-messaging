@@ -13,6 +13,7 @@ import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import com.maxxton.aam.messages.ResponseMessage;
 import com.maxxton.aam.messages.StatusMessage;
 import com.maxxton.aam.resources.Callback;
+import com.maxxton.aam.resources.Configuration;
 import com.maxxton.aam.resources.Resources;
 
 /**
@@ -29,6 +30,9 @@ public class ReceiveController implements MessageListener
   private SimpleMessageListenerContainer objListener;
   private CachingConnectionFactory objConnection;
   private RabbitAdmin objAdmin;
+  
+  private Binding objBinding;
+  private Queue objQueue;
 
   /**
    * ReceiveController constructor Initiates elements defined in this class
@@ -53,14 +57,22 @@ public class ReceiveController implements MessageListener
    */
   private void configureQueue()
   {
-    // TODO : change static defined name to dynamically declared configuration variable
-    String receiver = this.objResources.getConfiguration().getName();
-
     objAdmin = new RabbitAdmin(this.objConnection);
-    Queue queue = new Queue(receiver + ".queue", false, false, false);
-    objAdmin.declareQueue(queue);
-    Binding binding = new Binding(queue.getName(), DestinationType.QUEUE, "amq.direct", receiver + ".route", null);
-    objAdmin.declareBinding(binding);
+
+    Configuration config = this.objResources.getConfiguration();
+    String queueName = config.getQueuePrefix() + config.getName() + config.getQueueSuffix();
+    boolean queueDurability = config.getQueueDurability();
+    boolean queueAutoDelete = config.getQueueAutoDelete();
+    boolean queueExclusive = config.getQueueExclusive();
+
+    this.objQueue = new Queue(queueName, queueDurability, queueAutoDelete, queueExclusive);
+    this.objAdmin.declareQueue(this.objQueue);
+    
+    String bindingName = config.getBindingPrefix() + config.getName() + config.getBindingSuffix();
+    String bindingExchange = config.getBindingExchange();
+    
+    this.objBinding = new Binding(this.objQueue.getName(), DestinationType.QUEUE, bindingExchange, bindingName, null);
+    this.objAdmin.declareBinding(this.objBinding);
   }
 
   /**
@@ -70,12 +82,9 @@ public class ReceiveController implements MessageListener
    */
   private SimpleMessageListenerContainer configureMessageListener()
   {
-    // TODO : change static defined name to dynamically declared configuration variable
-    String receiver = this.objResources.getConfiguration().getName();
-
     SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
     container.setConnectionFactory(this.objConnection);
-    container.setQueueNames(receiver + ".queue");
+    container.setQueueNames(this.objQueue.getName());
     container.setMessageListener(this);
     container.afterPropertiesSet();
     container.start();
