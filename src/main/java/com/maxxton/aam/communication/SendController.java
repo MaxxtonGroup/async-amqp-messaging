@@ -46,7 +46,7 @@ public class SendController
     if (this.objConnection == null)
     {
       this.objConnection = new CachingConnectionFactory();
-      
+
       Configuration config = this.objResources.getConfiguration();
       String host = config.getHost();
       String addresses = "";
@@ -109,7 +109,7 @@ public class SendController
     Configuration config = objResources.getConfiguration();
     String name = config.getBindingPrefix() + receiver + config.getBindingSuffix();
     String exchange = config.getBindingExchange();
-    
+
     objTemplate.setExchange(exchange);
     objTemplate.setRoutingKey(name);
 

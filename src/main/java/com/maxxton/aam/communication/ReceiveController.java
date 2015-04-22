@@ -30,7 +30,7 @@ public class ReceiveController implements MessageListener
   private SimpleMessageListenerContainer objListener;
   private CachingConnectionFactory objConnection;
   private RabbitAdmin objAdmin;
-  
+
   private Binding objBinding;
   private Queue objQueue;
 
@@ -67,10 +67,10 @@ public class ReceiveController implements MessageListener
 
     this.objQueue = new Queue(queueName, queueDurability, queueAutoDelete, queueExclusive);
     this.objAdmin.declareQueue(this.objQueue);
-    
+
     String bindingName = config.getBindingPrefix() + config.getName() + config.getBindingSuffix();
     String bindingExchange = config.getBindingExchange();
-    
+
     this.objBinding = new Binding(this.objQueue.getName(), DestinationType.QUEUE, bindingExchange, bindingName, null);
     this.objAdmin.declareBinding(this.objBinding);
   }
@@ -297,5 +297,13 @@ public class ReceiveController implements MessageListener
     {
       // TODO : Generate error based on 'CorrelationId is not set.'
     }
+  }
+
+  public void reloadConfiguration()
+  {
+    this.objListener.stop();
+    this.connectToBroker();
+    this.configureQueue();
+    this.objListener = this.configureMessageListener();
   }
 }

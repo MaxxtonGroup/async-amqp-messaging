@@ -44,7 +44,7 @@ public class Configuration
    *
    * @param configFile
    */
-  private void loadConfiguration(String configFile)
+  public void loadConfiguration(String configFile)
   {
     Properties properties = ConfigParser.parseConfig(configFile);
 
@@ -72,7 +72,7 @@ public class Configuration
       this.setQueueDurability(properties.getProperty("queue.durability") == null ? this.getQueueDurability() : Boolean.parseBoolean(properties.getProperty("queue.durability")));
       this.setQueueAutoDelete(properties.getProperty("queue.autodelete") == null ? this.getQueueAutoDelete() : Boolean.parseBoolean(properties.getProperty("queue.autodelete")));
       this.setQueueExclusive(properties.getProperty("queue.exclusive") == null ? this.getQueueExclusive() : Boolean.parseBoolean(properties.getProperty("queue.exclusive")));
-      
+
       this.setBindingPrefix(properties.getProperty("binding.prefix") == null ? this.getBindingPrefix() : properties.getProperty("binding.prefix"));
       this.setBindingSuffix(properties.getProperty("binding.suffix") == null ? this.getBindingSuffix() : properties.getProperty("binding.suffix"));
       this.setBindingExchange(properties.getProperty("binding.exchange") == null ? this.getBindingExchange() : properties.getProperty("binding.exchange"));

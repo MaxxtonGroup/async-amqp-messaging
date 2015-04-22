@@ -17,6 +17,7 @@ public class Messenger
 
   private Resources objResources;
   private CommunicationController objCommunication;
+  private boolean bIsStarted;
 
   /**
    * Constructor for the Messenger class.
@@ -31,8 +32,7 @@ public class Messenger
     // TODO : setup + initialize the resources.
     this.setResources(resources);
 
-    CommunicationController controller = new CommunicationController(this.getResources());
-    this.setCommunication(controller);
+    this.bIsStarted = false;
   }
 
   /**
@@ -66,13 +66,14 @@ public class Messenger
    */
   public boolean sendMessage(MessageType messageType, String receiver, Object payload, String responseTo)
   {
-    // TODO : request new message instance from MessageFactory by specifying the MessageType given.
-
-    BaseMessage message = MessageFactory.createMessage(messageType);
-    if (message != null)
+    if (this.bIsStarted)
     {
-      message.setPayload(payload);
-      return this.objCommunication.packAndSend(receiver.toLowerCase(), message, responseTo);
+      BaseMessage message = MessageFactory.createMessage(messageType);
+      if (message != null)
+      {
+        message.setPayload(payload);
+        return this.objCommunication.packAndSend(receiver.toLowerCase(), message, responseTo);
+      }
     }
     return false;
   }
@@ -87,10 +88,13 @@ public class Messenger
   // TODO : create generic type to support passing the more relevant data.
   public Object receiveMessage(long millis)
   {
-    BaseMessage message = this.objCommunication.unpackAndReceive(millis);
-    if (message != null)
+    if (this.bIsStarted)
     {
-      return message.getPayload();
+      BaseMessage message = this.objCommunication.unpackAndReceive(millis);
+      if (message != null)
+      {
+        return message.getPayload();
+      }
     }
     return null;
   }
@@ -114,7 +118,17 @@ public class Messenger
    */
   public void loadConfiguration(String configFile)
   {
-    // TODO : implement functionality to support configuration loading from file.
+    this.objResources.getConfiguration().loadConfiguration(configFile);
+  }
+
+  /**
+   * Start method to notify the Messenger to start communicating.
+   */
+  public void start()
+  {
+    CommunicationController controller = new CommunicationController(this.getResources());
+    this.setCommunication(controller);
+    this.bIsStarted = true;
   }
 
   /**
