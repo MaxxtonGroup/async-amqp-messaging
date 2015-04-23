@@ -14,6 +14,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.springframework.amqp.core.Message;
 
+import com.maxxton.aam.resources.Configuration;
+import com.maxxton.aam.resources.Resources;
+
 /**
  * DataContainer class Contains all data which passes the Send- and/or ReceiveController. This may include id's and messages.
  * 
@@ -28,10 +31,11 @@ public class DataContainer
   private final ReentrantReadWriteLock rwReceivedLock = new ReentrantReadWriteLock(true);
   private final ReentrantReadWriteLock rwIdentifiersLock = new ReentrantReadWriteLock(true);
 
-  private final ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
-  private ScheduledFuture scheduledFeature;
+  private final ScheduledExecutorService objExecutor = Executors.newScheduledThreadPool(1);
+  private ScheduledFuture objScheduler;
 
   private String sName;
+  private Resources objResources;
   private Set<String> seIdentifiers;
   private Set<Message> seSendMessages;
   private Set<Message> seReceivedMessages;
@@ -46,15 +50,24 @@ public class DataContainer
     this.seSendMessages = new HashSet<Message>();
     this.seReceivedMessages = new HashSet<Message>();
     this.seOddMessages = new HashSet<Message>();
+  }
 
-    this.scheduledFeature = scheduledExecutorService.scheduleAtFixedRate(new Runnable()
+  public void setResources(Resources resources)
+  {
+    this.objResources = resources;
+    Configuration config = this.objResources.getConfiguration();
+
+    if (objScheduler == null)
     {
-      @Override
-      public void run()
+      objExecutor.scheduleAtFixedRate(new Runnable()
       {
-        garbageCleanup();
-      }
-    }, 30, 30, TimeUnit.SECONDS);
+        @Override
+        public void run()
+        {
+          garbageCleanup();
+        }
+      }, config.getDataCleanRate(), config.getDataCleanRate(), TimeUnit.SECONDS);
+    }
   }
 
   /**
@@ -99,7 +112,8 @@ public class DataContainer
    */
   private void identifierCleanup()
   {
-    if (this.seIdentifiers.size() > 500)
+    Configuration config = this.objResources.getConfiguration();
+    if (this.seIdentifiers.size() > config.getDataMaxElements())
     {
       Iterator<String> it = this.seIdentifiers.iterator();
       int count = 1;
@@ -109,7 +123,7 @@ public class DataContainer
         while (it.hasNext())
         {
           it.next();
-          if (count > 500)
+          if (count > config.getDataMaxElements())
           {
             it.remove();
           }
@@ -128,7 +142,8 @@ public class DataContainer
    */
   private void sendCleanup()
   {
-    if (this.seSendMessages.size() > 500)
+    Configuration config = this.objResources.getConfiguration();
+    if (this.seSendMessages.size() > config.getDataMaxElements())
     {
       this.rwSendLock.writeLock().lock();
       try
@@ -138,7 +153,7 @@ public class DataContainer
         while (it.hasNext())
         {
           it.next();
-          if (count > 500)
+          if (count > config.getDataMaxElements())
           {
             it.remove();
           }
@@ -157,7 +172,8 @@ public class DataContainer
    */
   private void receiveCleanup()
   {
-    if (this.seReceivedMessages.size() > 500)
+    Configuration config = this.objResources.getConfiguration();
+    if (this.seReceivedMessages.size() > config.getDataMaxElements())
     {
       this.rwReceivedLock.writeLock().lock();
       try
@@ -167,7 +183,7 @@ public class DataContainer
         while (it.hasNext())
         {
           it.next();
-          if (count > 500)
+          if (count > config.getDataMaxElements())
           {
             it.remove();
           }
@@ -186,7 +202,7 @@ public class DataContainer
    */
   public void destroy()
   {
-    this.scheduledExecutorService.shutdown();
+    this.objExecutor.shutdown();
 
     this.seIdentifiers = new HashSet<String>();
     this.seSendMessages = new HashSet<Message>();

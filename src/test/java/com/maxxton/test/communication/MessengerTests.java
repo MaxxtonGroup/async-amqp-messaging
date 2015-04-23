@@ -80,13 +80,13 @@ public class MessengerTests
     System.out.print("Messenger : Testing sending and receiving...");
 
     // TODO : change test to match MessageType option (currently null).
-//    this.objMessenger.sendMessage(null, "other", "Hello World");
-//
-//    Messenger receiver = new Messenger("other");
-//
-//    String msg = (String) receiver.receiveMessage(1000);
-//
-//    assertNotNull("No message has been received.", msg);
+    // this.objMessenger.sendMessage(null, "other", "Hello World");
+    //
+    // Messenger receiver = new Messenger("other");
+    //
+    // String msg = (String) receiver.receiveMessage(1000);
+    //
+    // assertNotNull("No message has been received.", msg);
 
     System.out.println("done.");
   }

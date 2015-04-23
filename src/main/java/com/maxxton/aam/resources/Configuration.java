@@ -29,6 +29,10 @@ public class Configuration
   private String strBindingSuffix;
   private String strBindingExchange;
 
+  private int intCleanRate;
+  private int intMaxElements;
+  private int intMaxSize;
+
   /**
    * Constructor for the Host class.
    */
@@ -63,19 +67,23 @@ public class Configuration
         }
       }
 
-      this.setHost(properties.getProperty("broker.host") == null ? this.getHost() : properties.getProperty("broker.host"));
-      this.setUsername(properties.getProperty("broker.username") == null ? this.getUsername() : properties.getProperty("broker.username"));
-      this.setPassword(properties.getProperty("broker.password") == null ? this.getPassword() : properties.getProperty("broker.password"));
+      this.setHost(properties.getProperty("broker.host", this.getHost()));
+      this.setUsername(properties.getProperty("broker.username", this.getUsername()));
+      this.setPassword(properties.getProperty("broker.password", this.getPassword()));
 
-      this.setQueuePrefix(properties.getProperty("queue.prefix") == null ? this.getQueuePrefix() : properties.getProperty("queue.prefix"));
-      this.setQueueSuffix(properties.getProperty("queue.suffix") == null ? this.getQueueSuffix() : properties.getProperty("queue.suffix"));
+      this.setQueuePrefix(properties.getProperty("queue.prefix", this.getQueuePrefix()));
+      this.setQueueSuffix(properties.getProperty("queue.suffix", this.getQueueSuffix()));
       this.setQueueDurability(properties.getProperty("queue.durability") == null ? this.getQueueDurability() : Boolean.parseBoolean(properties.getProperty("queue.durability")));
       this.setQueueAutoDelete(properties.getProperty("queue.autodelete") == null ? this.getQueueAutoDelete() : Boolean.parseBoolean(properties.getProperty("queue.autodelete")));
       this.setQueueExclusive(properties.getProperty("queue.exclusive") == null ? this.getQueueExclusive() : Boolean.parseBoolean(properties.getProperty("queue.exclusive")));
 
-      this.setBindingPrefix(properties.getProperty("binding.prefix") == null ? this.getBindingPrefix() : properties.getProperty("binding.prefix"));
-      this.setBindingSuffix(properties.getProperty("binding.suffix") == null ? this.getBindingSuffix() : properties.getProperty("binding.suffix"));
-      this.setBindingExchange(properties.getProperty("binding.exchange") == null ? this.getBindingExchange() : properties.getProperty("binding.exchange"));
+      this.setBindingPrefix(properties.getProperty("binding.prefix", this.getBindingPrefix()));
+      this.setBindingSuffix(properties.getProperty("binding.suffix", this.getBindingSuffix()));
+      this.setBindingExchange(properties.getProperty("binding.exchange", this.getBindingExchange()));
+
+      this.setDataCleanRate(properties.getProperty("data.cleanrate") == null ? this.getDataCleanRate() : Integer.parseInt(properties.getProperty("data.cleanrate")));
+      this.setDataMaxElements(properties.getProperty("data.maxelements") == null ? this.getDataMaxElements() : Integer.parseInt(properties.getProperty("data.maxelements")));
+      this.setDataMaxSize(properties.getProperty("data.maxsize") == null ? this.getDataMaxSize() : Integer.parseInt(properties.getProperty("data.maxsize")));
     }
   }
 
@@ -372,6 +380,69 @@ public class Configuration
   public String getBindingExchange()
   {
     return this.strBindingExchange;
+  }
+
+  /**
+   * Sets the clean rate for the DataContainer.
+   *
+   * @param cleanRate
+   *          the DataContainer clean rate.
+   */
+  public void setDataCleanRate(int cleanRate)
+  {
+    this.intCleanRate = cleanRate;
+  }
+
+  /**
+   * Gets the clean rate for the DataContainer.
+   *
+   * @return the DataContainer clean rate.
+   */
+  public int getDataCleanRate()
+  {
+    return this.intCleanRate;
+  }
+
+  /**
+   * Sets the clean rate for the DataContainer.
+   *
+   * @param cleanRate
+   *          the DataContainer clean rate.
+   */
+  public void setDataMaxElements(int maxElements)
+  {
+    this.intMaxElements = maxElements;
+  }
+
+  /**
+   * Gets the clean rate for the DataContainer.
+   *
+   * @return the DataContainer clean rate.
+   */
+  public int getDataMaxElements()
+  {
+    return this.intMaxElements;
+  }
+
+  /**
+   * Sets the clean rate for the DataContainer.
+   *
+   * @param cleanRate
+   *          the DataContainer clean rate.
+   */
+  public void setDataMaxSize(int maxSize)
+  {
+    this.intMaxSize = maxSize;
+  }
+
+  /**
+   * Gets the clean rate for the DataContainer.
+   *
+   * @return the DataContainer clean rate.
+   */
+  public int getDataMaxSize()
+  {
+    return this.intMaxSize;
   }
 
 }
