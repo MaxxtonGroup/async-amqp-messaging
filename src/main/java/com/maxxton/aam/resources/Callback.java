@@ -1,7 +1,5 @@
 package com.maxxton.aam.resources;
 
-import com.maxxton.aam.messages.BaseMessage;
-
 /**
  * Callback interface Can be set by the user to handle received message asynchronous. Uses Lambda expressions for the implementation of the code.
  * 
@@ -18,6 +16,6 @@ public interface Callback
    * @param message
    *          an instance of the Message class.
    */
-  public void handleMessage(BaseMessage message);
+  public void handleMessage(MessageDetails message);
 
 }

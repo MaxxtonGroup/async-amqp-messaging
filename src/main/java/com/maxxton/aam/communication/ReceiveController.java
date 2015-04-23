@@ -15,6 +15,7 @@ import com.maxxton.aam.messages.ResponseMessage;
 import com.maxxton.aam.messages.StatusMessage;
 import com.maxxton.aam.resources.Callback;
 import com.maxxton.aam.resources.Configuration;
+import com.maxxton.aam.resources.MessageDetails;
 import com.maxxton.aam.resources.Resources;
 
 /**
@@ -244,7 +245,8 @@ public class ReceiveController implements MessageListener
     {
       this.objContainer.removeSendMessageById(correlationId);
       BaseMessage messageBody = (BaseMessage) MessageSerializer.deserialize(message.getBody());
-      this.objCallback.handleMessage(messageBody);
+      MessageDetails details = new MessageDetails("", messageBody.getSender(), messageBody.getReceiver(), messageBody.getMessageType(), messageBody.getPayload());
+      this.objCallback.handleMessage(details);
     }
     else
     {

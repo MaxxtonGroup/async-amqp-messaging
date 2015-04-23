@@ -32,7 +32,7 @@ public class DataContainer
   private final ReentrantReadWriteLock rwIdentifiersLock = new ReentrantReadWriteLock(true);
 
   private final ScheduledExecutorService objExecutor = Executors.newScheduledThreadPool(1);
-  private ScheduledFuture objScheduler;
+  private ScheduledFuture<?> objScheduler;
 
   private String sName;
   private Resources objResources;
@@ -57,9 +57,9 @@ public class DataContainer
     this.objResources = resources;
     Configuration config = this.objResources.getConfiguration();
 
-    if (objScheduler == null)
+    if (this.objScheduler == null)
     {
-      objExecutor.scheduleAtFixedRate(new Runnable()
+      this.objScheduler = objExecutor.scheduleAtFixedRate(new Runnable()
       {
         @Override
         public void run()
