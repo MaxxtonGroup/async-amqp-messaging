@@ -21,6 +21,12 @@ public class MessageDetails
    * 
    * @param responseId
    *          identifier created by the sender of the message.
+   * @param sender
+   *          name of the sender of the message.
+   * @param receiver
+   *          name of the receiver of the message.
+   * @param messageType
+   *          type of the message received.
    * @param payload
    *          object which was in the payload of the message.
    */

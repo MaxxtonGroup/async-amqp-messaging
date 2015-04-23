@@ -74,6 +74,7 @@ public class MessagingFactory
    *
    * @param name
    *          the messenger name
+   * @return true if the messenger was deleted, false if it didn't.
    */
   public boolean destroyMessenger(String name)
   {

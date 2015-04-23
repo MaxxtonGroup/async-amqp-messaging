@@ -18,6 +18,7 @@ public class ConfigParser
    *
    * @param sFile
    *          path to the configuration file
+   * @return the configuration parsed into properties object.
    */
   public static Properties parseConfig(String sFile)
   {

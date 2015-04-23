@@ -55,7 +55,7 @@ public class Messenger
   /**
    * Send a specific message type with payload to a given receiver referring to another message.
    * 
-   * @param type
+   * @param messageType
    *          enumeration type of the to be send message.
    * @param receiver
    *          the receiver of the message as string

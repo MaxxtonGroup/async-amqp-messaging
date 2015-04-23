@@ -47,6 +47,7 @@ public class Configuration
    * Loads a given configuration file.
    *
    * @param configFile
+   *          the file to be loaded into the configuration.
    */
   public void loadConfiguration(String configFile)
   {
@@ -90,7 +91,7 @@ public class Configuration
   /**
    * Sets the Messenger name.
    * 
-   * @param messengerName
+   * @param name
    *          name of the messenger
    */
   public void setName(String name)
@@ -404,10 +405,10 @@ public class Configuration
   }
 
   /**
-   * Sets the clean rate for the DataContainer.
+   * Sets the max allowed amount of elements for the DataContainer.
    *
-   * @param cleanRate
-   *          the DataContainer clean rate.
+   * @param maxElements
+   *          the DataContainer max elements.
    */
   public void setDataMaxElements(int maxElements)
   {
@@ -415,9 +416,9 @@ public class Configuration
   }
 
   /**
-   * Gets the clean rate for the DataContainer.
+   * Gets the max allowed amount of elements for the DataContainer.
    *
-   * @return the DataContainer clean rate.
+   * @return the DataContainer max elements.
    */
   public int getDataMaxElements()
   {
@@ -425,10 +426,10 @@ public class Configuration
   }
 
   /**
-   * Sets the clean rate for the DataContainer.
+   * Sets the maximum size for HashSets in the DataContainer.
    *
-   * @param cleanRate
-   *          the DataContainer clean rate.
+   * @param maxSize
+   *          the DataContainer max size.
    */
   public void setDataMaxSize(int maxSize)
   {
@@ -436,9 +437,9 @@ public class Configuration
   }
 
   /**
-   * Gets the clean rate for the DataContainer.
+   * Gets the maximum size for HashSets in the DataContainer.
    *
-   * @return the DataContainer clean rate.
+   * @return the DataContainer maximum size.
    */
   public int getDataMaxSize()
   {
