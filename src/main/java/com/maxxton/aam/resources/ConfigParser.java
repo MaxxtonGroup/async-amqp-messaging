@@ -1,8 +1,7 @@
 package com.maxxton.aam.resources;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 /**
@@ -22,15 +21,15 @@ public class ConfigParser
    */
   public static Properties parseConfig(String sFile)
   {
-    File objFile = new File(sFile);
-    if (!objFile.isDirectory() && objFile.exists())
+    InputStream stream = ConfigParser.class.getResourceAsStream(sFile);
+    if (stream != null)
     {
       switch (ConfigParser.getExtension(sFile))
       {
         case "properties":
-          return ConfigParser.parseProperties(objFile);
+          return ConfigParser.parseProperties(stream);
         case "xml":
-          return ConfigParser.parseXml(objFile);
+          return ConfigParser.parseXml(stream);
         default:
           // TODO : Notify through logger that the configuration file given is unsupported.
           break;
@@ -67,12 +66,12 @@ public class ConfigParser
    *          configuration file to be parsed.
    * @return
    */
-  private static Properties parseProperties(File objFile)
+  private static Properties parseProperties(InputStream objFile)
   {
     try
     {
       Properties properties = new Properties();
-      properties.load(new FileInputStream(objFile));
+      properties.load(objFile);
       return properties;
     }
     catch (IOException e)
@@ -90,12 +89,12 @@ public class ConfigParser
    *          configuration file to be parsed.
    * @return
    */
-  private static Properties parseXml(File objFile)
+  private static Properties parseXml(InputStream objFile)
   {
     try
     {
       Properties properties = new Properties();
-      properties.loadFromXML(new FileInputStream(objFile));
+      properties.loadFromXML(objFile);
       return properties;
     }
     catch (IOException e)

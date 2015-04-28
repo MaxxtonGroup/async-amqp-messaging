@@ -68,7 +68,7 @@ public class SendController
    *          the name of the receiver.
    * @return true if it does, false if it doesn't exists.
    */
-  public boolean doesReceiverExist(String receiver)
+  public boolean doesReceiverExist(final String receiver)
   {
     if (objTemplate != null)
     {

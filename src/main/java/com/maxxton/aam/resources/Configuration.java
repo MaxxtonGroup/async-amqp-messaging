@@ -40,7 +40,7 @@ public class Configuration
   {
     this.setPorts(new ArrayList<Integer>());
 
-    this.loadConfiguration(getClass().getClassLoader().getResource("default.properties").getPath());
+    this.loadConfiguration("/META-INF/default.properties");
   }
 
   /**
