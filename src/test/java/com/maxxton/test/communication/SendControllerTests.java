@@ -44,7 +44,7 @@ public class SendControllerTests
     if (objResources == null)
     {
       this.objResources = new Resources();
-      this.objResources.getConfiguration().loadConfiguration("/config.properties");
+      this.objResources.getConfiguration().loadConfiguration("/test.properties");
       this.objResources.getConfiguration().setName("test");
       this.objController = new SendController(this.objResources);
 
@@ -64,7 +64,7 @@ public class SendControllerTests
     System.out.print("SendController : Testing receiver exists method...");
 
     Resources resources = new Resources();
-    resources.getConfiguration().loadConfiguration("/config.properties");
+    resources.getConfiguration().loadConfiguration("/test.properties");
     resources.getConfiguration().setName("other");
 
     ReceiveController otherSender = new ReceiveController(resources);
@@ -91,7 +91,7 @@ public class SendControllerTests
     System.out.print("SendController : Testing sending a message...");
 
     Resources otherResources = new Resources();
-    otherResources.getConfiguration().loadConfiguration("/config.properties");
+    otherResources.getConfiguration().loadConfiguration("/test.properties");
     otherResources.getConfiguration().setName("other");
     new ReceiveController(otherResources);
 

@@ -38,7 +38,7 @@ public class CommunicationControllerTests
     if (this.objCommunication == null)
     {
       this.objResources = new Resources();
-      this.objResources.getConfiguration().loadConfiguration("/config.properties");
+      this.objResources.getConfiguration().loadConfiguration("/test.properties");
       this.objResources.getConfiguration().setName("test");
 
       this.objCommunication = new CommunicationController(this.objResources);
@@ -99,7 +99,7 @@ public class CommunicationControllerTests
     System.out.print("CommunicationController : Testing sending and receiving a message...");
 
     Resources objResourcesOther = new Resources();
-    objResourcesOther.getConfiguration().loadConfiguration("/config.properties");
+    objResourcesOther.getConfiguration().loadConfiguration("/test.properties");
     objResourcesOther.getConfiguration().setName("other");
     CommunicationController comControllerOther = new CommunicationController(objResourcesOther);
 

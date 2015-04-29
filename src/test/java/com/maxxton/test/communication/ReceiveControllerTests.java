@@ -40,7 +40,7 @@ public class ReceiveControllerTests
     // if (this.objReceiver == null)
     // {
     this.objResources = new Resources();
-    this.objResources.getConfiguration().loadConfiguration("/config.properties");
+    this.objResources.getConfiguration().loadConfiguration("/test.properties");
     this.objResources.getConfiguration().setName("test");
     this.objReceiver = new ReceiveController(objResources);
     // }
@@ -58,7 +58,7 @@ public class ReceiveControllerTests
     System.out.print("ReceiveController : Testing receiving a message...");
 
     Resources otherResources = new Resources();
-    otherResources.getConfiguration().loadConfiguration("/config.properties");
+    otherResources.getConfiguration().loadConfiguration("/test.properties");
     otherResources.getConfiguration().setName("other");
     SendController sender = new SendController(otherResources);
 

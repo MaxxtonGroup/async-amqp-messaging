@@ -31,7 +31,7 @@ public class MessengerTests
   public void setup()
   {
     this.objMessenger = new Messenger("test");
-    this.objMessenger.loadConfiguration("/config.properties");
+    this.objMessenger.loadConfiguration("/test.properties");
     this.objMessenger.start();
     assertNotNull("The messenger cannot be NULL.", this.objMessenger);
   }

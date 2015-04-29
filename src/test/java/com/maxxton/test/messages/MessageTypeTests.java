@@ -38,6 +38,8 @@ public class MessageTypeTests
   @Test
   public void testMessageType() throws Exception
   {
+    System.out.print("MessageType : Testing the message type enumeration...");
+
     MessageType generationType = MessageType.GENERATION_MESSAGE;
     assertEquals("The message should be of type Generation.", generationType, MessageType.GENERATION_MESSAGE);
 
@@ -52,6 +54,8 @@ public class MessageTypeTests
 
     MessageType synchronizationType = MessageType.SYNCHRONIZION_MESSAGE;
     assertEquals("The message should be of type Synchronization.", synchronizationType, MessageType.SYNCHRONIZION_MESSAGE);
+
+    System.out.println("done.");
   }
 
   /**
