@@ -280,7 +280,7 @@ public class DataContainerTests
   }
 
   /**
-   * Static method called after running the test to cleanup.
+   * Cleanup method called after running the test.
    */
   @After
   public void cleanup()

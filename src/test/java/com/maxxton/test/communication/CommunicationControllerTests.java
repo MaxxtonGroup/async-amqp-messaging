@@ -40,7 +40,7 @@ public class CommunicationControllerTests
       this.objResources = new Resources();
       this.objResources.getConfiguration().loadConfiguration("/config.properties");
       this.objResources.getConfiguration().setName("test");
-      
+
       this.objCommunication = new CommunicationController(this.objResources);
 
       assertNotNull("The CommunicationController cannot be Null", this.objCommunication);
