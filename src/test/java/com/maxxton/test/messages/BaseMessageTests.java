@@ -12,6 +12,12 @@ import com.maxxton.aam.messages.MessageType;
 
 import static org.junit.Assert.*;
 
+/**
+ * Run a list of tests against the BaseMessage class.
+ * 
+ * @author Robin Hermans
+ * @copyright Maxxton 2015
+ */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class BaseMessageTests
 {
