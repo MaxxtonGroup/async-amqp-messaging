@@ -1,0 +1,8 @@
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<comment>Test configuration file.</comment>
+	<entry key="broker.host">localhost</entry>
+	<entry key="broker.ports">5672</entry>
+	<entry key="broker.username">username</entry>
+	<entry key="broker.password">password</entry>
+</properties>

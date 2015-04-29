@@ -1,4 +1,4 @@
-package com.maxxton.test.messages;
+package com.maxxton.test.resources;
 
 import org.junit.After;
 import org.junit.Before;
