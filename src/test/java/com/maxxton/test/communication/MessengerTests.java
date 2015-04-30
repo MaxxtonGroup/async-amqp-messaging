@@ -1,7 +1,8 @@
 package com.maxxton.test.communication;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
+import java.util.ArrayList;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -10,6 +11,10 @@ import org.junit.runners.MethodSorters;
 
 import com.maxxton.aam.communication.CommunicationController;
 import com.maxxton.aam.communication.Messenger;
+import com.maxxton.aam.messages.MessageType;
+import com.maxxton.aam.resources.Callback;
+import com.maxxton.aam.resources.Configuration;
+import com.maxxton.aam.resources.MessageDetails;
 import com.maxxton.aam.resources.Resources;
 
 /**
@@ -80,21 +85,23 @@ public class MessengerTests
   public void testSendAndReceive() throws Exception
   {
     System.out.print("Messenger : Testing sending and receiving...");
+    String strPayload = "Hello World";
+    this.objMessenger.sendMessage(MessageType.GENERATION_MESSAGE, "other", strPayload);
 
-    // TODO : change test to match MessageType option (currently null).
-    // this.objMessenger.sendMessage(null, "other", "Hello World");
-    //
-    // Messenger receiver = new Messenger("other");
-    //
-    // String msg = (String) receiver.receiveMessage(1000);
-    //
-    // assertNotNull("No message has been received.", msg);
+    Messenger receiver = new Messenger("other");
+    receiver.loadConfiguration("/test.properties");
+    receiver.start();
+
+    MessageDetails details = receiver.receiveMessage(1000);
+
+    assertNotNull("No message has been received.", details);
+    assertEquals("The payload should equal 'Hello World'", details.getPayload(), strPayload);
 
     System.out.println("done.");
   }
 
   /**
-   * Test the load of a configuration file.
+   * Test loading a configuration file.
    * 
    * @throws Exception
    *           reason of failure given by the test.
@@ -104,7 +111,25 @@ public class MessengerTests
   {
     System.out.print("Messenger : Testing configuration loading...");
 
-    // TODO : once functionality added, implement this test.
+    Messenger other = new Messenger("other");
+    other.loadConfiguration("/test.properties");
+    other.start();
+
+    Configuration objConfig = other.getResources().getConfiguration();
+    assertNotNull("The configuration instance cannot be Null.", objConfig);
+
+    String strHost = objConfig.getHost();
+    assertEquals("The host should equal '192.168.252.141'.", strHost, "192.168.252.141");
+
+    ArrayList<Integer> arrPorts = objConfig.getPorts();
+    int iPort = arrPorts.get(0);
+    assertEquals("The port should equal '5672'.", iPort, 5672);
+
+    String strUsername = objConfig.getUsername();
+    assertEquals("The username should equal 'username'.", strUsername, "username");
+
+    String strPassword = objConfig.getPassword();
+    assertEquals("The password should equal 'password'.", strPassword, "password");
 
     System.out.println("done.");
   }
@@ -120,8 +145,24 @@ public class MessengerTests
   {
     System.out.print("Messenger : Testing receive callback...");
 
-    // TODO : once callback is implemented test it by sending a message and
-    // receiving it through the callback set.
+    String strPayload = "Hello World";
+
+    this.objMessenger.sendMessage(MessageType.GENERATION_MESSAGE, "other", strPayload);
+
+    Messenger other = new Messenger("other");
+    other.loadConfiguration("/test.properties");
+    other.start();
+
+    Callback objCallback = new Callback()
+    {
+      @Override
+      public void handleMessage(MessageDetails message)
+      {
+        assertEquals("The payload should equal 'Hello World'.", strPayload, "Hello World");
+      }
+    };
+
+    other.setReceiveCallback(objCallback);
 
     System.out.println("done.");
   }
