@@ -12,10 +12,14 @@ import org.springframework.amqp.core.MessageProperties;
 
 import com.maxxton.aam.communication.DataContainer;
 import com.maxxton.aam.communication.MessageSerializer;
+import com.maxxton.aam.communication.Messenger;
 import com.maxxton.aam.communication.ReceiveController;
 import com.maxxton.aam.communication.SendController;
 import com.maxxton.aam.messages.BaseMessage;
 import com.maxxton.aam.messages.GenerationMessage;
+import com.maxxton.aam.messages.MessageType;
+import com.maxxton.aam.resources.Callback;
+import com.maxxton.aam.resources.MessageDetails;
 import com.maxxton.aam.resources.Resources;
 
 /**
@@ -140,20 +144,25 @@ public class ReceiveControllerTests
   {
     System.out.print("ReceiveController : Testing getter and setter for the callback instance...");
 
-    // TODO : Add test for receiving a message though the callback.
-    // Callback testCallback = this.objReceiver.getCallback();
-    // assertNull("The callback instance should be null.", testCallback);
-    //
-    // Callback otherCallback = new Callback();
-    // this.objReceiver.setCallback(otherCallback);
-    //
-    // Callback sameCallback = this.objReceiver.getCallback();
-    // assertNotNull("The callback instance cannot be null.", sameCallback);
-    //
-    // assertNotEquals("The callback instances cannot be the same.", testCallback, sameCallback);
-    // assertEquals("The callback instances should be the same.", otherCallback, sameCallback);
-    //
-    // this.objReceiver.setCallback(testCallback);
+    String strPayload = "Hello World";
+
+    Messenger other = new Messenger("other");
+    other.loadConfiguration("/test.properties");
+    other.start();
+
+    other.sendMessage(MessageType.GENERATION_MESSAGE, "test", strPayload);
+
+    Callback objCallback = new Callback()
+    {
+      @Override
+      public void handleMessage(MessageDetails message)
+      {
+        assertEquals("The payload should equal 'Hello World'.", strPayload, "Hello World");
+        objReceiver.setCallback(null);
+      }
+    };
+
+    this.objReceiver.setCallback(objCallback);
 
     System.out.println("done.");
   }
