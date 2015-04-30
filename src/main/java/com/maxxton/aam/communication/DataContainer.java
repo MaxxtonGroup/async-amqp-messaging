@@ -52,6 +52,12 @@ public class DataContainer
     this.seOddMessages = new HashSet<Message>();
   }
 
+  /**
+   * Sets the resources class for the DataContainer worker.
+   * 
+   * @param resources
+   *          an instance of the resources.
+   */
   public void setResources(Resources resources)
   {
     this.objResources = resources;

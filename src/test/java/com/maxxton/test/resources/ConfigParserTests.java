@@ -27,26 +27,27 @@ public class ConfigParserTests
   {
 
   }
-  
+
   /**
    * Test the file sorting mechanism.
    * 
-   * @throws Exception reason of failure given by the test.
+   * @throws Exception
+   *           reason of failure given by the test.
    */
   @Test
   public void testFileSorting() throws Exception
   {
     System.out.print("ConfigParser : Testing parsing of allowed and disallowed files...");
-    
+
     Properties objXml = ConfigParser.parseConfig("/parser.xml");
     assertNotNull("The properties instance should not be null.", objXml);
-    
+
     Properties objProperties = ConfigParser.parseConfig("/parser.properties");
     assertNotNull("The properties instance should not be null.", objProperties);
-    
+
     Properties objTxt = ConfigParser.parseConfig("/parser.txt");
     assertNull("The properties instance should be null.", objTxt);
-    
+
     System.out.println("done.");
   }
 
