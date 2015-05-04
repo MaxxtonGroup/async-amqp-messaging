@@ -1,12 +1,14 @@
 package com.maxxton.aam.resources;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Monitor class Supports monitoring and logging of information within the library.
+ * Monitor class. Supports monitoring and logging of information within the library.
  * 
  * @author Robin Hermans
  * @copyright Maxxton 2015
@@ -14,13 +16,18 @@ import org.slf4j.LoggerFactory;
 public class Monitor
 {
 
+  /**
+   * MonitorLevel class. Inner enumeration to determine level of monitoring.
+   * 
+   * @author Robin Hermans
+   * @copyright Maxxton 2015
+   */
   public enum MonitorLevel
   {
     ALL, TRACE, DEBUG, INFO, WARN, ERROR, OFF
   };
 
-  private Logger objLogger;
-
+  private final Logger objLogger;
   private MonitorLevel monitorLvl;
 
   /**
@@ -33,6 +40,12 @@ public class Monitor
     this.loadConfiguration("/default.properties");
   }
 
+  /**
+   * Loads the properties from a given configuration file if they exist.
+   * 
+   * @param configFile
+   *          properties or XML configuration file.
+   */
   public void loadConfiguration(String configFile)
   {
     Properties properties = ConfigParser.parseConfig(configFile);
@@ -44,6 +57,13 @@ public class Monitor
     }
   }
 
+  /**
+   * Determines the MonitorLevel enum for a given string.
+   * 
+   * @param lvl
+   *          the monitorlevel given as string.
+   * @return a MonitorLevel enumeration.
+   */
   private MonitorLevel determineLevel(String lvl)
   {
     switch (lvl.toUpperCase())
@@ -76,6 +96,20 @@ public class Monitor
   public void trace(String strTrace)
   {
     this.objLogger.trace(strTrace);
+  }
+
+  /**
+   * Log and/or monitor a TRACE using an Exception object.
+   * 
+   * @param e
+   *          Exception object to get trace from.
+   */
+  public void trace(Exception e)
+  {
+    StringWriter trace = new StringWriter();
+    e.printStackTrace(new PrintWriter(trace));
+
+    this.objLogger.trace(trace.toString());
   }
 
   /**

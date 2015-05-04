@@ -44,7 +44,6 @@ public class ReceiveController implements MessageListener
    */
   public ReceiveController(Resources resources)
   {
-    // TODO : Change the key to the appropriate one as mentioned in the configuration class.
     this.objResources = resources;
     this.objContainer = DataContainer.getInstance(this.objResources.getConfiguration().getName());
     this.objCallback = null;
@@ -139,8 +138,8 @@ public class ReceiveController implements MessageListener
       }
       catch (InterruptedException e)
       {
-        // TODO : Change to methods from Monitor class.
-        e.printStackTrace();
+        this.getResources().getMonitor().error("Unable to make the thread sleep for '10' milliseconds. Giving stack trace...");
+        this.getResources().getMonitor().trace(e);
       }
       message = this.objContainer.popReceivedMessage();
     }
@@ -245,6 +244,7 @@ public class ReceiveController implements MessageListener
     {
       this.objContainer.removeSendMessageById(correlationId);
       BaseMessage messageBody = (BaseMessage) MessageSerializer.deserialize(message.getBody());
+      // TODO : fix MessageDetails to use the given correlationId as responseId.
       MessageDetails details = new MessageDetails("", messageBody.getSender(), messageBody.getReceiver(), messageBody.getMessageType(), messageBody.getPayload());
       this.objCallback.handleMessage(details);
     }
@@ -285,6 +285,7 @@ public class ReceiveController implements MessageListener
             {
               // TODO : handle id which where not recognized by the messenger (maybe due client/broker failure, messages where resent).
               this.objContainer.addOddMessage(message);
+              this.getResources().getMonitor().warn("The received message was not recognized by the messenger. Maybe due client/broker failure, messages where resent.");
             }
           }
         }
@@ -295,12 +296,12 @@ public class ReceiveController implements MessageListener
       }
       else
       {
-        // TODO : Generate error based on 'CorrelationId is empty.'
+        this.getResources().getMonitor().warn("The CorrelationId was set, but was empty. Throwing away unknown message.");
       }
     }
     else
     {
-      // TODO : Generate error based on 'CorrelationId is not set.'
+      this.getResources().getMonitor().warn("The CorrelationId of a received message was not set. Throwing away unknown message.");
     }
   }
 }
