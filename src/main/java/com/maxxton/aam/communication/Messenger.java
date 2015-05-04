@@ -123,6 +123,7 @@ public class Messenger
   public void loadConfiguration(String configFile)
   {
     this.objResources.getConfiguration().loadConfiguration(configFile);
+    this.objResources.getMonitor().loadConfiguration(configFile);
   }
 
   /**
