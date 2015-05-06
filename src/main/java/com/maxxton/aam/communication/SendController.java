@@ -85,8 +85,7 @@ public class SendController
           }
           catch (Exception e)
           {
-            // TODO : Change to methods from Monitor class.
-            // e.printStackTrace();
+            getResources().getMonitor().info("The receiver client seems to be existing. This does not mean that it's connected and receiving message.");
             return null;
           }
         }

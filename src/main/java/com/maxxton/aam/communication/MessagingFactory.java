@@ -3,6 +3,8 @@ package com.maxxton.aam.communication;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.maxxton.aam.resources.Validator;
+
 /**
  * MessagingFactory class. Supports the creation and (prevents) duplication of Messenger objects. It implements the Creational pattern (with Singleton pattern as parent), as this is the best approach
  * for such a class.
@@ -31,11 +33,11 @@ public class MessagingFactory
    */
   public static MessagingFactory getInstance()
   {
-    if (objInstance == null)
+    if (Validator.checkObject(objInstance, true))
     {
       synchronized (MessagingFactory.class)
       {
-        if (objInstance == null)
+        if (Validator.checkObject(objInstance, true))
         {
           objInstance = new MessagingFactory();
         }
@@ -54,7 +56,7 @@ public class MessagingFactory
   public Messenger createMessenger(String name)
   {
     Messenger messenger = null;
-    if (name.matches("[a-zA-Z]+"))
+    if (Validator.checkString(name, "[a-zA-Z]+"))
     {
       if (this.mMessengerMap.containsKey(name.toLowerCase()))
       {
@@ -65,6 +67,10 @@ public class MessagingFactory
         messenger = new Messenger(name.toLowerCase());
         this.mMessengerMap.put(name.toLowerCase(), messenger);
       }
+    }
+    else
+    {
+      //TODO : Change design to be able to support logging/monitoring here. Also check rest of class.
     }
     return messenger;
   }

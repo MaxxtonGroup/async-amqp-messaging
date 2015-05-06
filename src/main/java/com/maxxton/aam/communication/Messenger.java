@@ -77,6 +77,14 @@ public class Messenger
         message.setReceiver(receiver.toLowerCase());
         return this.objCommunication.packAndSend(receiver.toLowerCase(), message, responseTo);
       }
+      else
+      {
+        this.getResources().getMonitor().warn("The messagetype you are sending is null. Be sure to fill all parameters correctly.");
+      }
+    }
+    else
+    {
+      this.getResources().getMonitor().warn("You need to call the start() method to be able to receive messages from the server.");
     }
     return false;
   }
@@ -86,9 +94,8 @@ public class Messenger
    * 
    * @param millis
    *          timeout given in milliseconds.
-   * @return an instance of the BaseMessage class.
+   * @return an instance of the MessageDetails class.
    */
-  // TODO : create generic type to support passing the more relevant data.
   public MessageDetails receiveMessage(long millis)
   {
     if (this.bIsStarted)
@@ -99,6 +106,11 @@ public class Messenger
         MessageDetails details = new MessageDetails("", message.getSender(), message.getReceiver(), message.getMessageType(), message.getPayload());
         return details;
       }
+      this.getResources().getMonitor().info("There is currently no message available.");
+    }
+    else
+    {
+      this.getResources().getMonitor().warn("You need to call the start() method to be able to receive messages from the server.");
     }
     return null;
   }
