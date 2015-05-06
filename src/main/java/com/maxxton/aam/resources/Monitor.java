@@ -22,22 +22,22 @@ public class Monitor
    * @author Robin Hermans
    * @copyright Maxxton 2015
    */
-  public enum MonitorLevel
+  public static enum MonitorLevel
   {
     ALL, TRACE, DEBUG, INFO, WARN, ERROR, OFF
   };
 
-  private final Logger objLogger;
-  private MonitorLevel monitorLvl;
+  private static Logger objLogger;
+  private static MonitorLevel monitorLvl;
 
   /**
    * Constructor for the monitor class.
    */
   public Monitor()
   {
-    this.objLogger = LoggerFactory.getLogger(Monitor.class);
+    Monitor.objLogger = LoggerFactory.getLogger(Monitor.class);
 
-    this.loadConfiguration("/default.properties");
+    Monitor.loadConfiguration("/default.properties");
   }
 
   /**
@@ -46,14 +46,14 @@ public class Monitor
    * @param configFile
    *          properties or XML configuration file.
    */
-  public void loadConfiguration(String configFile)
+  public static void loadConfiguration(String configFile)
   {
     Properties properties = ConfigParser.parseConfig(configFile);
 
-    if (properties != null)
+    if (Validator.checkObject(properties))
     {
-      String strMonitorLvl = properties.getProperty("monitor.level", this.getMonitorLevel() == null ? "" : this.getMonitorLevel().toString());
-      this.setMonitorLevel(this.determineLevel(strMonitorLvl));
+      String strMonitorLvl = properties.getProperty("monitor.level", Monitor.getMonitorLevel() == null ? "" : Monitor.getMonitorLevel().toString());
+      Monitor.setMonitorLevel(Monitor.determineLevel(strMonitorLvl));
     }
   }
 
@@ -64,7 +64,7 @@ public class Monitor
    *          the monitorlevel given as string.
    * @return a MonitorLevel enumeration.
    */
-  private MonitorLevel determineLevel(String lvl)
+  private static MonitorLevel determineLevel(String lvl)
   {
     switch (lvl.toUpperCase())
     {
@@ -93,9 +93,10 @@ public class Monitor
    * @param strTrace
    *          description given for the trace.
    */
-  public void trace(String strTrace)
+  public static void trace(String strTrace)
   {
-    this.objLogger.trace(strTrace);
+    if (Validator.checkString(strTrace))
+      Monitor.objLogger.trace(strTrace);
   }
 
   /**
@@ -104,12 +105,15 @@ public class Monitor
    * @param e
    *          Exception object to get trace from.
    */
-  public void trace(Exception e)
+  public static void trace(Exception e)
   {
-    StringWriter trace = new StringWriter();
-    e.printStackTrace(new PrintWriter(trace));
+    if (Validator.checkObject(e, Exception.class))
+    {
+      StringWriter trace = new StringWriter();
+      e.printStackTrace(new PrintWriter(trace));
 
-    this.objLogger.trace(trace.toString());
+      Monitor.objLogger.trace(trace.toString());
+    }
   }
 
   /**
@@ -118,9 +122,10 @@ public class Monitor
    * @param strDebug
    *          description given for the DEBUG
    */
-  public void debug(String strDebug)
+  public static void debug(String strDebug)
   {
-    this.objLogger.debug(strDebug);
+    if (Validator.checkString(strDebug))
+      Monitor.objLogger.debug(strDebug);
   }
 
   /**
@@ -129,9 +134,10 @@ public class Monitor
    * @param strInfo
    *          description given for the INFO
    */
-  public void info(String strInfo)
+  public static void info(String strInfo)
   {
-    this.objLogger.info(strInfo);
+    if (Validator.checkString(strInfo))
+      Monitor.objLogger.info(strInfo);
   }
 
   /**
@@ -140,9 +146,10 @@ public class Monitor
    * @param strWarn
    *          description given for the WARN
    */
-  public void warn(String strWarn)
+  public static void warn(String strWarn)
   {
-    this.objLogger.warn(strWarn);
+    if (Validator.checkString(strWarn))
+      Monitor.objLogger.warn(strWarn);
   }
 
   /**
@@ -151,9 +158,10 @@ public class Monitor
    * @param strError
    *          description given for the ERROR
    */
-  public void error(String strError)
+  public static void error(String strError)
   {
-    this.objLogger.error(strError);
+    if (Validator.checkString(strError))
+      Monitor.objLogger.error(strError);
   }
 
   /** Getters and Setters **/
@@ -164,9 +172,10 @@ public class Monitor
    * @param monitorLvl
    *          Level on which the monitor triggers
    */
-  public void setMonitorLevel(MonitorLevel monitorLvl)
+  public static void setMonitorLevel(MonitorLevel monitorLvl)
   {
-    this.monitorLvl = monitorLvl;
+    if (Validator.checkObject(monitorLvl, MonitorLevel.class))
+      Monitor.monitorLvl = monitorLvl;
   }
 
   /**
@@ -174,8 +183,8 @@ public class Monitor
    * 
    * @return Level on which the monitor triggers.
    */
-  public MonitorLevel getMonitorLevel()
+  public static MonitorLevel getMonitorLevel()
   {
-    return this.monitorLvl;
+    return Monitor.monitorLvl;
   }
 }

@@ -16,6 +16,7 @@ import com.maxxton.aam.messages.StatusMessage;
 import com.maxxton.aam.resources.Callback;
 import com.maxxton.aam.resources.Configuration;
 import com.maxxton.aam.resources.MessageDetails;
+import com.maxxton.aam.resources.Monitor;
 import com.maxxton.aam.resources.Resources;
 import com.maxxton.aam.resources.Validator;
 
@@ -127,7 +128,7 @@ public class ReceiveController implements MessageListener
 
     if (!Validator.checkInteger(millis, 0, Integer.MAX_VALUE))
     {
-      this.getResources().getMonitor().warn("Receiving timeout given is not between a minimum of '0' and a maximum of 'Integer.MAX_VALUE'. Setting timeout to defualt '0'");
+      Monitor.warn("Receiving timeout given is not between a minimum of '0' and a maximum of 'Integer.MAX_VALUE'. Setting timeout to defualt '0'");
       millis = 0;
     }
 
@@ -144,8 +145,8 @@ public class ReceiveController implements MessageListener
       }
       catch (InterruptedException e)
       {
-        this.getResources().getMonitor().error("Unable to make the thread sleep for '10' milliseconds. Giving stack trace...");
-        this.getResources().getMonitor().trace(e);
+        Monitor.error("Unable to make the thread sleep for '10' milliseconds. Giving stack trace...");
+        Monitor.trace(e);
       }
       message = this.objContainer.popReceivedMessage();
     }
@@ -291,7 +292,7 @@ public class ReceiveController implements MessageListener
             {
               // TODO : handle id which where not recognized by the messenger (maybe due client/broker failure, messages where resent).
               this.objContainer.addOddMessage(message);
-              this.getResources().getMonitor().warn("The received message was not recognized by the messenger. Maybe due client/broker failure, messages where resent.");
+              Monitor.warn("The received message was not recognized by the messenger. Maybe due client/broker failure, messages where resent.");
             }
           }
         }
@@ -302,12 +303,12 @@ public class ReceiveController implements MessageListener
       }
       else
       {
-        this.getResources().getMonitor().warn("The CorrelationId was set, but was empty. Throwing away unknown message.");
+        Monitor.warn("The CorrelationId was set, but was empty. Throwing away unknown message.");
       }
     }
     else
     {
-      this.getResources().getMonitor().warn("The CorrelationId of a received message was not set. Throwing away unknown message.");
+      Monitor.warn("The CorrelationId of a received message was not set. Throwing away unknown message.");
     }
   }
 }

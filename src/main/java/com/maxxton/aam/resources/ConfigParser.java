@@ -31,13 +31,13 @@ public class ConfigParser
         case "xml":
           return ConfigParser.parseXml(stream);
         default:
-          // TODO : Notify through logger that the configuration file given is unsupported.
+          Monitor.warn("Failed to load configuration file '" + sFile + "'. Unsupported file type (Allowed: Properties, XML).");
           break;
       }
     }
     else
     {
-      // TODO : Notify through logger that the configuration file given is invalid.
+      Monitor.warn("Unable to find configuration file '" + sFile + "' in classpath. Make sure the file exists and is in the correct location.");
     }
     return null;
   }
@@ -55,9 +55,9 @@ public class ConfigParser
     {
       int position = sFile.lastIndexOf('.');
       if (Validator.checkInteger(position, 1, Integer.MAX_VALUE))
-      {
         return sFile.substring(position + 1).toLowerCase();
-      }
+      else
+        Monitor.warn("Unable to find extension for file '" + sFile + "'. Make sure you are loading a file with a XML or Properties extension.");
     }
     return "";
   }
@@ -71,19 +71,16 @@ public class ConfigParser
    */
   private static Properties parseProperties(InputStream objFile)
   {
-    if (Validator.checkObject(objFile))
+    try
     {
-      try
-      {
-        Properties properties = new Properties();
-        properties.load(objFile);
-        return properties;
-      }
-      catch (IOException e)
-      {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
+      Properties properties = new Properties();
+      properties.load(objFile);
+      return properties;
+    }
+    catch (IOException e)
+    {
+      Monitor.warn("Unable to load properties configuration file from inputstream.");
+      Monitor.trace(e);
     }
     return null;
   }
@@ -97,19 +94,16 @@ public class ConfigParser
    */
   private static Properties parseXml(InputStream objFile)
   {
-    if (Validator.checkObject(objFile))
+    try
     {
-      try
-      {
-        Properties properties = new Properties();
-        properties.loadFromXML(objFile);
-        return properties;
-      }
-      catch (IOException e)
-      {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
+      Properties properties = new Properties();
+      properties.loadFromXML(objFile);
+      return properties;
+    }
+    catch (IOException e)
+    {
+      Monitor.warn("Unable to load XML configuration file from inputstream.");
+      Monitor.trace(e);
     }
     return null;
   }

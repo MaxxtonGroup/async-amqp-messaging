@@ -3,6 +3,7 @@ package com.maxxton.aam.communication;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.maxxton.aam.resources.Monitor;
 import com.maxxton.aam.resources.Validator;
 
 /**
@@ -70,7 +71,7 @@ public class MessagingFactory
     }
     else
     {
-      // TODO : Change design to be able to support logging/monitoring here. Also check rest of class.
+      Monitor.warn("No messenger instance created or returned due incorrect name.");
     }
     return messenger;
   }
@@ -84,10 +85,21 @@ public class MessagingFactory
    */
   public boolean destroyMessenger(String name)
   {
-    if (this.mMessengerMap.containsKey(name))
+    if (Validator.checkString(name, "[a-zA-Z]+"))
     {
-      this.mMessengerMap.remove(name);
-      return true;
+      if (this.mMessengerMap.containsKey(name))
+      {
+        this.mMessengerMap.remove(name);
+        return true;
+      }
+      else
+      {
+        Monitor.info("No Messenger found with name '" + name + "'");
+      }
+    }
+    else
+    {
+      Monitor.warn("No messenger instance deleted due incorrect name");
     }
     return false;
   }

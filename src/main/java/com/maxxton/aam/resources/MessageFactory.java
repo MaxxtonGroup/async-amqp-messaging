@@ -39,6 +39,7 @@ public class MessageFactory
       case STATUS_MESSAGE:
         return new StatusMessage();
       default:
+        Monitor.warn("Unable to create message for type '" + messageType + "'. Make sure the messagetype exist and is not null.");
         return null;
     }
   }

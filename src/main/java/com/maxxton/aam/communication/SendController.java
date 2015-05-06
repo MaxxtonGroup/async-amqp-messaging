@@ -6,6 +6,7 @@ import org.springframework.amqp.rabbit.core.ChannelCallback;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import com.maxxton.aam.resources.Configuration;
+import com.maxxton.aam.resources.Monitor;
 import com.maxxton.aam.resources.Resources;
 import com.rabbitmq.client.AMQP.Queue.DeclareOk;
 
@@ -85,7 +86,7 @@ public class SendController
           }
           catch (Exception e)
           {
-            getResources().getMonitor().info("The receiver client seems to be existing. This does not mean that it's connected and receiving message.");
+            Monitor.info("The receiver client seems to be existing. This does not mean that it's connected and receiving message.");
             return null;
           }
         }

@@ -5,6 +5,7 @@ import com.maxxton.aam.messages.MessageType;
 import com.maxxton.aam.resources.Callback;
 import com.maxxton.aam.resources.MessageDetails;
 import com.maxxton.aam.resources.MessageFactory;
+import com.maxxton.aam.resources.Monitor;
 import com.maxxton.aam.resources.Resources;
 import com.maxxton.aam.resources.Validator;
 
@@ -79,12 +80,12 @@ public class Messenger
       }
       else
       {
-        this.getResources().getMonitor().warn("The messagetype you are sending is null. Be sure to fill all parameters correctly.");
+        Monitor.warn("The messagetype you are sending is null. Be sure to fill all parameters correctly.");
       }
     }
     else
     {
-      this.getResources().getMonitor().warn("You need to call the start() method to be able to receive messages from the server.");
+      Monitor.warn("You need to call the start() method to be able to receive messages from the server.");
     }
     return false;
   }
@@ -106,11 +107,11 @@ public class Messenger
         MessageDetails details = new MessageDetails("", message.getSender(), message.getReceiver(), message.getMessageType(), message.getPayload());
         return details;
       }
-      this.getResources().getMonitor().info("There is currently no message available.");
+      Monitor.info("There is currently no message available.");
     }
     else
     {
-      this.getResources().getMonitor().warn("You need to call the start() method to be able to receive messages from the server.");
+      Monitor.warn("You need to call the start() method to be able to receive messages from the server.");
     }
     return null;
   }
@@ -126,7 +127,7 @@ public class Messenger
     if (Validator.checkObject(callback, Callback.class))
       this.objCommunication.getReceiver().setCallback(callback);
     else
-      this.getResources().getMonitor().warn("Callback given in the setter for the receiver callback is invallid.");
+      Monitor.warn("Callback given in the setter for the receiver callback is invallid.");
   }
 
   /**
@@ -139,12 +140,12 @@ public class Messenger
   {
     if (!this.bIsStarted)
     {
-      this.objResources.getMonitor().loadConfiguration(configFile);
+      Monitor.loadConfiguration(configFile);
       this.objResources.getConfiguration().loadConfiguration(configFile);
     }
     else
     {
-      this.getResources().getMonitor().warn("This messenger instance has already been started. Changes in the configuration are likely to be discarded.");
+      Monitor.warn("This messenger instance has already been started. Changes in the configuration are likely to be discarded.");
     }
   }
 
@@ -161,7 +162,7 @@ public class Messenger
     }
     else
     {
-      this.getResources().getMonitor().warn("This messenger instance has already been started. No new controller has been initiated.");
+      Monitor.warn("This messenger instance has already been started. No new controller has been initiated.");
     }
   }
 
@@ -176,7 +177,7 @@ public class Messenger
     if (Validator.checkObject(resources, Resources.class))
       this.objResources = resources;
     else
-      this.getResources().getMonitor().warn("Resource instance given in setter method is invallid.");
+      Monitor.warn("Resource instance given in setter method is invallid.");
   }
 
   /**
@@ -200,7 +201,7 @@ public class Messenger
     if (Validator.checkObject(communication, CommunicationController.class))
       this.objCommunication = communication;
     else
-      this.getResources().getMonitor().warn("CommunicationController instance given in setter method is invallid.");
+      Monitor.warn("CommunicationController instance given in setter method is invallid.");
   }
 
   /**
