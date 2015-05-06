@@ -17,6 +17,7 @@ import com.maxxton.aam.resources.Callback;
 import com.maxxton.aam.resources.Configuration;
 import com.maxxton.aam.resources.MessageDetails;
 import com.maxxton.aam.resources.Resources;
+import com.maxxton.aam.resources.Validator;
 
 /**
  * ReceiveController class Handles all message communication which involves receiving.
@@ -120,16 +121,21 @@ public class ReceiveController implements MessageListener
    *          timeout given in milliseconds.
    * @return The received message
    */
-  public Message receiveMessage(long millis)
+  public Message receiveMessage(int millis)
   {
     Message message = this.objContainer.popReceivedMessage();
+
+    if (!Validator.checkInteger(millis, 0, Integer.MAX_VALUE))
+    {
+      this.getResources().getMonitor().warn("Receiving timeout given is not between a minimum of '0' and a maximum of 'Integer.MAX_VALUE'. Setting timeout to defualt '0'");
+      millis = 0;
+    }
+
     while (message == null && millis > 0)
     {
-      long time = millis % 100;
+      int time = millis % 100;
       if (time == 0)
-      {
         time = 10;
-      }
 
       millis = millis - time;
       try

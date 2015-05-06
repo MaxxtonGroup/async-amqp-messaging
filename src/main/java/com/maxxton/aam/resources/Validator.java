@@ -7,7 +7,7 @@ public class Validator
 
   public static boolean checkString(String strObject)
   {
-    return Validator.checkString(strObject, "");
+    return Validator.checkString(strObject, "(.*)");
   }
 
   public static boolean checkString(String strObject, String regex)

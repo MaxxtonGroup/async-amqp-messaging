@@ -22,7 +22,7 @@ public class ConfigParser
   public static Properties parseConfig(String sFile)
   {
     InputStream stream = ConfigParser.class.getResourceAsStream(sFile);
-    if (stream != null)
+    if (Validator.checkObject(stream, InputStream.class))
     {
       switch (ConfigParser.getExtension(sFile))
       {
@@ -51,10 +51,13 @@ public class ConfigParser
    */
   private static String getExtension(String sFile)
   {
-    int position = sFile.lastIndexOf('.');
-    if (position > 0)
+    if (Validator.checkString(sFile))
     {
-      return sFile.substring(position + 1).toLowerCase();
+      int position = sFile.lastIndexOf('.');
+      if (Validator.checkInteger(position, 1, Integer.MAX_VALUE))
+      {
+        return sFile.substring(position + 1).toLowerCase();
+      }
     }
     return "";
   }
@@ -68,16 +71,19 @@ public class ConfigParser
    */
   private static Properties parseProperties(InputStream objFile)
   {
-    try
+    if (Validator.checkObject(objFile))
     {
-      Properties properties = new Properties();
-      properties.load(objFile);
-      return properties;
-    }
-    catch (IOException e)
-    {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      try
+      {
+        Properties properties = new Properties();
+        properties.load(objFile);
+        return properties;
+      }
+      catch (IOException e)
+      {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
     }
     return null;
   }
@@ -91,16 +97,19 @@ public class ConfigParser
    */
   private static Properties parseXml(InputStream objFile)
   {
-    try
+    if (Validator.checkObject(objFile))
     {
-      Properties properties = new Properties();
-      properties.loadFromXML(objFile);
-      return properties;
-    }
-    catch (IOException e)
-    {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      try
+      {
+        Properties properties = new Properties();
+        properties.loadFromXML(objFile);
+        return properties;
+      }
+      catch (IOException e)
+      {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
     }
     return null;
   }

@@ -70,7 +70,7 @@ public class MessagingFactory
     }
     else
     {
-      //TODO : Change design to be able to support logging/monitoring here. Also check rest of class.
+      // TODO : Change design to be able to support logging/monitoring here. Also check rest of class.
     }
     return messenger;
   }

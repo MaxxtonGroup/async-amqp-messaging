@@ -16,6 +16,7 @@ import org.springframework.amqp.core.Message;
 
 import com.maxxton.aam.resources.Configuration;
 import com.maxxton.aam.resources.Resources;
+import com.maxxton.aam.resources.Validator;
 
 /**
  * DataContainer class Contains all data which passes the Send- and/or ReceiveController. This may include id's and messages.
@@ -63,7 +64,7 @@ public class DataContainer
     this.objResources = resources;
     Configuration config = this.objResources.getConfiguration();
 
-    if (this.objScheduler == null)
+    if (Validator.checkObject(this.objScheduler, true))
     {
       this.objScheduler = objExecutor.scheduleAtFixedRate(new Runnable()
       {

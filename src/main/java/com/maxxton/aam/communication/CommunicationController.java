@@ -40,7 +40,7 @@ public class CommunicationController
    *          timeout given in milliseconds.
    * @return an unpacked instance which inherits BaseMessage.
    */
-  public BaseMessage unpackAndReceive(long millis)
+  public BaseMessage unpackAndReceive(int millis)
   {
     Message message = this.objReceiver.receiveMessage(millis);
     if (message != null)

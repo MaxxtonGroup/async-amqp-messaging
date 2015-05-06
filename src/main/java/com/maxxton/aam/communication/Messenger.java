@@ -6,6 +6,7 @@ import com.maxxton.aam.resources.Callback;
 import com.maxxton.aam.resources.MessageDetails;
 import com.maxxton.aam.resources.MessageFactory;
 import com.maxxton.aam.resources.Resources;
+import com.maxxton.aam.resources.Validator;
 
 /**
  * Messenger class. This is the main entry point for the library. It is connected to all other classes within the library. Has multiple methods to support the communication with AMQP brokers.
@@ -30,7 +31,6 @@ public class Messenger
   {
     Resources resources = new Resources();
     resources.getConfiguration().setName(messengerName);
-    // TODO : setup + initialize the resources.
     this.setResources(resources);
 
     this.bIsStarted = false;
@@ -70,7 +70,7 @@ public class Messenger
     if (this.bIsStarted)
     {
       BaseMessage message = MessageFactory.createMessage(messageType);
-      if (message != null)
+      if (Validator.checkObject(message, BaseMessage.class))
       {
         message.setPayload(payload);
         message.setSender(this.objResources.getConfiguration().getName());
@@ -96,12 +96,12 @@ public class Messenger
    *          timeout given in milliseconds.
    * @return an instance of the MessageDetails class.
    */
-  public MessageDetails receiveMessage(long millis)
+  public MessageDetails receiveMessage(int millis)
   {
     if (this.bIsStarted)
     {
       BaseMessage message = this.objCommunication.unpackAndReceive(millis);
-      if (message != null)
+      if (Validator.checkObject(message, BaseMessage.class))
       {
         MessageDetails details = new MessageDetails("", message.getSender(), message.getReceiver(), message.getMessageType(), message.getPayload());
         return details;
@@ -123,7 +123,10 @@ public class Messenger
    */
   public void setReceiveCallback(Callback callback)
   {
-    this.objCommunication.getReceiver().setCallback(callback);
+    if (Validator.checkObject(callback, Callback.class))
+      this.objCommunication.getReceiver().setCallback(callback);
+    else
+      this.getResources().getMonitor().warn("Callback given in the setter for the receiver callback is invallid.");
   }
 
   /**
@@ -134,8 +137,15 @@ public class Messenger
    */
   public void loadConfiguration(String configFile)
   {
-    this.objResources.getConfiguration().loadConfiguration(configFile);
-    this.objResources.getMonitor().loadConfiguration(configFile);
+    if (!this.bIsStarted)
+    {
+      this.objResources.getMonitor().loadConfiguration(configFile);
+      this.objResources.getConfiguration().loadConfiguration(configFile);
+    }
+    else
+    {
+      this.getResources().getMonitor().warn("This messenger instance has already been started. Changes in the configuration are likely to be discarded.");
+    }
   }
 
   /**
@@ -143,9 +153,16 @@ public class Messenger
    */
   public void start()
   {
-    CommunicationController controller = new CommunicationController(this.getResources());
-    this.setCommunication(controller);
-    this.bIsStarted = true;
+    if (!this.bIsStarted)
+    {
+      CommunicationController controller = new CommunicationController(this.getResources());
+      this.setCommunication(controller);
+      this.bIsStarted = true;
+    }
+    else
+    {
+      this.getResources().getMonitor().warn("This messenger instance has already been started. No new controller has been initiated.");
+    }
   }
 
   /**
@@ -156,7 +173,10 @@ public class Messenger
    */
   private void setResources(Resources resources)
   {
-    this.objResources = resources;
+    if (Validator.checkObject(resources, Resources.class))
+      this.objResources = resources;
+    else
+      this.getResources().getMonitor().warn("Resource instance given in setter method is invallid.");
   }
 
   /**
@@ -177,7 +197,10 @@ public class Messenger
    */
   private void setCommunication(CommunicationController communication)
   {
-    this.objCommunication = communication;
+    if (Validator.checkObject(communication, CommunicationController.class))
+      this.objCommunication = communication;
+    else
+      this.getResources().getMonitor().warn("CommunicationController instance given in setter method is invallid.");
   }
 
   /**

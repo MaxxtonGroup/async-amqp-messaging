@@ -53,18 +53,15 @@ public class Configuration
   {
     Properties properties = ConfigParser.parseConfig(configFile);
 
-    if (properties != null)
+    if (Validator.checkObject(properties, Properties.class))
     {
-      if (properties.getProperty("broker.ports") != null)
+      String ports = properties.getProperty("broker.ports", "");
+      if (Validator.checkString(ports, "^[0-9,]+$"))
       {
-        String ports = properties.getProperty("broker.ports").replace("\\s", "");
-        if (ports.matches("^[0-9,]+$"))
+        List<String> strPorts = Arrays.asList(ports.split(","));
+        for (String port : strPorts)
         {
-          List<String> strPorts = Arrays.asList(ports.split(","));
-          for (String port : strPorts)
-          {
-            this.addPort(Integer.parseInt(port));
-          }
+          this.addPort(Integer.parseInt(port));
         }
       }
 
