@@ -28,7 +28,9 @@ public class Monitor
   };
 
   private static Logger objLogger;
+  private static Zabbix objZabbix;
   private static MonitorLevel monitorLvl;
+  private static boolean bIsStarted;
 
   /**
    * Constructor for the monitor class.
@@ -36,8 +38,23 @@ public class Monitor
   public Monitor()
   {
     Monitor.objLogger = LoggerFactory.getLogger(Monitor.class);
+    Monitor.objZabbix = new Zabbix();
+    Monitor.monitorLvl = MonitorLevel.ALL;
+    Monitor.bIsStarted = false;
 
     Monitor.loadConfiguration("/default.properties");
+  }
+
+  /**
+   * Start method. Called after the correct configuration has been loaded.
+   */
+  public static void start()
+  {
+    if (!bIsStarted)
+    {
+      Monitor.objZabbix.start();
+      Monitor.bIsStarted = true;
+    }
   }
 
   /**
@@ -52,8 +69,14 @@ public class Monitor
 
     if (Validator.checkObject(properties))
     {
-      String strMonitorLvl = properties.getProperty("monitor.level", Monitor.getMonitorLevel() == null ? "" : Monitor.getMonitorLevel().toString());
+      String strMonitorLvl = properties.getProperty("monitor.level", Monitor.getMonitorLevel().toString());
       Monitor.setMonitorLevel(Monitor.determineLevel(strMonitorLvl));
+
+      String strHostName = properties.getProperty("monitor.hostname", Monitor.objZabbix.getHostname());
+      String strServerAddress = properties.getProperty("monitor.server.address", Monitor.objZabbix.getServerAddress());
+      int intServerPort = properties.getProperty("monitor.server.port") == null ? Monitor.objZabbix.getServerPort() : Integer.parseInt(properties.getProperty("monitor.server.port"));
+
+      Monitor.objZabbix.setupAgent(strHostName, strServerAddress, intServerPort);
     }
   }
 

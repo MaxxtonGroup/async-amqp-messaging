@@ -156,6 +156,8 @@ public class Messenger
   {
     if (!this.bIsStarted)
     {
+      Monitor.start();
+
       CommunicationController controller = new CommunicationController(this.getResources());
       this.setCommunication(controller);
       this.bIsStarted = true;
