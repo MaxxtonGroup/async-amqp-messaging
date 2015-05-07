@@ -4,6 +4,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Properties;
 
+import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.spi.LoggingEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +15,7 @@ import org.slf4j.LoggerFactory;
  * @author Robin Hermans
  * @copyright Maxxton 2015
  */
-public class Monitor
+public class Monitor extends AppenderSkeleton
 {
 
   /**
@@ -108,6 +110,36 @@ public class Monitor
     }
   }
 
+  /**
+   * Checks if a certain level passes the MonitorLevel setting.
+   * 
+   * @param level
+   *          Level to be checked against the MonitorLevel.
+   * @return True if it passed, False if it didn't.
+   */
+  private static boolean checkLevelPass(MonitorLevel level)
+  {
+    switch (Monitor.monitorLvl)
+    {
+      case ALL:
+        return true;
+      case TRACE:
+        return level == MonitorLevel.TRACE || level == MonitorLevel.DEBUG || level == MonitorLevel.INFO || level == MonitorLevel.WARN || level == MonitorLevel.ERROR ? true : false;
+      case DEBUG:
+        return level == MonitorLevel.DEBUG || level == MonitorLevel.INFO || level == MonitorLevel.WARN || level == MonitorLevel.ERROR ? true : false;
+      case INFO:
+        return level == MonitorLevel.INFO || level == MonitorLevel.WARN || level == MonitorLevel.ERROR ? true : false;
+      case WARN:
+        return level == MonitorLevel.WARN || level == MonitorLevel.ERROR ? true : false;
+      case ERROR:
+        return level == MonitorLevel.ERROR ? true : false;
+      case OFF:
+        return false;
+      default:
+        return true;
+    }
+  }
+
   /** Different Log Levels **/
 
   /**
@@ -119,7 +151,13 @@ public class Monitor
   public static void trace(String strTrace)
   {
     if (Validator.checkString(strTrace))
+    {
       Monitor.objLogger.trace(strTrace);
+      if (Monitor.checkLevelPass(MonitorLevel.TRACE))
+      {
+        Monitor.objZabbix.addLog(MonitorLevel.TRACE, strTrace);
+      }
+    }
   }
 
   /**
@@ -136,6 +174,10 @@ public class Monitor
       e.printStackTrace(new PrintWriter(trace));
 
       Monitor.objLogger.trace(trace.toString());
+      if (Monitor.checkLevelPass(MonitorLevel.TRACE))
+      {
+        Monitor.objZabbix.addLog(MonitorLevel.TRACE, trace.toString());
+      }
     }
   }
 
@@ -148,7 +190,13 @@ public class Monitor
   public static void debug(String strDebug)
   {
     if (Validator.checkString(strDebug))
+    {
       Monitor.objLogger.debug(strDebug);
+      if (Monitor.checkLevelPass(MonitorLevel.DEBUG))
+      {
+        Monitor.objZabbix.addLog(MonitorLevel.DEBUG, strDebug);
+      }
+    }
   }
 
   /**
@@ -160,7 +208,13 @@ public class Monitor
   public static void info(String strInfo)
   {
     if (Validator.checkString(strInfo))
+    {
       Monitor.objLogger.info(strInfo);
+      if (Monitor.checkLevelPass(MonitorLevel.INFO))
+      {
+        Monitor.objZabbix.addLog(MonitorLevel.INFO, strInfo);
+      }
+    }
   }
 
   /**
@@ -172,7 +226,13 @@ public class Monitor
   public static void warn(String strWarn)
   {
     if (Validator.checkString(strWarn))
+    {
       Monitor.objLogger.warn(strWarn);
+      if (Monitor.checkLevelPass(MonitorLevel.WARN))
+      {
+        Monitor.objZabbix.addLog(MonitorLevel.WARN, strWarn);
+      }
+    }
   }
 
   /**
@@ -184,7 +244,13 @@ public class Monitor
   public static void error(String strError)
   {
     if (Validator.checkString(strError))
+    {
       Monitor.objLogger.error(strError);
+      if (Monitor.checkLevelPass(MonitorLevel.ERROR))
+      {
+        Monitor.objZabbix.addLog(MonitorLevel.ERROR, strError);
+      }
+    }
   }
 
   /** Getters and Setters **/
@@ -209,5 +275,27 @@ public class Monitor
   public static MonitorLevel getMonitorLevel()
   {
     return Monitor.monitorLvl;
+  }
+
+  @Override
+  public void close()
+  {
+
+  }
+
+  @Override
+  public boolean requiresLayout()
+  {
+    return false;
+  }
+
+  @Override
+  protected void append(LoggingEvent event)
+  {
+    MonitorLevel level = Monitor.determineLevel(event.getLevel().toString());
+    if (Monitor.checkLevelPass(level))
+    {
+      Monitor.objZabbix.addLog(level, event.getMessage().toString());
+    }
   }
 }
