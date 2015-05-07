@@ -6,7 +6,7 @@ It has support for:
 * Endpoint control
 * Status control
 * Logging for muliple logsystems
-* Monitoring through Zabbix
+* Monitoring through Zabbix (using [Zabbix/J](http://quigley.com/software/zabbixj/)
 * Message Types
 * Highly Available and Failover
 * Callbacks
@@ -23,11 +23,12 @@ This dependency comes with the use of [Lambda Expressions](http://www.oracle.com
 The library makes use of some Maven dependencies.
 All are listed below.
 
-| Name          | Version        |
-| ------------- |:--------------:|
-| Spring Rabbit | 1.4.3.RELEASE  |
-| SLF4J API     | 1.7.10         |
-| JUnit			| RELEASE        |
+| Name          | GroupId				  | Version       |
+| ------------- | ----------------------- |:-------------:|
+| Spring Rabbit | org.springframework.amqp| 1.4.3.RELEASE |
+| Zabbix/J		| com.quigley			  | 1.0.1		  |
+| SLF4J API     | org.slf4j				  | 1.7.10        |
+| JUnit			| junit					  | RELEASE       |
 
 Throughout the development of the project this list may grow.
 
@@ -69,4 +70,5 @@ Any calls to the same name will return the same object.
 
 License
 ---
-The Async AMQP Messaging project makes use of the Spring AMQP project. Due this dependency this wil be released under the terms of Apache Licence Version 2.0.
+The Async AMQP Messaging project makes use of the Spring AMQP project. Due this dependency this wil be released under the terms of **Apache Licence Version 2.0**.
+Also the dependency Zabbix/J commes with the licence restriction of the **GNU Library General Public License**.
