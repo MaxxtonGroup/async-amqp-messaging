@@ -19,7 +19,7 @@ public class Monitor extends AppenderSkeleton
 {
 
   /**
-   * MonitorLevel class. Inner enumeration to determine level of monitoring.
+   * MonitorLevel class. Public static enumeration to determine level of monitoring.
    * 
    * @author Robin Hermans
    * @copyright Maxxton 2015
@@ -31,6 +31,7 @@ public class Monitor extends AppenderSkeleton
 
   private static Logger objLogger;
   private static Zabbix objZabbix;
+  private static boolean bMonitorEnabled;
   private static MonitorLevel monitorLvl;
   private static boolean bIsStarted;
 
@@ -41,6 +42,7 @@ public class Monitor extends AppenderSkeleton
   {
     Monitor.objLogger = LoggerFactory.getLogger(Monitor.class);
     Monitor.objZabbix = new Zabbix();
+    Monitor.bMonitorEnabled = false;
     Monitor.monitorLvl = MonitorLevel.ALL;
     Monitor.bIsStarted = false;
 
@@ -54,7 +56,10 @@ public class Monitor extends AppenderSkeleton
   {
     if (!bIsStarted)
     {
-      Monitor.objZabbix.start();
+      if (bMonitorEnabled)
+      {
+        Monitor.objZabbix.start();
+      }
       Monitor.bIsStarted = true;
     }
   }
@@ -71,6 +76,9 @@ public class Monitor extends AppenderSkeleton
 
     if (Validator.checkObject(properties))
     {
+      Boolean bEnabled = properties.getProperty("monitor.enabled") == null ? Monitor.bMonitorEnabled : Boolean.parseBoolean(properties.getProperty("monitor.enabled"));
+      Monitor.setEnabled(bEnabled);
+
       String strMonitorLvl = properties.getProperty("monitor.level", Monitor.getMonitorLevel().toString());
       Monitor.setMonitorLevel(Monitor.determineLevel(strMonitorLvl));
 
@@ -275,6 +283,27 @@ public class Monitor extends AppenderSkeleton
   public static MonitorLevel getMonitorLevel()
   {
     return Monitor.monitorLvl;
+  }
+
+  /**
+   * Sets the enabled state of Zabbix monitoring.
+   * 
+   * @param enabled
+   *          boolean to tell the enabled state.
+   */
+  public static void setEnabled(boolean enabled)
+  {
+    Monitor.bMonitorEnabled = enabled;
+  }
+
+  /**
+   * Gets the enabled state of Zabbix monitoring.
+   * 
+   * @return the enabled state.
+   */
+  public static boolean getEnabled()
+  {
+    return Monitor.bMonitorEnabled;
   }
 
   @Override

@@ -17,6 +17,7 @@ import com.quigley.zabbixj.providers.JVMMetricsProvider;
 public class Zabbix
 {
   private ZabbixAgent zbxAgent;
+  private boolean bIsStarted;
 
   private String strHostname;
   private String strServerAddress;
@@ -38,6 +39,8 @@ public class Zabbix
     this.arrInfoLog = new ArrayList<String>();
     this.arrDebugLog = new ArrayList<String>();
     this.arrTraceLog = new ArrayList<String>();
+
+    this.bIsStarted = false;
   }
 
   /**
@@ -80,13 +83,17 @@ public class Zabbix
    */
   public void start()
   {
-    try
+    if (!this.bIsStarted)
     {
-      this.zbxAgent.start();
-    }
-    catch (Exception e)
-    {
-      Monitor.error("Failed to start the Zabbix Agent. No active/passive communication with the server available, ALL monitoring dropped.");
+      try
+      {
+        this.zbxAgent.start();
+      }
+      catch (Exception e)
+      {
+        Monitor.error("Failed to start the Zabbix Agent. No active/passive communication with the server available, ALL monitoring dropped.");
+      }
+      this.bIsStarted = true;
     }
   }
 
@@ -177,26 +184,29 @@ public class Zabbix
    */
   public void addLog(MonitorLevel level, String log)
   {
-    switch (level)
+    if (bIsStarted)
     {
-      case ERROR:
-        this.arrErrorLog.add(log);
-        break;
-      case WARN:
-        this.arrWarnLog.add(log);
-        break;
-      case INFO:
-        this.arrInfoLog.add(log);
-        break;
-      case DEBUG:
-        this.arrDebugLog.add(log);
-        break;
-      case TRACE:
-        this.arrTraceLog.add(log);
-        break;
-      default:
-        // Do Nothing...
-        break;
+      switch (level)
+      {
+        case ERROR:
+          this.arrErrorLog.add(log);
+          break;
+        case WARN:
+          this.arrWarnLog.add(log);
+          break;
+        case INFO:
+          this.arrInfoLog.add(log);
+          break;
+        case DEBUG:
+          this.arrDebugLog.add(log);
+          break;
+        case TRACE:
+          this.arrTraceLog.add(log);
+          break;
+        default:
+          // Do Nothing...
+          break;
+      }
     }
   }
 }
