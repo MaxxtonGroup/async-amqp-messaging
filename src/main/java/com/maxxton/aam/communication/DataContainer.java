@@ -28,29 +28,29 @@ public class DataContainer
 {
   private static Map<String, DataContainer> mInstances = new HashMap<String, DataContainer>();
 
-  private final ReentrantReadWriteLock rwSendLock = new ReentrantReadWriteLock(true);
-  private final ReentrantReadWriteLock rwReceivedLock = new ReentrantReadWriteLock(true);
-  private final ReentrantReadWriteLock rwIdentifiersLock = new ReentrantReadWriteLock(true);
+  private final ReentrantReadWriteLock objSendLock = new ReentrantReadWriteLock(true);
+  private final ReentrantReadWriteLock objReceivedLock = new ReentrantReadWriteLock(true);
+  private final ReentrantReadWriteLock objIdentifiersLock = new ReentrantReadWriteLock(true);
 
   private final ScheduledExecutorService objExecutor = Executors.newScheduledThreadPool(1);
   private ScheduledFuture<?> objScheduler;
 
   private String sName;
   private Resources objResources;
-  private Set<String> seIdentifiers;
-  private Set<Message> seSendMessages;
-  private Set<Message> seReceivedMessages;
-  private Set<Message> seOddMessages;
+  private Set<String> setIdentifiers;
+  private Set<Message> setSendMessages;
+  private Set<Message> setReceivedMessages;
+  private Set<Message> setOddMessages;
 
   /**
    * DataContainer constructor Initiates elements defined in this class
    */
   private DataContainer()
   {
-    this.seIdentifiers = new HashSet<String>();
-    this.seSendMessages = new HashSet<Message>();
-    this.seReceivedMessages = new HashSet<Message>();
-    this.seOddMessages = new HashSet<Message>();
+    this.setIdentifiers = new HashSet<String>();
+    this.setSendMessages = new HashSet<Message>();
+    this.setReceivedMessages = new HashSet<Message>();
+    this.setOddMessages = new HashSet<Message>();
   }
 
   /**
@@ -120,11 +120,11 @@ public class DataContainer
   private void identifierCleanup()
   {
     Configuration config = this.objResources.getConfiguration();
-    if (this.seIdentifiers.size() > config.getDataMaxElements())
+    if (this.setIdentifiers.size() > config.getDataMaxElements())
     {
-      Iterator<String> it = this.seIdentifiers.iterator();
+      Iterator<String> it = this.setIdentifiers.iterator();
       int count = 1;
-      this.rwIdentifiersLock.writeLock().lock();
+      this.objIdentifiersLock.writeLock().lock();
       try
       {
         while (it.hasNext())
@@ -139,7 +139,7 @@ public class DataContainer
       }
       finally
       {
-        this.rwIdentifiersLock.writeLock().unlock();
+        this.objIdentifiersLock.writeLock().unlock();
       }
     }
   }
@@ -150,12 +150,12 @@ public class DataContainer
   private void sendCleanup()
   {
     Configuration config = this.objResources.getConfiguration();
-    if (this.seSendMessages.size() > config.getDataMaxElements())
+    if (this.setSendMessages.size() > config.getDataMaxElements())
     {
-      this.rwSendLock.writeLock().lock();
+      this.objSendLock.writeLock().lock();
       try
       {
-        Iterator<Message> it = this.seSendMessages.iterator();
+        Iterator<Message> it = this.setSendMessages.iterator();
         int count = 1;
         while (it.hasNext())
         {
@@ -169,7 +169,7 @@ public class DataContainer
       }
       finally
       {
-        this.rwSendLock.writeLock().unlock();
+        this.objSendLock.writeLock().unlock();
       }
     }
   }
@@ -180,12 +180,12 @@ public class DataContainer
   private void receiveCleanup()
   {
     Configuration config = this.objResources.getConfiguration();
-    if (this.seReceivedMessages.size() > config.getDataMaxElements())
+    if (this.setReceivedMessages.size() > config.getDataMaxElements())
     {
-      this.rwReceivedLock.writeLock().lock();
+      this.objReceivedLock.writeLock().lock();
       try
       {
-        Iterator<Message> it = this.seReceivedMessages.iterator();
+        Iterator<Message> it = this.setReceivedMessages.iterator();
         int count = 1;
         while (it.hasNext())
         {
@@ -199,7 +199,7 @@ public class DataContainer
       }
       finally
       {
-        this.rwReceivedLock.writeLock().unlock();
+        this.objReceivedLock.writeLock().unlock();
       }
     }
   }
@@ -211,10 +211,10 @@ public class DataContainer
   {
     this.objExecutor.shutdown();
 
-    this.seIdentifiers = new HashSet<String>();
-    this.seSendMessages = new HashSet<Message>();
-    this.seReceivedMessages = new HashSet<Message>();
-    this.seOddMessages = new HashSet<Message>();
+    this.setIdentifiers = new HashSet<String>();
+    this.setSendMessages = new HashSet<Message>();
+    this.setReceivedMessages = new HashSet<Message>();
+    this.setOddMessages = new HashSet<Message>();
 
     mInstances.remove(this.sName);
   }
@@ -248,7 +248,7 @@ public class DataContainer
   public String getUniqueId()
   {
     String id = UUID.randomUUID().toString();
-    this.seIdentifiers.add(id);
+    this.setIdentifiers.add(id);
     return id;
   }
 
@@ -261,10 +261,10 @@ public class DataContainer
    */
   public boolean isOwnedByMe(String id)
   {
-    this.rwIdentifiersLock.readLock().lock();
+    this.objIdentifiersLock.readLock().lock();
     try
     {
-      if (this.seIdentifiers.contains(id))
+      if (this.setIdentifiers.contains(id))
       {
         return true;
       }
@@ -272,7 +272,7 @@ public class DataContainer
     }
     finally
     {
-      this.rwIdentifiersLock.readLock().unlock();
+      this.objIdentifiersLock.readLock().unlock();
     }
   }
 
@@ -284,14 +284,14 @@ public class DataContainer
    */
   public void addIdentifier(String id)
   {
-    this.rwIdentifiersLock.writeLock().lock();
+    this.objIdentifiersLock.writeLock().lock();
     try
     {
-      this.seIdentifiers.add(id);
+      this.setIdentifiers.add(id);
     }
     finally
     {
-      this.rwIdentifiersLock.writeLock().unlock();
+      this.objIdentifiersLock.writeLock().unlock();
     }
   }
 
@@ -303,19 +303,19 @@ public class DataContainer
    */
   public void removeIdentifier(String id)
   {
-    this.rwIdentifiersLock.writeLock().lock();
-    this.rwIdentifiersLock.readLock().lock();
+    this.objIdentifiersLock.writeLock().lock();
+    this.objIdentifiersLock.readLock().lock();
     try
     {
-      if (this.seIdentifiers.contains(id))
+      if (this.setIdentifiers.contains(id))
       {
-        this.seIdentifiers.remove(id);
+        this.setIdentifiers.remove(id);
       }
     }
     finally
     {
-      this.rwIdentifiersLock.readLock().unlock();
-      this.rwIdentifiersLock.writeLock().unlock();
+      this.objIdentifiersLock.readLock().unlock();
+      this.objIdentifiersLock.writeLock().unlock();
     }
   }
 
@@ -326,7 +326,7 @@ public class DataContainer
    */
   public Set<String> getIdentifiers()
   {
-    return this.seIdentifiers;
+    return this.setIdentifiers;
   }
 
   /**
@@ -337,7 +337,7 @@ public class DataContainer
    */
   public void setIdentifiers(Set<String> identifiers)
   {
-    this.seIdentifiers = identifiers;
+    this.setIdentifiers = identifiers;
   }
 
   /**
@@ -349,10 +349,10 @@ public class DataContainer
   public void addSendMessage(Message message)
   {
     // TODO : find solution for overflowing send messages set (run thread that cleans periodically).
-    this.rwSendLock.writeLock().lock();
+    this.objSendLock.writeLock().lock();
     try
     {
-      this.seSendMessages.add(message);
+      this.setSendMessages.add(message);
       if (message.getMessageProperties().getCorrelationId() != null && message.getMessageProperties().getCorrelationId().length > 0)
       {
         this.addIdentifier(message.getMessageProperties().getCorrelationId().toString());
@@ -360,7 +360,7 @@ public class DataContainer
     }
     finally
     {
-      this.rwSendLock.writeLock().unlock();
+      this.objSendLock.writeLock().unlock();
     }
   }
 
@@ -372,14 +372,14 @@ public class DataContainer
    */
   public void removeSendMessage(Message message)
   {
-    this.rwSendLock.writeLock().lock();
+    this.objSendLock.writeLock().lock();
     try
     {
-      this.seSendMessages.remove(message);
+      this.setSendMessages.remove(message);
     }
     finally
     {
-      this.rwSendLock.writeLock().unlock();
+      this.objSendLock.writeLock().unlock();
     }
   }
 
@@ -391,10 +391,10 @@ public class DataContainer
    */
   public void removeSendMessageById(String id)
   {
-    this.rwSendLock.readLock().lock();
+    this.objSendLock.readLock().lock();
     try
     {
-      for (Message message : this.seSendMessages)
+      for (Message message : this.setSendMessages)
       {
         if (message.getMessageProperties().getCorrelationId() != null && message.getMessageProperties().getCorrelationId().length > 0)
         {
@@ -408,7 +408,7 @@ public class DataContainer
     }
     finally
     {
-      this.rwSendLock.readLock().unlock();
+      this.objSendLock.readLock().unlock();
     }
   }
 
@@ -420,7 +420,7 @@ public class DataContainer
    */
   public void setSendMessages(Set<Message> messages)
   {
-    this.seSendMessages = messages;
+    this.setSendMessages = messages;
   }
 
   /**
@@ -430,7 +430,7 @@ public class DataContainer
    */
   public Set<Message> getSendMessages()
   {
-    return this.seSendMessages;
+    return this.setSendMessages;
   }
 
   /**
@@ -441,15 +441,15 @@ public class DataContainer
    */
   public void addReceivedMessage(Message message)
   {
-    this.rwReceivedLock.writeLock().lock();
+    this.objReceivedLock.writeLock().lock();
     try
     {
       // TODO : Make sure that messages which the same correlationId override each other
-      this.seReceivedMessages.add(message);
+      this.setReceivedMessages.add(message);
     }
     finally
     {
-      this.rwReceivedLock.writeLock().unlock();
+      this.objReceivedLock.writeLock().unlock();
     }
   }
 
@@ -460,11 +460,11 @@ public class DataContainer
    */
   public Message popReceivedMessage()
   {
-    this.rwReceivedLock.readLock().lock();
+    this.objReceivedLock.readLock().lock();
     Message message = null;
     try
     {
-      Iterator<Message> it = this.seReceivedMessages.iterator();
+      Iterator<Message> it = this.setReceivedMessages.iterator();
       while (it.hasNext())
       {
         message = (Message) it.next();
@@ -472,7 +472,7 @@ public class DataContainer
     }
     finally
     {
-      this.rwReceivedLock.readLock().unlock();
+      this.objReceivedLock.readLock().unlock();
     }
 
     this.removeReceivedMessage(message);
@@ -487,14 +487,14 @@ public class DataContainer
    */
   public void removeReceivedMessage(Message message)
   {
-    this.rwReceivedLock.writeLock().lock();
+    this.objReceivedLock.writeLock().lock();
     try
     {
-      this.seReceivedMessages.remove(message);
+      this.setReceivedMessages.remove(message);
     }
     finally
     {
-      this.rwReceivedLock.writeLock().unlock();
+      this.objReceivedLock.writeLock().unlock();
     }
   }
 
@@ -506,10 +506,10 @@ public class DataContainer
    */
   public void removeReceivedMessageById(String id)
   {
-    this.rwReceivedLock.readLock().lock();
+    this.objReceivedLock.readLock().lock();
     try
     {
-      for (Message message : this.seReceivedMessages)
+      for (Message message : this.setReceivedMessages)
       {
         if (message.getMessageProperties().getCorrelationId() != null && message.getMessageProperties().getCorrelationId().length > 0)
         {
@@ -523,7 +523,7 @@ public class DataContainer
     }
     finally
     {
-      this.rwReceivedLock.readLock().unlock();
+      this.objReceivedLock.readLock().unlock();
     }
   }
 
@@ -535,14 +535,14 @@ public class DataContainer
    */
   public void setReceivedMessages(Set<Message> messages)
   {
-    this.rwReceivedLock.writeLock().lock();
+    this.objReceivedLock.writeLock().lock();
     try
     {
-      this.seReceivedMessages = messages;
+      this.setReceivedMessages = messages;
     }
     finally
     {
-      this.rwReceivedLock.writeLock().unlock();
+      this.objReceivedLock.writeLock().unlock();
     }
   }
 
@@ -553,14 +553,14 @@ public class DataContainer
    */
   public Set<Message> getReceivedMessages()
   {
-    this.rwReceivedLock.readLock().lock();
+    this.objReceivedLock.readLock().lock();
     try
     {
-      return this.seReceivedMessages;
+      return this.setReceivedMessages;
     }
     finally
     {
-      this.rwReceivedLock.readLock().unlock();
+      this.objReceivedLock.readLock().unlock();
     }
   }
 
@@ -572,7 +572,7 @@ public class DataContainer
    */
   public void addOddMessage(Message message)
   {
-    this.seOddMessages.add(message);
+    this.setOddMessages.add(message);
   }
 
   /**
@@ -583,7 +583,7 @@ public class DataContainer
    */
   public void removeOddMessage(Message message)
   {
-    this.seOddMessages.remove(message);
+    this.setOddMessages.remove(message);
   }
 
   /**
@@ -594,14 +594,14 @@ public class DataContainer
    */
   public void removeOddMessageById(String id)
   {
-    for (Message message : this.seOddMessages)
+    for (Message message : this.setOddMessages)
     {
       if (message.getMessageProperties().getCorrelationId() != null && message.getMessageProperties().getCorrelationId().length > 0)
       {
         String messageId = (String) MessageSerializer.deserialize(message.getMessageProperties().getCorrelationId());
         if (messageId.equals(id))
         {
-          this.seOddMessages.remove(message);
+          this.setOddMessages.remove(message);
         }
       }
     }
@@ -614,7 +614,7 @@ public class DataContainer
    */
   public Set<Message> getOddMessages()
   {
-    return this.seOddMessages;
+    return this.setOddMessages;
   }
 
   /**
@@ -625,6 +625,6 @@ public class DataContainer
    */
   public void setOddMessages(Set<Message> messages)
   {
-    this.seOddMessages = messages;
+    this.setOddMessages = messages;
   }
 }

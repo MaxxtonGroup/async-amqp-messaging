@@ -15,18 +15,18 @@ import com.quigley.zabbixj.providers.JVMMetricsProvider;
 // TODO : Make this monitoring class thread safe.
 public class Zabbix
 {
-  private ZabbixAgent zbxAgent;
-  private boolean bIsStarted;
+  private ZabbixAgent objZabbixAgent;
+  private boolean blnIsStarted;
 
   private String strHostname;
   private String strServerAddress;
   private int intServerPort;
 
-  private ArrayList<String> arrErrorLog;
-  private ArrayList<String> arrWarnLog;
-  private ArrayList<String> arrInfoLog;
-  private ArrayList<String> arrDebugLog;
-  private ArrayList<String> arrTraceLog;
+  private ArrayList<String> arlErrorLog;
+  private ArrayList<String> arlWarnLog;
+  private ArrayList<String> arlInfoLog;
+  private ArrayList<String> arlDebugLog;
+  private ArrayList<String> arlTraceLog;
 
   private int intSentMessage;
   private int intReceivedMessage;
@@ -48,17 +48,17 @@ public class Zabbix
    */
   public Zabbix()
   {
-    this.arrErrorLog = new ArrayList<String>();
-    this.arrWarnLog = new ArrayList<String>();
-    this.arrInfoLog = new ArrayList<String>();
-    this.arrDebugLog = new ArrayList<String>();
-    this.arrTraceLog = new ArrayList<String>();
+    this.arlErrorLog = new ArrayList<String>();
+    this.arlWarnLog = new ArrayList<String>();
+    this.arlInfoLog = new ArrayList<String>();
+    this.arlDebugLog = new ArrayList<String>();
+    this.arlTraceLog = new ArrayList<String>();
 
     this.intSentMessage = 0;
     this.intReceivedMessage = 0;
     this.intDiscardedMessage = 0;
 
-    this.bIsStarted = false;
+    this.blnIsStarted = false;
   }
 
   /**
@@ -75,17 +75,17 @@ public class Zabbix
   {
     try
     {
-      this.zbxAgent = new ZabbixAgent();
-      this.zbxAgent.setEnableActive(true);
-      this.zbxAgent.setEnablePassive(false);
-      this.zbxAgent.setHostName(hostname);
-      this.zbxAgent.setServerAddress(InetAddress.getByName(serverAddress));
-      this.zbxAgent.setServerPort(serverPort);
+      this.objZabbixAgent = new ZabbixAgent();
+      this.objZabbixAgent.setEnableActive(true);
+      this.objZabbixAgent.setEnablePassive(false);
+      this.objZabbixAgent.setHostName(hostname);
+      this.objZabbixAgent.setServerAddress(InetAddress.getByName(serverAddress));
+      this.objZabbixAgent.setServerPort(serverPort);
 
-      this.zbxAgent.addProvider("java", new JVMMetricsProvider());
-      this.zbxAgent.addProvider("heartbeat", new HeartBeatProvider());
-      this.zbxAgent.addProvider("logs", new LogProvider(this));
-      this.zbxAgent.addProvider("messages", new MessageProvider(this));
+      this.objZabbixAgent.addProvider("java", new JVMMetricsProvider());
+      this.objZabbixAgent.addProvider("heartbeat", new HeartBeatProvider());
+      this.objZabbixAgent.addProvider("logs", new LogProvider(this));
+      this.objZabbixAgent.addProvider("messages", new MessageProvider(this));
 
       this.strHostname = hostname;
       this.strServerAddress = serverAddress;
@@ -102,17 +102,17 @@ public class Zabbix
    */
   public void start()
   {
-    if (!this.bIsStarted)
+    if (!this.blnIsStarted)
     {
       try
       {
-        this.zbxAgent.start();
+        this.objZabbixAgent.start();
       }
       catch (Exception e)
       {
         Monitor.error("Failed to start the Zabbix Agent. No active/passive communication with the server available, ALL monitoring dropped.");
       }
-      this.bIsStarted = true;
+      this.blnIsStarted = true;
     }
   }
 
@@ -178,15 +178,15 @@ public class Zabbix
     switch (level)
     {
       case ERROR:
-        return this.drainArrayList("ERROR: ", this.arrErrorLog);
+        return this.drainArrayList("ERROR: ", this.arlErrorLog);
       case WARN:
-        return this.drainArrayList("WARN: ", this.arrWarnLog);
+        return this.drainArrayList("WARN: ", this.arlWarnLog);
       case INFO:
-        return this.drainArrayList("INFO: ", this.arrInfoLog);
+        return this.drainArrayList("INFO: ", this.arlInfoLog);
       case DEBUG:
-        return this.drainArrayList("DEBUG: ", this.arrDebugLog);
+        return this.drainArrayList("DEBUG: ", this.arlDebugLog);
       case TRACE:
-        return this.drainArrayList("TRACE: ", this.arrTraceLog);
+        return this.drainArrayList("TRACE: ", this.arlTraceLog);
       default:
         return "";
     }
@@ -203,24 +203,24 @@ public class Zabbix
    */
   public void addLog(Monitor.MonitorLevel level, String log)
   {
-    if (bIsStarted)
+    if (blnIsStarted)
     {
       switch (level)
       {
         case ERROR:
-          this.arrErrorLog.add(log);
+          this.arlErrorLog.add(log);
           break;
         case WARN:
-          this.arrWarnLog.add(log);
+          this.arlWarnLog.add(log);
           break;
         case INFO:
-          this.arrInfoLog.add(log);
+          this.arlInfoLog.add(log);
           break;
         case DEBUG:
-          this.arrDebugLog.add(log);
+          this.arlDebugLog.add(log);
           break;
         case TRACE:
-          this.arrTraceLog.add(log);
+          this.arlTraceLog.add(log);
           break;
         default:
           // Do Nothing...
@@ -237,7 +237,7 @@ public class Zabbix
   public Object getDataByType(DataType type)
   {
     int intTemp = 0;
-    if (bIsStarted)
+    if (blnIsStarted)
     {
       switch (type)
       {
@@ -270,7 +270,7 @@ public class Zabbix
    */
   public void addData(DataType type, Object data)
   {
-    if (bIsStarted)
+    if (blnIsStarted)
     {
       switch (type)
       {

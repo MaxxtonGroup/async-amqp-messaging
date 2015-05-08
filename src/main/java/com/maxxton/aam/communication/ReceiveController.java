@@ -290,12 +290,16 @@ public class ReceiveController implements MessageListener
           }
           else
           {
-            if (properties.getRedelivered())
+            if (!properties.getRedelivered())
             {
-              // TODO : handle id which where not recognized by the messenger (maybe due client/broker failure, messages where resent).
               this.objContainer.addOddMessage(message);
               Monitor.data(DataType.MESSAGE_DISCARDED, 1);
               Monitor.warn("The received message was not recognized by the messenger. Maybe due client/broker failure, messages where resent.");
+            }
+            else
+            {
+              this.objContainer.addIdentifier(correlationId);
+              this.handleMessageCallback(correlationId, message);
             }
           }
         }

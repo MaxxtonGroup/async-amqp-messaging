@@ -35,9 +35,9 @@ public class Monitor extends AppenderSkeleton
 
   private static Logger objLogger;
   private static Zabbix objZabbix;
-  private static boolean bMonitorEnabled;
+  private static boolean blnMonitorEnabled;
   private static MonitorLevel monitorLvl;
-  private static boolean bIsStarted;
+  private static boolean blnIsStarted;
 
   /**
    * Constructor for the monitor class.
@@ -46,9 +46,9 @@ public class Monitor extends AppenderSkeleton
   {
     Monitor.objLogger = LoggerFactory.getLogger(Monitor.class);
     Monitor.objZabbix = new Zabbix();
-    Monitor.bMonitorEnabled = false;
+    Monitor.blnMonitorEnabled = false;
     Monitor.monitorLvl = MonitorLevel.ALL;
-    Monitor.bIsStarted = false;
+    Monitor.blnIsStarted = false;
 
     Monitor.loadConfiguration("/default.properties");
   }
@@ -58,13 +58,13 @@ public class Monitor extends AppenderSkeleton
    */
   public static void start()
   {
-    if (!bIsStarted)
+    if (!blnIsStarted)
     {
-      if (bMonitorEnabled)
+      if (blnMonitorEnabled)
       {
         Monitor.objZabbix.start();
       }
-      Monitor.bIsStarted = true;
+      Monitor.blnIsStarted = true;
     }
   }
 
@@ -76,7 +76,7 @@ public class Monitor extends AppenderSkeleton
    */
   public static void loadConfiguration(String configFile)
   {
-    if (!bIsStarted)
+    if (!blnIsStarted)
     {
       Properties properties = ConfigParser.parseConfig(configFile);
       if (Validator.checkObject(properties))
@@ -316,7 +316,7 @@ public class Monitor extends AppenderSkeleton
    */
   private static void setEnabled(boolean enabled)
   {
-    Monitor.bMonitorEnabled = enabled;
+    Monitor.blnMonitorEnabled = enabled;
   }
 
   /**
@@ -326,7 +326,7 @@ public class Monitor extends AppenderSkeleton
    */
   private static boolean getEnabled()
   {
-    return Monitor.bMonitorEnabled;
+    return Monitor.blnMonitorEnabled;
   }
 
   @Override

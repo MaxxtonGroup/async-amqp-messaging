@@ -20,7 +20,7 @@ public class Messenger
 
   private Resources objResources;
   private CommunicationController objCommunication;
-  private boolean bIsStarted;
+  private boolean blnIsStarted;
 
   /**
    * Constructor for the Messenger class.
@@ -34,7 +34,7 @@ public class Messenger
     resources.getConfiguration().setName(messengerName);
     this.setResources(resources);
 
-    this.bIsStarted = false;
+    this.blnIsStarted = false;
   }
 
   /**
@@ -68,7 +68,7 @@ public class Messenger
    */
   public boolean sendMessage(MessageType messageType, String receiver, Object payload, String responseTo)
   {
-    if (this.bIsStarted)
+    if (this.blnIsStarted)
     {
       BaseMessage message = MessageFactory.createMessage(messageType);
       if (Validator.checkObject(message, BaseMessage.class))
@@ -99,7 +99,7 @@ public class Messenger
    */
   public MessageDetails receiveMessage(int millis)
   {
-    if (this.bIsStarted)
+    if (this.blnIsStarted)
     {
       BaseMessage message = this.objCommunication.unpackAndReceive(millis);
       if (Validator.checkObject(message, BaseMessage.class))
@@ -138,7 +138,7 @@ public class Messenger
    */
   public void loadConfiguration(String configFile)
   {
-    if (!this.bIsStarted)
+    if (!this.blnIsStarted)
     {
       Monitor.loadConfiguration(configFile);
       this.objResources.getConfiguration().loadConfiguration(configFile);
@@ -154,13 +154,13 @@ public class Messenger
    */
   public void start()
   {
-    if (!this.bIsStarted)
+    if (!this.blnIsStarted)
     {
       Monitor.start();
 
       CommunicationController controller = new CommunicationController(this.getResources());
       this.setCommunication(controller);
-      this.bIsStarted = true;
+      this.blnIsStarted = true;
     }
     else
     {

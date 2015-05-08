@@ -15,15 +15,15 @@ public class Configuration
 {
   private String strName;
   private String strHost;
-  private ArrayList<Integer> arrPorts;
+  private ArrayList<Integer> arlPorts;
   private String strUsername;
   private String strPassword;
 
   private String strQueuePrefix;
   private String strQueueSuffix;
-  private boolean bQueueDurability;
-  private boolean bQueueAutoDelete;
-  private boolean bQueueExclusive;
+  private boolean blnQueueDurability;
+  private boolean blnQueueAutoDelete;
+  private boolean blnQueueExclusive;
 
   private String strBindingPrefix;
   private String strBindingSuffix;
@@ -135,7 +135,7 @@ public class Configuration
    */
   public void addPort(int port)
   {
-    this.arrPorts.add(port);
+    this.arlPorts.add(port);
   }
 
   /**
@@ -146,7 +146,7 @@ public class Configuration
    */
   public void removePort(int port)
   {
-    this.arrPorts.remove(port);
+    this.arlPorts.remove(port);
   }
 
   /**
@@ -157,7 +157,7 @@ public class Configuration
    */
   public void setPorts(ArrayList<Integer> port)
   {
-    this.arrPorts = port;
+    this.arlPorts = port;
   }
 
   /**
@@ -167,7 +167,7 @@ public class Configuration
    */
   public ArrayList<Integer> getPorts()
   {
-    return this.arrPorts;
+    return this.arlPorts;
   }
 
   /**
@@ -262,7 +262,7 @@ public class Configuration
    */
   public void setQueueDurability(boolean durability)
   {
-    this.bQueueDurability = durability;
+    this.blnQueueDurability = durability;
   }
 
   /**
@@ -272,7 +272,7 @@ public class Configuration
    */
   public boolean getQueueDurability()
   {
-    return this.bQueueDurability;
+    return this.blnQueueDurability;
   }
 
   /**
@@ -283,7 +283,7 @@ public class Configuration
    */
   public void setQueueAutoDelete(boolean autodelete)
   {
-    this.bQueueAutoDelete = autodelete;
+    this.blnQueueAutoDelete = autodelete;
   }
 
   /**
@@ -293,7 +293,7 @@ public class Configuration
    */
   public boolean getQueueAutoDelete()
   {
-    return this.bQueueAutoDelete;
+    return this.blnQueueAutoDelete;
   }
 
   /**
@@ -304,7 +304,7 @@ public class Configuration
    */
   public void setQueueExclusive(boolean exclusive)
   {
-    this.bQueueExclusive = exclusive;
+    this.blnQueueExclusive = exclusive;
   }
 
   /**
@@ -314,7 +314,7 @@ public class Configuration
    */
   public boolean getQueueExclusive()
   {
-    return this.bQueueExclusive;
+    return this.blnQueueExclusive;
   }
 
   /**

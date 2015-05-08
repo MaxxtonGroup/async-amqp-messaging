@@ -17,14 +17,14 @@ public class MessagingFactory
 {
   private static MessagingFactory objInstance = null;
 
-  private Map<String, Messenger> mMessengerMap;
+  private Map<String, Messenger> mapMessengerMap;
 
   /**
    * Private constructor for the MessagingFactory class.
    */
   private MessagingFactory()
   {
-    this.mMessengerMap = new HashMap<String, Messenger>();
+    this.mapMessengerMap = new HashMap<String, Messenger>();
   }
 
   /**
@@ -59,14 +59,14 @@ public class MessagingFactory
     Messenger messenger = null;
     if (Validator.checkString(name, "[a-zA-Z]+"))
     {
-      if (this.mMessengerMap.containsKey(name.toLowerCase()))
+      if (this.mapMessengerMap.containsKey(name.toLowerCase()))
       {
-        messenger = this.mMessengerMap.get(name.toLowerCase());
+        messenger = this.mapMessengerMap.get(name.toLowerCase());
       }
       else
       {
         messenger = new Messenger(name.toLowerCase());
-        this.mMessengerMap.put(name.toLowerCase(), messenger);
+        this.mapMessengerMap.put(name.toLowerCase(), messenger);
       }
     }
     else
@@ -87,9 +87,9 @@ public class MessagingFactory
   {
     if (Validator.checkString(name, "[a-zA-Z]+"))
     {
-      if (this.mMessengerMap.containsKey(name))
+      if (this.mapMessengerMap.containsKey(name))
       {
-        this.mMessengerMap.remove(name);
+        this.mapMessengerMap.remove(name);
         return true;
       }
       else

@@ -17,13 +17,9 @@ public abstract class BaseMessage implements Serializable
   private static final long serialVersionUID = -8763348067503641944L;
 
   protected Object objPayload;
-
   protected MessageType objMessageType;
-
   protected int intPriority;
-
   protected String strSender;
-
   protected String strReceiver;
 
   protected BaseMessage()
