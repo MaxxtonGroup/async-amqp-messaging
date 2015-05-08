@@ -3,7 +3,7 @@ package com.maxxton.aam.communication;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.maxxton.aam.resources.Monitor;
+import com.maxxton.aam.monitoring.Monitor;
 import com.maxxton.aam.resources.Validator;
 
 /**

@@ -1,9 +1,8 @@
-package com.maxxton.aam.resources;
+package com.maxxton.aam.monitoring;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
 
-import com.maxxton.aam.resources.Monitor.MonitorLevel;
 import com.quigley.zabbixj.agent.ZabbixAgent;
 import com.quigley.zabbixj.providers.JVMMetricsProvider;
 
@@ -182,7 +181,7 @@ public class Zabbix
    * @param log
    *          The log message as string.
    */
-  public void addLog(MonitorLevel level, String log)
+  public void addLog(Monitor.MonitorLevel level, String log)
   {
     if (bIsStarted)
     {

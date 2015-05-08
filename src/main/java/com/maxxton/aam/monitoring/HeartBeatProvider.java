@@ -1,4 +1,4 @@
-package com.maxxton.aam.resources;
+package com.maxxton.aam.monitoring;
 
 import com.quigley.zabbixj.metrics.MetricsException;
 import com.quigley.zabbixj.metrics.MetricsKey;

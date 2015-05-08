@@ -13,10 +13,10 @@ import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import com.maxxton.aam.messages.BaseMessage;
 import com.maxxton.aam.messages.ResponseMessage;
 import com.maxxton.aam.messages.StatusMessage;
+import com.maxxton.aam.monitoring.Monitor;
 import com.maxxton.aam.resources.Callback;
 import com.maxxton.aam.resources.Configuration;
 import com.maxxton.aam.resources.MessageDetails;
-import com.maxxton.aam.resources.Monitor;
 import com.maxxton.aam.resources.Resources;
 import com.maxxton.aam.resources.Validator;
 

@@ -10,7 +10,8 @@ public class Resources
 {
   private Configuration objConfiguration;
   private MessageFactory objMessageFactory;
-  private Monitor objMonitor;
+
+  // private Monitor objMonitor;
 
   /**
    * Constructor for the Resources class.
@@ -25,9 +26,9 @@ public class Resources
     // TODO : Configure MessageFactory
     this.setMessageFactory(messageFactory);
 
-    Monitor monitor = new Monitor();
-    // TODO : Configure Monitor
-    this.setMonitor(monitor);
+    // Monitor monitor = new Monitor();
+    // // TODO : Configure Monitor
+    // this.setMonitor(monitor);
   }
 
   /**
@@ -72,24 +73,24 @@ public class Resources
     this.objMessageFactory = messageFactory;
   }
 
-  /**
-   * Gets the Monitor class.
-   *
-   * @return an instance of the Monitor class.
-   */
-  public Monitor getMonitor()
-  {
-    return this.objMonitor;
-  }
-
-  /**
-   * Sets the Monitor class.
-   *
-   * @param monitor
-   *          instance of the Monitor class.
-   */
-  private void setMonitor(Monitor monitor)
-  {
-    this.objMonitor = monitor;
-  }
+  // /**
+  // * Gets the Monitor class.
+  // *
+  // * @return an instance of the Monitor class.
+  // */
+  // public Monitor getMonitor()
+  // {
+  // return this.objMonitor;
+  // }
+  //
+  // /**
+  // * Sets the Monitor class.
+  // *
+  // * @param monitor
+  // * instance of the Monitor class.
+  // */
+  // private void setMonitor(Monitor monitor)
+  // {
+  // this.objMonitor = monitor;
+  // }
 }

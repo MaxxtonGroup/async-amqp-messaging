@@ -6,7 +6,7 @@ It has support for:
 * Endpoint control
 * Status control
 * Logging for muliple logsystems
-* Monitoring through Zabbix (using [Zabbix/J](http://quigley.com/software/zabbixj/)
+* Monitoring through Zabbix (using [Zabbix/J](http://quigley.com/software/zabbixj/))
 * Message Types
 * Highly Available and Failover
 * Callbacks

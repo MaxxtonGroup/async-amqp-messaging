@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import com.maxxton.aam.monitoring.Monitor;
+
 /**
  * ConfigParser class Used by multiple classes to load configuration files. Contains mostly static classes as it is a utility class.
  * 

@@ -5,8 +5,8 @@ import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.core.ChannelCallback;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
+import com.maxxton.aam.monitoring.Monitor;
 import com.maxxton.aam.resources.Configuration;
-import com.maxxton.aam.resources.Monitor;
 import com.maxxton.aam.resources.Resources;
 import com.rabbitmq.client.AMQP.Queue.DeclareOk;
 

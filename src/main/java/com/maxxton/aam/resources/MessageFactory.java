@@ -7,6 +7,7 @@ import com.maxxton.aam.messages.MessageType;
 import com.maxxton.aam.messages.ResponseMessage;
 import com.maxxton.aam.messages.StatusMessage;
 import com.maxxton.aam.messages.SynchronizionMessage;
+import com.maxxton.aam.monitoring.Monitor;
 
 /**
  * MessageFactory class Creates new instances of a certain message type. Implements the Factory pattern as this suits the class better.

@@ -1,4 +1,4 @@
-package com.maxxton.aam.resources;
+package com.maxxton.aam.monitoring;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -8,6 +8,9 @@ import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.spi.LoggingEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.maxxton.aam.resources.ConfigParser;
+import com.maxxton.aam.resources.Validator;
 
 /**
  * Monitor class. Supports monitoring and logging of information within the library.

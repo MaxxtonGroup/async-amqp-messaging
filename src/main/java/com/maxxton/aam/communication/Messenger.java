@@ -2,10 +2,10 @@ package com.maxxton.aam.communication;
 
 import com.maxxton.aam.messages.BaseMessage;
 import com.maxxton.aam.messages.MessageType;
+import com.maxxton.aam.monitoring.Monitor;
 import com.maxxton.aam.resources.Callback;
 import com.maxxton.aam.resources.MessageDetails;
 import com.maxxton.aam.resources.MessageFactory;
-import com.maxxton.aam.resources.Monitor;
 import com.maxxton.aam.resources.Resources;
 import com.maxxton.aam.resources.Validator;
 

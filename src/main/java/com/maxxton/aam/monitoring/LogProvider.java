@@ -1,6 +1,5 @@
-package com.maxxton.aam.resources;
+package com.maxxton.aam.monitoring;
 
-import com.maxxton.aam.resources.Monitor.MonitorLevel;
 import com.quigley.zabbixj.metrics.MetricsException;
 import com.quigley.zabbixj.metrics.MetricsKey;
 import com.quigley.zabbixj.metrics.MetricsProvider;
@@ -32,15 +31,15 @@ public class LogProvider implements MetricsProvider
     switch (mKey.getKey())
     {
       case "error":
-        return this.objZabbix.getLogsByLevel(MonitorLevel.ERROR);
+        return this.objZabbix.getLogsByLevel(Monitor.MonitorLevel.ERROR);
       case "warn":
-        return this.objZabbix.getLogsByLevel(MonitorLevel.WARN);
+        return this.objZabbix.getLogsByLevel(Monitor.MonitorLevel.WARN);
       case "info":
-        return this.objZabbix.getLogsByLevel(MonitorLevel.INFO);
+        return this.objZabbix.getLogsByLevel(Monitor.MonitorLevel.INFO);
       case "debug":
-        return this.objZabbix.getLogsByLevel(MonitorLevel.DEBUG);
+        return this.objZabbix.getLogsByLevel(Monitor.MonitorLevel.DEBUG);
       case "trace":
-        return this.objZabbix.getLogsByLevel(MonitorLevel.TRACE);
+        return this.objZabbix.getLogsByLevel(Monitor.MonitorLevel.TRACE);
       default:
         throw new MetricsException("Unknown Key: " + mKey.getKey());
     }
