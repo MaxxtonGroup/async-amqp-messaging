@@ -6,6 +6,7 @@ import org.springframework.amqp.rabbit.core.ChannelCallback;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import com.maxxton.aam.monitoring.Monitor;
+import com.maxxton.aam.monitoring.Zabbix.DataType;
 import com.maxxton.aam.resources.Configuration;
 import com.maxxton.aam.resources.Resources;
 import com.rabbitmq.client.AMQP.Queue.DeclareOk;
@@ -119,6 +120,7 @@ public class SendController
     {
       objTemplate.send(message);
       this.objContainer.addSendMessage(message);
+      Monitor.data(DataType.MESSAGE_SENT, 1);
     }
     return exists;
   }

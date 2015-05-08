@@ -14,6 +14,7 @@ import com.maxxton.aam.messages.BaseMessage;
 import com.maxxton.aam.messages.ResponseMessage;
 import com.maxxton.aam.messages.StatusMessage;
 import com.maxxton.aam.monitoring.Monitor;
+import com.maxxton.aam.monitoring.Zabbix.DataType;
 import com.maxxton.aam.resources.Callback;
 import com.maxxton.aam.resources.Configuration;
 import com.maxxton.aam.resources.MessageDetails;
@@ -247,6 +248,7 @@ public class ReceiveController implements MessageListener
    */
   private void handleMessageCallback(String correlationId, Message message)
   {
+    Monitor.data(DataType.MESSAGE_RECEIVED, 1);
     if (this.objCallback != null)
     {
       this.objContainer.removeSendMessageById(correlationId);
@@ -292,6 +294,7 @@ public class ReceiveController implements MessageListener
             {
               // TODO : handle id which where not recognized by the messenger (maybe due client/broker failure, messages where resent).
               this.objContainer.addOddMessage(message);
+              Monitor.data(DataType.MESSAGE_DISCARDED, 1);
               Monitor.warn("The received message was not recognized by the messenger. Maybe due client/broker failure, messages where resent.");
             }
           }

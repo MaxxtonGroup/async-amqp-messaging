@@ -28,6 +28,21 @@ public class Zabbix
   private ArrayList<String> arrDebugLog;
   private ArrayList<String> arrTraceLog;
 
+  private int intSentMessage;
+  private int intReceivedMessage;
+  private int intDiscardedMessage;
+
+  /**
+   * DataType enumeration. Used to determine the type of data being passed to the monitor.
+   * 
+   * @author Robin Hermans
+   * @copyright Maxxton 2015
+   */
+  public enum DataType
+  {
+    MESSAGE_SENT, MESSAGE_RECEIVED, MESSAGE_DISCARDED
+  }
+
   /**
    * Zabbix class constructor.
    */
@@ -38,6 +53,10 @@ public class Zabbix
     this.arrInfoLog = new ArrayList<String>();
     this.arrDebugLog = new ArrayList<String>();
     this.arrTraceLog = new ArrayList<String>();
+
+    this.intSentMessage = 0;
+    this.intReceivedMessage = 0;
+    this.intDiscardedMessage = 0;
 
     this.bIsStarted = false;
   }
@@ -66,6 +85,7 @@ public class Zabbix
       this.zbxAgent.addProvider("java", new JVMMetricsProvider());
       this.zbxAgent.addProvider("heartbeat", new HeartBeatProvider());
       this.zbxAgent.addProvider("logs", new LogProvider(this));
+      this.zbxAgent.addProvider("messages", new MessageProvider(this));
 
       this.strHostname = hostname;
       this.strServerAddress = serverAddress;
@@ -204,6 +224,67 @@ public class Zabbix
           break;
         default:
           // Do Nothing...
+          break;
+      }
+    }
+  }
+
+  /**
+   * Gets all data by a given DataType.
+   * 
+   * @return The object of the data.
+   */
+  public Object getDataByType(DataType type)
+  {
+    int intTemp = 0;
+    if (bIsStarted)
+    {
+      switch (type)
+      {
+        case MESSAGE_SENT:
+          intTemp = intSentMessage;
+          intSentMessage = 0;
+          break;
+        case MESSAGE_RECEIVED:
+          intTemp = intReceivedMessage;
+          intReceivedMessage = 0;
+          break;
+        case MESSAGE_DISCARDED:
+          intTemp = intDiscardedMessage;
+          intDiscardedMessage = 0;
+          break;
+        default:
+          break;
+      }
+    }
+    return intTemp;
+  }
+
+  /**
+   * Adds a new data entry to a certain type.
+   * 
+   * @param type
+   *          The type to assign the data too.
+   * @param data
+   *          The data to be assigned.
+   */
+  public void addData(DataType type, Object data)
+  {
+    if (bIsStarted)
+    {
+      switch (type)
+      {
+        case MESSAGE_SENT:
+          intSentMessage += (Integer) data;
+          break;
+        case MESSAGE_RECEIVED:
+          intReceivedMessage += (Integer) data;
+          break;
+        case MESSAGE_DISCARDED:
+          intDiscardedMessage += (Integer) data;
+          break;
+        default:
+          // Do Nothing
           break;
       }
     }

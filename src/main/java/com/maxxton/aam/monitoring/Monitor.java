@@ -9,6 +9,7 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.maxxton.aam.monitoring.Zabbix.DataType;
 import com.maxxton.aam.resources.ConfigParser;
 import com.maxxton.aam.resources.Validator;
 
@@ -41,7 +42,7 @@ public class Monitor extends AppenderSkeleton
   /**
    * Constructor for the monitor class.
    */
-  public Monitor()
+  static
   {
     Monitor.objLogger = LoggerFactory.getLogger(Monitor.class);
     Monitor.objZabbix = new Zabbix();
@@ -75,21 +76,24 @@ public class Monitor extends AppenderSkeleton
    */
   public static void loadConfiguration(String configFile)
   {
-    Properties properties = ConfigParser.parseConfig(configFile);
-
-    if (Validator.checkObject(properties))
+    if (!bIsStarted)
     {
-      Boolean bEnabled = properties.getProperty("monitor.enabled") == null ? Monitor.bMonitorEnabled : Boolean.parseBoolean(properties.getProperty("monitor.enabled"));
-      Monitor.setEnabled(bEnabled);
+      Properties properties = ConfigParser.parseConfig(configFile);
+      if (Validator.checkObject(properties))
+      {
+        Boolean bEnabled = properties.getProperty("monitor.enabled") == null ? Monitor.getEnabled() : Boolean.parseBoolean(properties.getProperty("monitor.enabled"));
+        Monitor.setEnabled(bEnabled);
 
-      String strMonitorLvl = properties.getProperty("monitor.level", Monitor.getMonitorLevel().toString());
-      Monitor.setMonitorLevel(Monitor.determineLevel(strMonitorLvl));
+        MonitorLevel level = Monitor.getMonitorLevel();
+        String strMonitorLvl = properties.getProperty("monitor.level", level.toString());
+        Monitor.setMonitorLevel(Monitor.determineLevel(strMonitorLvl));
 
-      String strHostName = properties.getProperty("monitor.hostname", Monitor.objZabbix.getHostname());
-      String strServerAddress = properties.getProperty("monitor.server.address", Monitor.objZabbix.getServerAddress());
-      int intServerPort = properties.getProperty("monitor.server.port") == null ? Monitor.objZabbix.getServerPort() : Integer.parseInt(properties.getProperty("monitor.server.port"));
+        String strHostName = properties.getProperty("monitor.hostname", Monitor.objZabbix.getHostname());
+        String strServerAddress = properties.getProperty("monitor.server.address", Monitor.objZabbix.getServerAddress());
+        int intServerPort = properties.getProperty("monitor.server.port") == null ? Monitor.objZabbix.getServerPort() : Integer.parseInt(properties.getProperty("monitor.server.port"));
 
-      Monitor.objZabbix.setupAgent(strHostName, strServerAddress, intServerPort);
+        Monitor.objZabbix.setupAgent(strHostName, strServerAddress, intServerPort);
+      }
     }
   }
 
@@ -264,6 +268,22 @@ public class Monitor extends AppenderSkeleton
     }
   }
 
+  /**
+   * Adds a new data entry to a certain type.
+   * 
+   * @param type
+   *          Type to award the data to.
+   * @param data
+   *          Data to be awarded.
+   */
+  public static void data(DataType type, Object data)
+  {
+    if (Validator.checkObject(data))
+    {
+      Monitor.objZabbix.addData(type, data);
+    }
+  }
+
   /** Getters and Setters **/
 
   /**
@@ -272,7 +292,7 @@ public class Monitor extends AppenderSkeleton
    * @param monitorLvl
    *          Level on which the monitor triggers
    */
-  public static void setMonitorLevel(MonitorLevel monitorLvl)
+  private static void setMonitorLevel(MonitorLevel monitorLvl)
   {
     if (Validator.checkObject(monitorLvl, MonitorLevel.class))
       Monitor.monitorLvl = monitorLvl;
@@ -283,7 +303,7 @@ public class Monitor extends AppenderSkeleton
    * 
    * @return Level on which the monitor triggers.
    */
-  public static MonitorLevel getMonitorLevel()
+  private static MonitorLevel getMonitorLevel()
   {
     return Monitor.monitorLvl;
   }
@@ -294,7 +314,7 @@ public class Monitor extends AppenderSkeleton
    * @param enabled
    *          boolean to tell the enabled state.
    */
-  public static void setEnabled(boolean enabled)
+  private static void setEnabled(boolean enabled)
   {
     Monitor.bMonitorEnabled = enabled;
   }
@@ -304,7 +324,7 @@ public class Monitor extends AppenderSkeleton
    * 
    * @return the enabled state.
    */
-  public static boolean getEnabled()
+  private static boolean getEnabled()
   {
     return Monitor.bMonitorEnabled;
   }
