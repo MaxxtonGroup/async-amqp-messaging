@@ -2,28 +2,23 @@ package com.maxxton.aam.monitoring;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Properties;
+import java.util.ArrayList;
 
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.spi.LoggingEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.maxxton.aam.monitoring.Zabbix.DataType;
-import com.maxxton.aam.resources.ConfigParser;
 import com.maxxton.aam.resources.Validator;
 
 /**
- * Monitor class. Supports monitoring and logging of information within the library.
+ * Monitor class. Supports both logging and monitoring of logs and data.
  * 
  * @author Robin Hermans
  * @copyright Maxxton 2015
  */
-public class Monitor extends AppenderSkeleton
+public class Monitor
 {
-
   /**
-   * MonitorLevel class. Public static enumeration to determine level of monitoring.
+   * Static enumeration to tell the monitor level.
    * 
    * @author Robin Hermans
    * @copyright Maxxton 2015
@@ -33,95 +28,227 @@ public class Monitor extends AppenderSkeleton
     ALL, TRACE, DEBUG, INFO, WARN, ERROR, OFF
   };
 
-  private static Logger objLogger;
-  private static Zabbix objZabbix;
-  private static boolean blnMonitorEnabled;
-  private static MonitorLevel monitorLvl;
-  private static boolean blnIsStarted;
+  /**
+   * Static enumeration to tell the type of data
+   * 
+   * @author Robin Hermans
+   * @copyright Maxxton 2015
+   */
+  public static enum DataType
+  {
+    MESSAGE_SENT, MESSAGE_RECEIVED, MESSAGE_DISCARDED
+  };
+
+  private String strName;
+  private MonitorLevel enmLevel;
+
+  private ArrayList<String> arlErrorLog;
+  private ArrayList<String> arlWarnLog;
+  private ArrayList<String> arlInfoLog;
+  private ArrayList<String> arlDebugLog;
+  private ArrayList<String> arlTraceLog;
+
+  private int intSentMessages;
+  private int intReceivedMessages;
+  private int intDiscardedMessages;
 
   /**
-   * Constructor for the monitor class.
+   * Constructor of the Monitor class.
+   * 
+   * @param name
+   *          the name of the messenger which uses the monitor class.
    */
-  static
+  public Monitor(String name)
   {
-    Monitor.objLogger = LoggerFactory.getLogger(Monitor.class);
-    Monitor.objZabbix = new Zabbix();
-    Monitor.blnMonitorEnabled = false;
-    Monitor.monitorLvl = MonitorLevel.ALL;
-    Monitor.blnIsStarted = false;
+    this.strName = name;
+    this.enmLevel = MonitorLevel.ALL;
 
-    Monitor.loadConfiguration("/default.properties");
+    this.arlErrorLog = new ArrayList<String>();
+    this.arlWarnLog = new ArrayList<String>();
+    this.arlInfoLog = new ArrayList<String>();
+    this.arlDebugLog = new ArrayList<String>();
+    this.arlTraceLog = new ArrayList<String>();
+
+    this.intSentMessages = 0;
+    this.intReceivedMessages = 0;
+    this.intDiscardedMessages = 0;
   }
 
   /**
-   * Start method. Called after the correct configuration has been loaded.
+   * Sets the level of monitoring.
+   * 
+   * @param level
+   *          The level on which the zabbixAgent starts monitoring.
    */
-  public static void start()
+  public void setMonitorLevel(MonitorLevel level)
   {
-    if (!blnIsStarted)
+    this.enmLevel = level;
+  }
+
+  /**
+   * Gets the level of monitoring.
+   * 
+   * @return The level on which the zabbixAgent starts monitoring.
+   */
+  public MonitorLevel getMonitorLevel()
+  {
+    return this.enmLevel;
+  }
+
+  /**
+   * Log a trace using a certain class.
+   * 
+   * @param objClass
+   *          The class from which the trace is given.
+   * @param trace
+   *          The trace message as string.
+   */
+  public void trace(Class<?> objClass, String trace)
+  {
+    if (Validator.checkString(trace, false, false))
     {
-      if (blnMonitorEnabled)
+      Logger logger = LoggerFactory.getLogger(objClass);
+      logger.trace(trace);
+      if (this.checkLevelPass(MonitorLevel.TRACE))
       {
-        Monitor.objZabbix.start();
+        this.arlTraceLog.add("[" + this.strName + "]" + trace);
       }
-      Monitor.blnIsStarted = true;
     }
   }
 
   /**
-   * Loads the properties from a given configuration file if they exist.
+   * Log a trace using a certain class.
    * 
-   * @param configFile
-   *          properties or XML configuration file.
+   * @param objClass
+   *          The class from which the trace is given.
+   * @param e
+   *          The trace exception class.
    */
-  public static void loadConfiguration(String configFile)
+  public void trace(Class<?> objClass, Exception e)
   {
-    if (!blnIsStarted)
+    if (Validator.checkObject(e, Exception.class))
     {
-      Properties properties = ConfigParser.parseConfig(configFile);
-      if (Validator.checkObject(properties))
+      StringWriter trace = new StringWriter();
+      e.printStackTrace(new PrintWriter(trace));
+
+      Logger logger = LoggerFactory.getLogger(objClass);
+      logger.trace(trace.toString());
+
+      if (this.checkLevelPass(MonitorLevel.TRACE))
       {
-        Boolean bEnabled = properties.getProperty("monitor.enabled") == null ? Monitor.getEnabled() : Boolean.parseBoolean(properties.getProperty("monitor.enabled"));
-        Monitor.setEnabled(bEnabled);
-
-        MonitorLevel level = Monitor.getMonitorLevel();
-        String strMonitorLvl = properties.getProperty("monitor.level", level.toString());
-        Monitor.setMonitorLevel(Monitor.determineLevel(strMonitorLvl));
-
-        String strHostName = properties.getProperty("monitor.hostname", Monitor.objZabbix.getHostname());
-        String strServerAddress = properties.getProperty("monitor.server.address", Monitor.objZabbix.getServerAddress());
-        int intServerPort = properties.getProperty("monitor.server.port") == null ? Monitor.objZabbix.getServerPort() : Integer.parseInt(properties.getProperty("monitor.server.port"));
-
-        Monitor.objZabbix.setupAgent(strHostName, strServerAddress, intServerPort);
+        this.arlTraceLog.add("[" + this.strName + "]" + trace.toString());
       }
     }
   }
 
   /**
-   * Determines the MonitorLevel enum for a given string.
+   * Log a debug using a certain class.
    * 
-   * @param lvl
-   *          the monitorlevel given as string.
-   * @return a MonitorLevel enumeration.
+   * @param objClass
+   *          The class from which the debug is given.
+   * @param strDebug
+   *          The debug message as string.
    */
-  private static MonitorLevel determineLevel(String lvl)
+  public void debug(Class<?> objClass, String strDebug)
   {
-    switch (lvl.toUpperCase())
+    if (Validator.checkString(strDebug, false, false))
     {
-      case "TRACE":
-        return MonitorLevel.TRACE;
-      case "DEBUG":
-        return MonitorLevel.DEBUG;
-      case "INFO":
-        return MonitorLevel.INFO;
-      case "WARN":
-        return MonitorLevel.WARN;
-      case "ERROR":
-        return MonitorLevel.ERROR;
-      case "OFF":
-        return MonitorLevel.OFF;
+      Logger logger = LoggerFactory.getLogger(objClass);
+      logger.debug(strDebug);
+      if (this.checkLevelPass(MonitorLevel.DEBUG))
+      {
+        this.arlDebugLog.add("[" + this.strName + "]" + strDebug);
+      }
+    }
+  }
+
+  /**
+   * Log an info using a certain class.
+   * 
+   * @param objClass
+   *          The class from which the info is given.
+   * @param strInfo
+   *          The info message as string.
+   */
+  public void info(Class<?> objClass, String strInfo)
+  {
+    if (Validator.checkString(strInfo, false, false))
+    {
+      Logger logger = LoggerFactory.getLogger(objClass);
+      logger.info(strInfo);
+      if (this.checkLevelPass(MonitorLevel.INFO))
+      {
+        this.arlInfoLog.add("[" + this.strName + "]" + strInfo);
+      }
+    }
+  }
+
+  /**
+   * Log a warn using a certain class.
+   * 
+   * @param objClass
+   *          The class from which the warn is given.
+   * @param strWarn
+   *          The debug message as string.
+   */
+  public void warn(Class<?> objClass, String strWarn)
+  {
+    if (Validator.checkString(strWarn, false, false))
+    {
+      Logger logger = LoggerFactory.getLogger(objClass);
+      logger.warn(strWarn);
+      if (this.checkLevelPass(MonitorLevel.WARN))
+      {
+        this.arlWarnLog.add("[" + this.strName + "]" + strWarn);
+      }
+    }
+  }
+
+  /**
+   * Log an error using a certain class.
+   * 
+   * @param objClass
+   *          The class from which the error is given.
+   * @param strError
+   *          The error message as string.
+   */
+  public void error(Class<?> objClass, String strError)
+  {
+    if (Validator.checkString(strError, false, false))
+    {
+      Logger logger = LoggerFactory.getLogger(objClass);
+      logger.error(strError);
+      if (this.checkLevelPass(MonitorLevel.ERROR))
+      {
+        this.arlErrorLog.add("[" + this.strName + "]" + strError);
+      }
+    }
+  }
+
+  /**
+   * Adds a new data entry to a certain type.
+   * 
+   * @param type
+   *          The type to assign the data too.
+   * @param data
+   *          The data to be assigned.
+   */
+  public void data(DataType type, Object data)
+  {
+    switch (type)
+    {
+      case MESSAGE_SENT:
+        this.intSentMessages += (Integer) data;
+        break;
+      case MESSAGE_RECEIVED:
+        this.intReceivedMessages += (Integer) data;
+        break;
+      case MESSAGE_DISCARDED:
+        this.intDiscardedMessages += (Integer) data;
+        break;
       default:
-        return MonitorLevel.ALL;
+        // Do Nothing
+        break;
     }
   }
 
@@ -132,9 +259,9 @@ public class Monitor extends AppenderSkeleton
    *          Level to be checked against the MonitorLevel.
    * @return True if it passed, False if it didn't.
    */
-  private static boolean checkLevelPass(MonitorLevel level)
+  private boolean checkLevelPass(MonitorLevel level)
   {
-    switch (Monitor.monitorLvl)
+    switch (this.enmLevel)
     {
       case ALL:
         return true;
@@ -155,199 +282,111 @@ public class Monitor extends AppenderSkeleton
     }
   }
 
-  /** Different Log Levels **/
+  /**
+   * Converts a given ArrayList of logs to string.
+   * 
+   * @param logs
+   *          The ArrayList with logs.
+   * @return The logs as an string.
+   */
+  private String logsToString(ArrayList<String> logs)
+  {
+    String strLog = "";
+
+    for (String log : logs)
+    {
+      strLog += log + "\n";
+    }
+    logs.clear();
+
+    return strLog;
+  }
 
   /**
-   * Log and/or monitor a TRACE.
+   * Drains the logs into a string.
    * 
-   * @param strTrace
-   *          description given for the trace.
+   * @param level
+   *          The level of the requested logs.
+   * @return a string of the logs.
    */
-  public static void trace(String strTrace)
+  public String drainLogs(MonitorLevel level)
   {
-    if (Validator.checkString(strTrace))
+    switch (level)
     {
-      Monitor.objLogger.trace(strTrace);
-      if (Monitor.checkLevelPass(MonitorLevel.TRACE))
-      {
-        Monitor.objZabbix.addLog(MonitorLevel.TRACE, strTrace);
-      }
+      case ERROR:
+        return this.logsToString(this.arlErrorLog);
+      case WARN:
+        return this.logsToString(this.arlWarnLog);
+      case INFO:
+        return this.logsToString(this.arlInfoLog);
+      case DEBUG:
+        return this.logsToString(this.arlDebugLog);
+      case TRACE:
+        return this.logsToString(this.arlTraceLog);
+      default:
+        return "";
     }
   }
 
   /**
-   * Log and/or monitor a TRACE using an Exception object.
+   * Drains the data into an object.
    * 
-   * @param e
-   *          Exception object to get trace from.
-   */
-  public static void trace(Exception e)
-  {
-    if (Validator.checkObject(e, Exception.class))
-    {
-      StringWriter trace = new StringWriter();
-      e.printStackTrace(new PrintWriter(trace));
-
-      Monitor.objLogger.trace(trace.toString());
-      if (Monitor.checkLevelPass(MonitorLevel.TRACE))
-      {
-        Monitor.objZabbix.addLog(MonitorLevel.TRACE, trace.toString());
-      }
-    }
-  }
-
-  /**
-   * Log and/or monitor a DEBUG.
-   * 
-   * @param strDebug
-   *          description given for the DEBUG
-   */
-  public static void debug(String strDebug)
-  {
-    if (Validator.checkString(strDebug))
-    {
-      Monitor.objLogger.debug(strDebug);
-      if (Monitor.checkLevelPass(MonitorLevel.DEBUG))
-      {
-        Monitor.objZabbix.addLog(MonitorLevel.DEBUG, strDebug);
-      }
-    }
-  }
-
-  /**
-   * Log and/or monitor a INFO.
-   * 
-   * @param strInfo
-   *          description given for the INFO
-   */
-  public static void info(String strInfo)
-  {
-    if (Validator.checkString(strInfo))
-    {
-      Monitor.objLogger.info(strInfo);
-      if (Monitor.checkLevelPass(MonitorLevel.INFO))
-      {
-        Monitor.objZabbix.addLog(MonitorLevel.INFO, strInfo);
-      }
-    }
-  }
-
-  /**
-   * Log and/or monitor a WARN.
-   * 
-   * @param strWarn
-   *          description given for the WARN
-   */
-  public static void warn(String strWarn)
-  {
-    if (Validator.checkString(strWarn))
-    {
-      Monitor.objLogger.warn(strWarn);
-      if (Monitor.checkLevelPass(MonitorLevel.WARN))
-      {
-        Monitor.objZabbix.addLog(MonitorLevel.WARN, strWarn);
-      }
-    }
-  }
-
-  /**
-   * Log and/or monitor a ERROR.
-   * 
-   * @param strError
-   *          description given for the ERROR
-   */
-  public static void error(String strError)
-  {
-    if (Validator.checkString(strError))
-    {
-      Monitor.objLogger.error(strError);
-      if (Monitor.checkLevelPass(MonitorLevel.ERROR))
-      {
-        Monitor.objZabbix.addLog(MonitorLevel.ERROR, strError);
-      }
-    }
-  }
-
-  /**
-   * Adds a new data entry to a certain type.
-   * 
-   * @param type
-   *          Type to award the data to.
    * @param data
-   *          Data to be awarded.
+   *          The data type to be drained.
+   * @return a object of the requested data type.
    */
-  public static void data(DataType type, Object data)
+  public Object drainData(DataType data)
   {
-    if (Validator.checkObject(data))
+    Object tmpData = 0;
+    switch (data)
     {
-      Monitor.objZabbix.addData(type, data);
+      case MESSAGE_SENT:
+        tmpData = intSentMessages;
+        intSentMessages = 0;
+        return tmpData;
+      case MESSAGE_RECEIVED:
+        tmpData = intReceivedMessages;
+        intReceivedMessages = 0;
+        return tmpData;
+      case MESSAGE_DISCARDED:
+        tmpData = intDiscardedMessages;
+        intDiscardedMessages = 0;
+        return tmpData;
+      default:
+        return tmpData;
     }
   }
 
-  /** Getters and Setters **/
-
   /**
-   * Sets the level for the monitor to activate.
+   * Adds a new log line to a given monitor level.
    * 
-   * @param monitorLvl
-   *          Level on which the monitor triggers
+   * @param level
+   *          The level of the given log.
+   * @param log
+   *          The log message as string.
    */
-  private static void setMonitorLevel(MonitorLevel monitorLvl)
+  public void addLog(MonitorLevel level, String log)
   {
-    if (Validator.checkObject(monitorLvl, MonitorLevel.class))
-      Monitor.monitorLvl = monitorLvl;
-  }
-
-  /**
-   * Gets the level for the monitor to activate.
-   * 
-   * @return Level on which the monitor triggers.
-   */
-  private static MonitorLevel getMonitorLevel()
-  {
-    return Monitor.monitorLvl;
-  }
-
-  /**
-   * Sets the enabled state of Zabbix monitoring.
-   * 
-   * @param enabled
-   *          boolean to tell the enabled state.
-   */
-  private static void setEnabled(boolean enabled)
-  {
-    Monitor.blnMonitorEnabled = enabled;
-  }
-
-  /**
-   * Gets the enabled state of Zabbix monitoring.
-   * 
-   * @return the enabled state.
-   */
-  private static boolean getEnabled()
-  {
-    return Monitor.blnMonitorEnabled;
-  }
-
-  @Override
-  public void close()
-  {
-
-  }
-
-  @Override
-  public boolean requiresLayout()
-  {
-    return false;
-  }
-
-  @Override
-  protected void append(LoggingEvent event)
-  {
-    MonitorLevel level = Monitor.determineLevel(event.getLevel().toString());
-    if (Monitor.checkLevelPass(level))
+    switch (level)
     {
-      Monitor.objZabbix.addLog(level, event.getMessage().toString());
+      case ERROR:
+        this.arlErrorLog.add(log);
+        break;
+      case WARN:
+        this.arlWarnLog.add(log);
+        break;
+      case INFO:
+        this.arlInfoLog.add(log);
+        break;
+      case DEBUG:
+        this.arlDebugLog.add(log);
+        break;
+      case TRACE:
+        this.arlTraceLog.add(log);
+        break;
+      default:
+        // Do Nothing...
+        break;
     }
   }
 }

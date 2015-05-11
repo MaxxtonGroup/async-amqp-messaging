@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.maxxton.aam.monitoring.Monitor;
+import com.maxxton.aam.monitoring.MonitorFactory;
 import com.maxxton.aam.resources.Validator;
 
 /**
@@ -15,6 +16,8 @@ import com.maxxton.aam.resources.Validator;
  */
 public class MessagingFactory
 {
+  private final Monitor objMonitor = MonitorFactory.getMonitor("global");
+
   private static MessagingFactory objInstance = null;
 
   private Map<String, Messenger> mapMessengerMap;
@@ -71,7 +74,7 @@ public class MessagingFactory
     }
     else
     {
-      Monitor.warn("No messenger instance created or returned due incorrect name.");
+      objMonitor.warn(MessagingFactory.class, "No messenger instance created or returned due incorrect name.");
     }
     return messenger;
   }
@@ -94,12 +97,12 @@ public class MessagingFactory
       }
       else
       {
-        Monitor.info("No Messenger found with name '" + name + "'");
+        objMonitor.info(MessagingFactory.class, "No Messenger found with name '" + name + "'");
       }
     }
     else
     {
-      Monitor.warn("No messenger instance deleted due incorrect name");
+      objMonitor.warn(MessagingFactory.class, "No messenger instance deleted due incorrect name");
     }
     return false;
   }

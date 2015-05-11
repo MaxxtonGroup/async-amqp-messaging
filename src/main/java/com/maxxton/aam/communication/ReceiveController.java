@@ -14,7 +14,8 @@ import com.maxxton.aam.messages.BaseMessage;
 import com.maxxton.aam.messages.ResponseMessage;
 import com.maxxton.aam.messages.StatusMessage;
 import com.maxxton.aam.monitoring.Monitor;
-import com.maxxton.aam.monitoring.Zabbix.DataType;
+import com.maxxton.aam.monitoring.MonitorFactory;
+import com.maxxton.aam.monitoring.Monitor.DataType;
 import com.maxxton.aam.resources.Callback;
 import com.maxxton.aam.resources.Configuration;
 import com.maxxton.aam.resources.MessageDetails;
@@ -29,6 +30,8 @@ import com.maxxton.aam.resources.Validator;
  */
 public class ReceiveController implements MessageListener
 {
+  private Monitor objMonitor = MonitorFactory.getMonitor("global");
+
   private Resources objResources;
   private DataContainer objContainer;
   private Callback objCallback;
@@ -49,6 +52,7 @@ public class ReceiveController implements MessageListener
   {
     this.objResources = resources;
     this.objContainer = DataContainer.getInstance(this.objResources.getConfiguration().getName());
+    this.objMonitor = MonitorFactory.getMonitor(this.objResources.getConfiguration().getName());
     this.objCallback = null;
 
     this.connectToBroker();
@@ -129,7 +133,7 @@ public class ReceiveController implements MessageListener
 
     if (!Validator.checkInteger(millis, 0, Integer.MAX_VALUE))
     {
-      Monitor.warn("Receiving timeout given is not between a minimum of '0' and a maximum of 'Integer.MAX_VALUE'. Setting timeout to defualt '0'");
+      objMonitor.warn(ReceiveController.class, "Receiving timeout given is not between a minimum of '0' and a maximum of 'Integer.MAX_VALUE'. Setting timeout to defualt '0'");
       millis = 0;
     }
 
@@ -146,8 +150,8 @@ public class ReceiveController implements MessageListener
       }
       catch (InterruptedException e)
       {
-        Monitor.error("Unable to make the thread sleep for '10' milliseconds. Giving stack trace...");
-        Monitor.trace(e);
+        objMonitor.error(ReceiveController.class, "Unable to make the thread sleep for '10' milliseconds. Giving stack trace...");
+        objMonitor.trace(ReceiveController.class, e);
       }
       message = this.objContainer.popReceivedMessage();
     }
@@ -248,7 +252,7 @@ public class ReceiveController implements MessageListener
    */
   private void handleMessageCallback(String correlationId, Message message)
   {
-    Monitor.data(DataType.MESSAGE_RECEIVED, 1);
+    objMonitor.data(DataType.MESSAGE_RECEIVED, 1);
     if (this.objCallback != null)
     {
       this.objContainer.removeSendMessageById(correlationId);
@@ -293,8 +297,8 @@ public class ReceiveController implements MessageListener
             if (!properties.getRedelivered())
             {
               this.objContainer.addOddMessage(message);
-              Monitor.data(DataType.MESSAGE_DISCARDED, 1);
-              Monitor.warn("The received message was not recognized by the messenger. Maybe due client/broker failure, messages where resent.");
+              objMonitor.data(DataType.MESSAGE_DISCARDED, 1);
+              objMonitor.warn(ReceiveController.class, "The received message was not recognized by the messenger. Maybe due client/broker failure, messages where resent.");
             }
             else
             {
@@ -310,12 +314,12 @@ public class ReceiveController implements MessageListener
       }
       else
       {
-        Monitor.warn("The CorrelationId was set, but was empty. Throwing away unknown message.");
+        objMonitor.warn(ReceiveController.class, "The CorrelationId was set, but was empty. Throwing away unknown message.");
       }
     }
     else
     {
-      Monitor.warn("The CorrelationId of a received message was not set. Throwing away unknown message.");
+      objMonitor.warn(ReceiveController.class, "The CorrelationId of a received message was not set. Throwing away unknown message.");
     }
   }
 }

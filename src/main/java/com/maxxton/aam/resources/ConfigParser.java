@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import com.maxxton.aam.monitoring.Monitor;
+import com.maxxton.aam.monitoring.MonitorFactory;
 
 /**
  * ConfigParser class Used by multiple classes to load configuration files. Contains mostly static classes as it is a utility class.
@@ -14,6 +15,8 @@ import com.maxxton.aam.monitoring.Monitor;
  */
 public class ConfigParser
 {
+  private final static Monitor objMonitor = MonitorFactory.getMonitor("global");
+
   /**
    * Parses all supported configuration files.
    *
@@ -33,13 +36,13 @@ public class ConfigParser
         case "xml":
           return ConfigParser.parseXml(stream);
         default:
-          Monitor.warn("Failed to load configuration file '" + sFile + "'. Unsupported file type (Allowed: Properties, XML).");
+          objMonitor.warn(ConfigParser.class, "Failed to load configuration file '" + sFile + "'. Unsupported file type (Allowed: Properties, XML).");
           break;
       }
     }
     else
     {
-      Monitor.warn("Unable to find configuration file '" + sFile + "' in classpath. Make sure the file exists and is in the correct location.");
+      objMonitor.warn(ConfigParser.class, "Unable to find configuration file '" + sFile + "' in classpath. Make sure the file exists and is in the correct location.");
     }
     return null;
   }
@@ -59,7 +62,7 @@ public class ConfigParser
       if (Validator.checkInteger(position, 1, Integer.MAX_VALUE))
         return sFile.substring(position + 1).toLowerCase();
       else
-        Monitor.warn("Unable to find extension for file '" + sFile + "'. Make sure you are loading a file with a XML or Properties extension.");
+        objMonitor.warn(ConfigParser.class, "Unable to find extension for file '" + sFile + "'. Make sure you are loading a file with a XML or Properties extension.");
     }
     return "";
   }
@@ -81,8 +84,8 @@ public class ConfigParser
     }
     catch (IOException e)
     {
-      Monitor.warn("Unable to load properties configuration file from inputstream.");
-      Monitor.trace(e);
+      objMonitor.warn(ConfigParser.class, "Unable to load properties configuration file from inputstream.");
+      objMonitor.trace(ConfigParser.class, e);
     }
     return null;
   }
@@ -104,8 +107,8 @@ public class ConfigParser
     }
     catch (IOException e)
     {
-      Monitor.warn("Unable to load XML configuration file from inputstream.");
-      Monitor.trace(e);
+      objMonitor.warn(ConfigParser.class, "Unable to load XML configuration file from inputstream.");
+      objMonitor.trace(ConfigParser.class, e);
     }
     return null;
   }

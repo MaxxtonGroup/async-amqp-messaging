@@ -8,6 +8,7 @@ import com.maxxton.aam.messages.ResponseMessage;
 import com.maxxton.aam.messages.StatusMessage;
 import com.maxxton.aam.messages.SynchronizionMessage;
 import com.maxxton.aam.monitoring.Monitor;
+import com.maxxton.aam.monitoring.MonitorFactory;
 
 /**
  * MessageFactory class Creates new instances of a certain message type. Implements the Factory pattern as this suits the class better.
@@ -17,6 +18,7 @@ import com.maxxton.aam.monitoring.Monitor;
  */
 public class MessageFactory
 {
+  private final static Monitor objMonitor = MonitorFactory.getMonitor("global");
 
   /**
    * Creates a new Message instance based on the given MessageType.
@@ -40,7 +42,7 @@ public class MessageFactory
       case STATUS_MESSAGE:
         return new StatusMessage();
       default:
-        Monitor.warn("Unable to create message for type '" + messageType + "'. Make sure the messagetype exist and is not null.");
+        objMonitor.warn(MessageFactory.class, "Unable to create message for type '" + messageType + "'. Make sure the messagetype exist and is not null.");
         return null;
     }
   }

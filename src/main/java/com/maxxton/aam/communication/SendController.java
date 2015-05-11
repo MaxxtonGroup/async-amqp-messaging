@@ -6,7 +6,8 @@ import org.springframework.amqp.rabbit.core.ChannelCallback;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import com.maxxton.aam.monitoring.Monitor;
-import com.maxxton.aam.monitoring.Zabbix.DataType;
+import com.maxxton.aam.monitoring.MonitorFactory;
+import com.maxxton.aam.monitoring.Monitor.DataType;
 import com.maxxton.aam.resources.Configuration;
 import com.maxxton.aam.resources.Resources;
 import com.rabbitmq.client.AMQP.Queue.DeclareOk;
@@ -19,6 +20,8 @@ import com.rabbitmq.client.AMQP.Queue.DeclareOk;
  */
 public class SendController
 {
+  private Monitor objMonitor = MonitorFactory.getMonitor("global");
+
   private Resources objResources;
   private DataContainer objContainer;
   private RabbitTemplate objTemplate;
@@ -35,6 +38,7 @@ public class SendController
     // TODO : Change the key to the appropriate one as mentioned in the configuration class.
     this.objResources = resources;
     this.objContainer = DataContainer.getInstance(this.objResources.getConfiguration().getName());
+    this.objMonitor = MonitorFactory.getMonitor(this.objResources.getConfiguration().getName());
 
     this.connectToBroker();
     this.objTemplate = new RabbitTemplate(this.objConnection);
@@ -87,7 +91,7 @@ public class SendController
           }
           catch (Exception e)
           {
-            Monitor.info("The receiver client seems to be existing. This does not mean that it's connected and receiving message.");
+            objMonitor.info(SendController.class, "The receiver client seems to be existing. This does not mean that it's connected and receiving message.");
             return null;
           }
         }
@@ -120,7 +124,7 @@ public class SendController
     {
       objTemplate.send(message);
       this.objContainer.addSendMessage(message);
-      Monitor.data(DataType.MESSAGE_SENT, 1);
+      objMonitor.data(DataType.MESSAGE_SENT, 1);
     }
     return exists;
   }
