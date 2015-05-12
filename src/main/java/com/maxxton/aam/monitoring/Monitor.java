@@ -108,10 +108,10 @@ public class Monitor
     if (Validator.checkString(trace, false, false))
     {
       Logger logger = LoggerFactory.getLogger(objClass);
-      logger.trace(trace);
+      logger.trace("[" + this.strName + "] " + trace);
       if (this.checkLevelPass(MonitorLevel.TRACE))
       {
-        this.arlTraceLog.add("[" + this.strName + "]" + trace);
+        this.arlTraceLog.add("(" + objClass.getName() + ") " + trace);
       }
     }
   }
@@ -132,11 +132,11 @@ public class Monitor
       e.printStackTrace(new PrintWriter(trace));
 
       Logger logger = LoggerFactory.getLogger(objClass);
-      logger.trace(trace.toString());
+      logger.trace("[" + this.strName + "] " + trace.toString());
 
       if (this.checkLevelPass(MonitorLevel.TRACE))
       {
-        this.arlTraceLog.add("[" + this.strName + "]" + trace.toString());
+        this.arlTraceLog.add("(" + objClass.getName() + ") " + trace.toString());
       }
     }
   }
@@ -154,10 +154,10 @@ public class Monitor
     if (Validator.checkString(strDebug, false, false))
     {
       Logger logger = LoggerFactory.getLogger(objClass);
-      logger.debug(strDebug);
+      logger.debug("[" + this.strName + "] " + strDebug);
       if (this.checkLevelPass(MonitorLevel.DEBUG))
       {
-        this.arlDebugLog.add("[" + this.strName + "]" + strDebug);
+        this.arlDebugLog.add("(" + objClass.getName() + ") " + strDebug);
       }
     }
   }
@@ -175,10 +175,10 @@ public class Monitor
     if (Validator.checkString(strInfo, false, false))
     {
       Logger logger = LoggerFactory.getLogger(objClass);
-      logger.info(strInfo);
+      logger.info("[" + this.strName + "] " + strInfo);
       if (this.checkLevelPass(MonitorLevel.INFO))
       {
-        this.arlInfoLog.add("[" + this.strName + "]" + strInfo);
+        this.arlInfoLog.add("(" + objClass.getName() + ") " + strInfo);
       }
     }
   }
@@ -196,10 +196,10 @@ public class Monitor
     if (Validator.checkString(strWarn, false, false))
     {
       Logger logger = LoggerFactory.getLogger(objClass);
-      logger.warn(strWarn);
+      logger.warn("[" + this.strName + "] " + strWarn);
       if (this.checkLevelPass(MonitorLevel.WARN))
       {
-        this.arlWarnLog.add("[" + this.strName + "]" + strWarn);
+        this.arlWarnLog.add("(" + objClass.getName() + ") " + strWarn);
       }
     }
   }
@@ -217,10 +217,10 @@ public class Monitor
     if (Validator.checkString(strError, false, false))
     {
       Logger logger = LoggerFactory.getLogger(objClass);
-      logger.error(strError);
+      logger.error("[" + this.strName + "] " + strError);
       if (this.checkLevelPass(MonitorLevel.ERROR))
       {
-        this.arlErrorLog.add("[" + this.strName + "]" + strError);
+        this.arlErrorLog.add("(" + objClass.getName() + ") " + strError);
       }
     }
   }

@@ -146,14 +146,21 @@ public class MonitorFactory extends AppenderSkeleton
   {
     if (!MonitorFactory.blnIsStarted)
     {
-      try
+      if (MonitorFactory.blnEnabled)
       {
-        MonitorFactory.objAgent.start();
-        MonitorFactory.blnIsStarted = true;
+        try
+        {
+          MonitorFactory.objAgent.start();
+          MonitorFactory.blnIsStarted = true;
+        }
+        catch (Exception e)
+        {
+          MonitorFactory.objMonitor.error(MonitorFactory.class, "Failed to start the Zabbix Agent. No active/passive communication with the server available, ALL monitoring dropped.");
+        }
       }
-      catch (Exception e)
+      else
       {
-        MonitorFactory.objMonitor.error(MonitorFactory.class, "Failed to start the Zabbix Agent. No active/passive communication with the server available, ALL monitoring dropped.");
+        MonitorFactory.objMonitor.warn(MonitorFactory.class, "Zabbix monitoring is set as disabled in the configuration file. Please change this if you'd want to use this functionality.");
       }
     }
   }
@@ -306,7 +313,10 @@ public class MonitorFactory extends AppenderSkeleton
   @Override
   protected void append(LoggingEvent event)
   {
-    MonitorLevel level = MonitorFactory.determineLevel(event.getLevel().toString());
-    MonitorFactory.objMonitor.addLog(level, (String) event.getMessage());
+    if(event.getLocationInformation().getClassName() != Monitor.class.getName())
+    {
+      MonitorLevel level = MonitorFactory.determineLevel(event.getLevel().toString());
+      MonitorFactory.objMonitor.addLog(level, (String) event.getMessage());
+    }
   }
 }
