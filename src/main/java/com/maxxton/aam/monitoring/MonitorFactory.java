@@ -61,7 +61,7 @@ public class MonitorFactory extends AppenderSkeleton
         instance = mapMonitors.get(key);
         if (Validator.checkObject(instance, true))
         {
-          instance = new Monitor(key);
+          instance = new Monitor(key, MonitorFactory.getEnabled());
           mapMonitors.put(key, instance);
         }
       }
@@ -99,6 +99,7 @@ public class MonitorFactory extends AppenderSkeleton
         MonitorFactory.setServerPort(serverPort);
 
         MonitorFactory.setupAgent();
+        MonitorFactory.updateLogger();
       }
     }
   }
@@ -125,6 +126,22 @@ public class MonitorFactory extends AppenderSkeleton
       catch (Exception e)
       {
         MonitorFactory.objMonitor.error(MonitorFactory.class, "Failed to initiate the Zabbix Agent. No active/passive communication with the server available, ALL monitoring dropped.");
+      }
+    }
+  }
+
+  /**
+   * Updates the currently created Monitor instances to match new settings.
+   */
+  private static void updateLogger()
+  {
+    if (!MonitorFactory.blnIsStarted)
+    {
+      for (String key : MonitorFactory.mapMonitors.keySet())
+      {
+        Monitor monitor = MonitorFactory.mapMonitors.get(key);
+        monitor.setEnabled(MonitorFactory.getEnabled());
+        monitor.setMonitorLevel(MonitorFactory.getMonitorLevel());
       }
     }
   }
@@ -313,10 +330,10 @@ public class MonitorFactory extends AppenderSkeleton
   @Override
   protected void append(LoggingEvent event)
   {
-    if(event.getLocationInformation().getClassName() != Monitor.class.getName())
+    if (event.getLocationInformation().getClassName() != Monitor.class.getName())
     {
       MonitorLevel level = MonitorFactory.determineLevel(event.getLevel().toString());
-      MonitorFactory.objMonitor.addLog(level, (String) event.getMessage());
+      MonitorFactory.objMonitor.addLog(level, "(" + event.getLocationInformation().getClassName() + ") " + event.getMessage());
     }
   }
 }

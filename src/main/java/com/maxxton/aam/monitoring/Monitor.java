@@ -40,6 +40,7 @@ public class Monitor
   };
 
   private String strName;
+  private boolean blnEnabled;
   private MonitorLevel enmLevel;
 
   private ArrayList<String> arlErrorLog;
@@ -58,9 +59,10 @@ public class Monitor
    * @param name
    *          the name of the messenger which uses the monitor class.
    */
-  public Monitor(String name)
+  public Monitor(String name, boolean enabled)
   {
     this.strName = name;
+    this.blnEnabled = enabled;
     this.enmLevel = MonitorLevel.ALL;
 
     this.arlErrorLog = new ArrayList<String>();
@@ -93,6 +95,27 @@ public class Monitor
   public MonitorLevel getMonitorLevel()
   {
     return this.enmLevel;
+  }
+
+  /**
+   * Sets the enabled state of the Monitor.
+   * 
+   * @param enabled
+   *          New enabled state of the Monitor.
+   */
+  public void setEnabled(boolean enabled)
+  {
+    this.blnEnabled = enabled;
+  }
+
+  /**
+   * Gets the enabled state of the Monitor.
+   * 
+   * @return Current enabled state of the Monitor.
+   */
+  public boolean getEnabled()
+  {
+    return this.blnEnabled;
   }
 
   /**
@@ -235,20 +258,23 @@ public class Monitor
    */
   public void data(DataType type, Object data)
   {
-    switch (type)
+    if (this.blnEnabled)
     {
-      case MESSAGE_SENT:
-        this.intSentMessages += (Integer) data;
-        break;
-      case MESSAGE_RECEIVED:
-        this.intReceivedMessages += (Integer) data;
-        break;
-      case MESSAGE_DISCARDED:
-        this.intDiscardedMessages += (Integer) data;
-        break;
-      default:
-        // Do Nothing
-        break;
+      switch (type)
+      {
+        case MESSAGE_SENT:
+          this.intSentMessages += (Integer) data;
+          break;
+        case MESSAGE_RECEIVED:
+          this.intReceivedMessages += (Integer) data;
+          break;
+        case MESSAGE_DISCARDED:
+          this.intDiscardedMessages += (Integer) data;
+          break;
+        default:
+          // Do Nothing
+          break;
+      }
     }
   }
 
@@ -261,24 +287,31 @@ public class Monitor
    */
   private boolean checkLevelPass(MonitorLevel level)
   {
-    switch (this.enmLevel)
+    if (this.blnEnabled)
     {
-      case ALL:
-        return true;
-      case TRACE:
-        return level == MonitorLevel.TRACE || level == MonitorLevel.DEBUG || level == MonitorLevel.INFO || level == MonitorLevel.WARN || level == MonitorLevel.ERROR ? true : false;
-      case DEBUG:
-        return level == MonitorLevel.DEBUG || level == MonitorLevel.INFO || level == MonitorLevel.WARN || level == MonitorLevel.ERROR ? true : false;
-      case INFO:
-        return level == MonitorLevel.INFO || level == MonitorLevel.WARN || level == MonitorLevel.ERROR ? true : false;
-      case WARN:
-        return level == MonitorLevel.WARN || level == MonitorLevel.ERROR ? true : false;
-      case ERROR:
-        return level == MonitorLevel.ERROR ? true : false;
-      case OFF:
-        return false;
-      default:
-        return true;
+      switch (this.enmLevel)
+      {
+        case ALL:
+          return true;
+        case TRACE:
+          return level == MonitorLevel.TRACE || level == MonitorLevel.DEBUG || level == MonitorLevel.INFO || level == MonitorLevel.WARN || level == MonitorLevel.ERROR ? true : false;
+        case DEBUG:
+          return level == MonitorLevel.DEBUG || level == MonitorLevel.INFO || level == MonitorLevel.WARN || level == MonitorLevel.ERROR ? true : false;
+        case INFO:
+          return level == MonitorLevel.INFO || level == MonitorLevel.WARN || level == MonitorLevel.ERROR ? true : false;
+        case WARN:
+          return level == MonitorLevel.WARN || level == MonitorLevel.ERROR ? true : false;
+        case ERROR:
+          return level == MonitorLevel.ERROR ? true : false;
+        case OFF:
+          return false;
+        default:
+          return true;
+      }
+    }
+    else
+    {
+      return false;
     }
   }
 
@@ -367,26 +400,29 @@ public class Monitor
    */
   public void addLog(MonitorLevel level, String log)
   {
-    switch (level)
+    if (this.blnEnabled)
     {
-      case ERROR:
-        this.arlErrorLog.add(log);
-        break;
-      case WARN:
-        this.arlWarnLog.add(log);
-        break;
-      case INFO:
-        this.arlInfoLog.add(log);
-        break;
-      case DEBUG:
-        this.arlDebugLog.add(log);
-        break;
-      case TRACE:
-        this.arlTraceLog.add(log);
-        break;
-      default:
-        // Do Nothing...
-        break;
+      switch (level)
+      {
+        case ERROR:
+          this.arlErrorLog.add(log);
+          break;
+        case WARN:
+          this.arlWarnLog.add(log);
+          break;
+        case INFO:
+          this.arlInfoLog.add(log);
+          break;
+        case DEBUG:
+          this.arlDebugLog.add(log);
+          break;
+        case TRACE:
+          this.arlTraceLog.add(log);
+          break;
+        default:
+          // Do Nothing...
+          break;
+      }
     }
   }
 }
