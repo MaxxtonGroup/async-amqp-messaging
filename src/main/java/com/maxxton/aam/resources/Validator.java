@@ -57,7 +57,7 @@ public class Validator
     if ((strObject == null) != isNull)
       return false;
 
-    if (strObject.isEmpty() != isEmtpy)
+    if (isNull == false && strObject.isEmpty() != isEmtpy)
       return false;
 
     return true;
