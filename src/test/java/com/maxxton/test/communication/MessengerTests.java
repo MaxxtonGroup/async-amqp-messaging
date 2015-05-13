@@ -173,7 +173,7 @@ public class MessengerTests
   @AfterClass
   public static void cleanup()
   {
-    // TODO : cleanup queues and close connections
+
   }
 
 }

@@ -56,6 +56,6 @@ public class MessageSerializerTests
   @AfterClass
   public static void cleanup()
   {
-    // TODO : Cleanup queues and connections.
+
   }
 }

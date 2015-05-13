@@ -138,7 +138,7 @@ public class DataContainerTests
       ids.put(i, uuid);
       alterIds.put(i, uuid);
     }
-    
+
     this.objContainer.setIdentifiers(ids);
     ConcurrentSkipListMap<Integer, String> idsOther = this.objContainer.getIdentifiers();
 
@@ -175,7 +175,7 @@ public class DataContainerTests
     MessageProperties properties = new MessageProperties();
     properties.setCorrelationId(new String("1234567890").getBytes());
     Message msgOne = new Message("Hello First World".getBytes(), properties);
-    
+
     properties.setCorrelationId(new String("1234567890").getBytes());
     Message msgTwo = new Message("Hello Second World".getBytes(), properties);
 

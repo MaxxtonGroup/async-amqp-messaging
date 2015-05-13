@@ -1,9 +1,9 @@
 package com.maxxton.aam.monitoring;
 
 import java.net.InetAddress;
-import java.util.HashMap;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.spi.LoggingEvent;
@@ -21,7 +21,7 @@ import com.quigley.zabbixj.agent.ZabbixAgent;
  */
 public class MonitorFactory extends AppenderSkeleton
 {
-  private static HashMap<String, Monitor> mapMonitors = new HashMap<String, Monitor>();
+  private static ConcurrentHashMap<String, Monitor> mapMonitors = new ConcurrentHashMap<String, Monitor>();
   private static Monitor objMonitor = MonitorFactory.getMonitor("global");
 
   private static MonitorLevel enmMonitorLevel;
@@ -56,14 +56,11 @@ public class MonitorFactory extends AppenderSkeleton
     Monitor instance = mapMonitors.get(key);
     if (Validator.checkObject(instance, true))
     {
-      synchronized (mapMonitors)
+      instance = mapMonitors.get(key);
+      if (Validator.checkObject(instance, true))
       {
-        instance = mapMonitors.get(key);
-        if (Validator.checkObject(instance, true))
-        {
-          instance = new Monitor(key, MonitorFactory.getEnabled());
-          mapMonitors.put(key, instance);
-        }
+        instance = new Monitor(key, MonitorFactory.getEnabled());
+        mapMonitors.put(key, instance);
       }
     }
     return instance;

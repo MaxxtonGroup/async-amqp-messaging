@@ -2,8 +2,8 @@ package com.maxxton.aam.monitoring;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
-
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,21 +43,23 @@ public class Monitor
   private boolean blnEnabled;
   private MonitorLevel enmLevel;
 
-  private ArrayList<String> arlErrorLog;
-  private ArrayList<String> arlWarnLog;
-  private ArrayList<String> arlInfoLog;
-  private ArrayList<String> arlDebugLog;
-  private ArrayList<String> arlTraceLog;
+  private CopyOnWriteArrayList<String> arlErrorLog;
+  private CopyOnWriteArrayList<String> arlWarnLog;
+  private CopyOnWriteArrayList<String> arlInfoLog;
+  private CopyOnWriteArrayList<String> arlDebugLog;
+  private CopyOnWriteArrayList<String> arlTraceLog;
 
-  private int intSentMessages;
-  private int intReceivedMessages;
-  private int intDiscardedMessages;
+  private AtomicInteger intSentMessages;
+  private AtomicInteger intReceivedMessages;
+  private AtomicInteger intDiscardedMessages;
 
   /**
    * Constructor of the Monitor class.
    * 
    * @param name
    *          the name of the messenger which uses the monitor class.
+   * @param enabled
+   *          the enabled state of this monitor.
    */
   public Monitor(String name, boolean enabled)
   {
@@ -65,15 +67,15 @@ public class Monitor
     this.blnEnabled = enabled;
     this.enmLevel = MonitorLevel.ALL;
 
-    this.arlErrorLog = new ArrayList<String>();
-    this.arlWarnLog = new ArrayList<String>();
-    this.arlInfoLog = new ArrayList<String>();
-    this.arlDebugLog = new ArrayList<String>();
-    this.arlTraceLog = new ArrayList<String>();
+    this.arlErrorLog = new CopyOnWriteArrayList<String>();
+    this.arlWarnLog = new CopyOnWriteArrayList<String>();
+    this.arlInfoLog = new CopyOnWriteArrayList<String>();
+    this.arlDebugLog = new CopyOnWriteArrayList<String>();
+    this.arlTraceLog = new CopyOnWriteArrayList<String>();
 
-    this.intSentMessages = 0;
-    this.intReceivedMessages = 0;
-    this.intDiscardedMessages = 0;
+    this.intSentMessages = new AtomicInteger(0);
+    this.intReceivedMessages = new AtomicInteger(0);
+    this.intDiscardedMessages = new AtomicInteger(0);
   }
 
   /**
@@ -263,13 +265,13 @@ public class Monitor
       switch (type)
       {
         case MESSAGE_SENT:
-          this.intSentMessages += (Integer) data;
+          this.intSentMessages.addAndGet((Integer) data);
           break;
         case MESSAGE_RECEIVED:
-          this.intReceivedMessages += (Integer) data;
+          this.intReceivedMessages.addAndGet((Integer) data);
           break;
         case MESSAGE_DISCARDED:
-          this.intDiscardedMessages += (Integer) data;
+          this.intDiscardedMessages.addAndGet((Integer) data);
           break;
         default:
           // Do Nothing
@@ -322,7 +324,7 @@ public class Monitor
    *          The ArrayList with logs.
    * @return The logs as an string.
    */
-  private String logsToString(ArrayList<String> logs)
+  private String logsToString(CopyOnWriteArrayList<String> logs)
   {
     String strLog = "";
 
@@ -374,16 +376,16 @@ public class Monitor
     switch (data)
     {
       case MESSAGE_SENT:
-        tmpData = intSentMessages;
-        intSentMessages = 0;
+        tmpData = intSentMessages.get();
+        intSentMessages.set(0);
         return tmpData;
       case MESSAGE_RECEIVED:
-        tmpData = intReceivedMessages;
-        intReceivedMessages = 0;
+        tmpData = intReceivedMessages.get();
+        intReceivedMessages.set(0);
         return tmpData;
       case MESSAGE_DISCARDED:
-        tmpData = intDiscardedMessages;
-        intDiscardedMessages = 0;
+        tmpData = intDiscardedMessages.get();
+        intDiscardedMessages.set(0);
         return tmpData;
       default:
         return tmpData;

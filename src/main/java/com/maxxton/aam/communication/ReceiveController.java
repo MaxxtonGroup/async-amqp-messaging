@@ -257,8 +257,7 @@ public class ReceiveController implements MessageListener
     {
       this.objContainer.removeSendMessageById(correlationId);
       BaseMessage messageBody = (BaseMessage) MessageSerializer.deserialize(message.getBody());
-      // TODO : fix MessageDetails to use the given correlationId as responseId.
-      MessageDetails details = new MessageDetails("", messageBody.getSender(), messageBody.getReceiver(), messageBody.getMessageType(), messageBody.getPayload());
+      MessageDetails details = new MessageDetails(correlationId, messageBody.getSender(), messageBody.getReceiver(), messageBody.getMessageType(), messageBody.getPayload());
       this.objCallback.handleMessage(details);
     }
     else

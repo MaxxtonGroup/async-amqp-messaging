@@ -35,7 +35,6 @@ public class SendController
    */
   public SendController(Resources resources)
   {
-    // TODO : Change the key to the appropriate one as mentioned in the configuration class.
     this.objResources = resources;
     this.objContainer = DataContainer.getInstance(this.objResources.getConfiguration().getName());
     this.objMonitor = MonitorFactory.getMonitor(this.objResources.getConfiguration().getName());
