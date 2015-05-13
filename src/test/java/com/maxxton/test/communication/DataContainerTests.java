@@ -7,8 +7,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 import org.junit.After;
 import org.junit.Before;
@@ -97,11 +98,11 @@ public class DataContainerTests
   {
     System.out.print("DataContainer : Testing if an id is owned by the datacontainer...");
 
-    Set<String> ids = new HashSet<String>();
+    ConcurrentSkipListMap<Integer, String> ids = new ConcurrentSkipListMap<Integer, String>();
     String idOne = "0123456789";
     String idTwo = "9876543210";
-    ids.add(idOne);
-    ids.add(idTwo);
+    ids.put(0, idOne);
+    ids.put(1, idTwo);
 
     this.objContainer.setIdentifiers(ids);
 
@@ -129,25 +130,24 @@ public class DataContainerTests
   {
     System.out.print("DataContainer : Testing getting, setting and removal of identifiers..");
 
-    Set<String> ids = new HashSet<String>();
-    Set<String> alterIds = new HashSet<String>();
+    ConcurrentSkipListMap<Integer, String> ids = new ConcurrentSkipListMap<Integer, String>();
+    ConcurrentSkipListMap<Integer, String> alterIds = new ConcurrentSkipListMap<Integer, String>();
     for (int i = 0; i < 10; i++)
     {
       String uuid = this.objContainer.getUniqueId();
-      ids.add(uuid);
-      alterIds.add(uuid);
+      ids.put(i, uuid);
+      alterIds.put(i, uuid);
     }
-
+    
     this.objContainer.setIdentifiers(ids);
-    Set<String> idsOther = this.objContainer.getIdentifiers();
+    ConcurrentSkipListMap<Integer, String> idsOther = this.objContainer.getIdentifiers();
 
     assertNotNull("The set with identifiers cannot be Null", idsOther);
     assertEquals("The sets with ids are not the same.", ids, idsOther);
 
     // Testing removal
-    Iterator<String> iterator = ids.iterator();
-
-    String removedId = iterator.next();
+    String removedId = ids.get(0);
+    ids.remove(0);
     this.objContainer.removeIdentifier(removedId);
 
     idsOther = this.objContainer.getIdentifiers();
@@ -155,7 +155,7 @@ public class DataContainerTests
     assertNotNull("The set with identifiers cannot be Null", idsOther);
     assertNotEquals("The sets with identifiers are not the same.", alterIds, idsOther);
 
-    alterIds.remove(removedId);
+    alterIds.remove(0);
     assertEquals("The sets with identifiers are not the same.", alterIds, idsOther);
 
     System.out.println("done.");
@@ -172,26 +172,30 @@ public class DataContainerTests
   {
     System.out.print("DataContainer : Testing getting, setting and removal of send messages...");
 
-    Message msgOne = new Message("Hello First World".getBytes(), new MessageProperties());
-    Message msgTwo = new Message("Hello Second World".getBytes(), new MessageProperties());
+    MessageProperties properties = new MessageProperties();
+    properties.setCorrelationId(new String("1234567890").getBytes());
+    Message msgOne = new Message("Hello First World".getBytes(), properties);
+    
+    properties.setCorrelationId(new String("1234567890").getBytes());
+    Message msgTwo = new Message("Hello Second World".getBytes(), properties);
 
     this.objContainer.addSendMessage(msgOne);
     this.objContainer.addSendMessage(msgTwo);
 
-    Set<Message> sendMessages = new HashSet<Message>();
-    sendMessages.add(msgOne);
-    sendMessages.add(msgTwo);
+    ConcurrentSkipListMap<Integer, Message> sendMessages = new ConcurrentSkipListMap<Integer, Message>();
+    sendMessages.put(0, msgOne);
+    sendMessages.put(1, msgTwo);
 
-    Set<Message> otherMessages = this.objContainer.getSendMessages();
+    ConcurrentSkipListMap<Integer, Message> otherMessages = this.objContainer.getSendMessages();
 
     assertNotNull("The set with message cannot be Null.", otherMessages);
-    assertEquals("The sets with messages where not the same.", otherMessages, sendMessages);
+    assertEquals("The sets with messages where not the same.", otherMessages.size(), sendMessages.size());
 
     this.objContainer.removeSendMessage(msgOne);
-    assertNotEquals("The sets with messages cannot be the same.", otherMessages, sendMessages);
+    assertNotEquals("The sets with messages cannot be the same.", otherMessages.size(), sendMessages.size());
 
-    sendMessages.remove(msgOne);
-    assertEquals("The sets with messages where not the same.", otherMessages, sendMessages);
+    sendMessages.remove(0);
+    assertEquals("The sets with messages where not the same.", otherMessages.size(), sendMessages.size());
 
     System.out.println("done.");
   }
@@ -217,16 +221,16 @@ public class DataContainerTests
     receivedMessages.add(msgOne);
     receivedMessages.add(msgTwo);
 
-    Set<Message> otherMessages = this.objContainer.getReceivedMessages();
+    ConcurrentLinkedQueue<Message> otherMessages = this.objContainer.getReceivedMessages();
 
     assertNotNull("The set with message cannot be Null.", otherMessages);
-    assertEquals("The sets with messages where not the same.", otherMessages, receivedMessages);
+    assertEquals("The sets with messages where not the same.", otherMessages.size(), receivedMessages.size());
 
     this.objContainer.removeReceivedMessage(msgOne);
-    assertNotEquals("The sets with messages cannot be the same.", otherMessages, receivedMessages);
+    assertNotEquals("The sets with messages cannot be the same.", otherMessages.size(), receivedMessages.size());
 
     receivedMessages.remove(msgOne);
-    assertEquals("The sets with messages where not the same.", otherMessages, receivedMessages);
+    assertEquals("The sets with messages where not the same.", otherMessages.size(), receivedMessages.size());
 
     System.out.println("done.");
   }
@@ -248,20 +252,20 @@ public class DataContainerTests
     this.objContainer.addOddMessage(msgOne);
     this.objContainer.addOddMessage(msgTwo);
 
-    Set<Message> oddMessages = new HashSet<Message>();
+    ConcurrentLinkedQueue<Message> oddMessages = new ConcurrentLinkedQueue<Message>();
     oddMessages.add(msgOne);
     oddMessages.add(msgTwo);
 
-    Set<Message> otherMessages = this.objContainer.getOddMessages();
+    ConcurrentLinkedQueue<Message> otherMessages = this.objContainer.getOddMessages();
 
     assertNotNull("The set with message cannot be Null.", otherMessages);
-    assertEquals("The sets with messages where not the same.", otherMessages, oddMessages);
+    assertEquals("The sets with messages where not the same.", otherMessages.size(), oddMessages.size());
 
     this.objContainer.removeOddMessage(msgOne);
     assertNotEquals("The sets with messages cannot be the same.", otherMessages, oddMessages);
 
     oddMessages.remove(msgOne);
-    assertEquals("The sets with messages where not the same.", otherMessages, oddMessages);
+    assertEquals("The sets with messages where not the same.", otherMessages.size(), oddMessages.size());
 
     System.out.println("done.");
   }

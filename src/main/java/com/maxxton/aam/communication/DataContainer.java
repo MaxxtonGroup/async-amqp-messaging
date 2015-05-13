@@ -1,17 +1,14 @@
 package com.maxxton.aam.communication;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
 import org.springframework.amqp.core.Message;
 
 import com.maxxton.aam.resources.Configuration;
@@ -26,31 +23,27 @@ import com.maxxton.aam.resources.Validator;
  */
 public class DataContainer
 {
-  private static Map<String, DataContainer> mInstances = new HashMap<String, DataContainer>();
-
-  private final ReentrantReadWriteLock objSendLock = new ReentrantReadWriteLock(true);
-  private final ReentrantReadWriteLock objReceivedLock = new ReentrantReadWriteLock(true);
-  private final ReentrantReadWriteLock objIdentifiersLock = new ReentrantReadWriteLock(true);
+  private static ConcurrentMap<String, DataContainer> mInstances = new ConcurrentHashMap<String, DataContainer>();
 
   private final ScheduledExecutorService objExecutor = Executors.newScheduledThreadPool(1);
   private ScheduledFuture<?> objScheduler;
 
   private String sName;
   private Resources objResources;
-  private Set<String> setIdentifiers;
-  private Set<Message> setSendMessages;
-  private Set<Message> setReceivedMessages;
-  private Set<Message> setOddMessages;
+  private ConcurrentSkipListMap<Integer, String> mapIdentifiers;
+  private ConcurrentSkipListMap<Integer, Message> mapSendMessages;
+  private ConcurrentLinkedQueue<Message> clqReceivedMessages;
+  private ConcurrentLinkedQueue<Message> clqOddMessages;
 
   /**
    * DataContainer constructor Initiates elements defined in this class
    */
   private DataContainer()
   {
-    this.setIdentifiers = new HashSet<String>();
-    this.setSendMessages = new HashSet<Message>();
-    this.setReceivedMessages = new HashSet<Message>();
-    this.setOddMessages = new HashSet<Message>();
+    this.mapIdentifiers = new ConcurrentSkipListMap<Integer, String>();
+    this.mapSendMessages = new ConcurrentSkipListMap<Integer, Message>();
+    this.clqReceivedMessages = new ConcurrentLinkedQueue<Message>();
+    this.clqOddMessages = new ConcurrentLinkedQueue<Message>();
   }
 
   /**
@@ -112,94 +105,77 @@ public class DataContainer
     this.identifierCleanup();
     this.sendCleanup();
     this.receiveCleanup();
+    this.oddCleanup();
   }
 
   /**
-   * Cleans up the HashSet with identifiers.
+   * Cleans up the SkipListMap with identifiers.
    */
   private void identifierCleanup()
   {
     Configuration config = this.objResources.getConfiguration();
-    if (this.setIdentifiers.size() > config.getDataMaxElements())
+    if (this.mapIdentifiers.size() > config.getDataMaxElements())
     {
-      Iterator<String> it = this.setIdentifiers.iterator();
-      int count = 1;
-      this.objIdentifiersLock.writeLock().lock();
-      try
+      int diff = this.mapIdentifiers.size() - config.getDataMaxElements();
+      for (int key = diff; key < this.mapIdentifiers.size(); key++)
       {
-        while (it.hasNext())
+        this.mapIdentifiers.put(key - diff, this.mapIdentifiers.get(key));
+        if (key >= config.getDataMaxElements())
         {
-          it.next();
-          if (count > config.getDataMaxElements())
-          {
-            it.remove();
-          }
-          count++;
+          this.mapIdentifiers.remove(key);
         }
-      }
-      finally
-      {
-        this.objIdentifiersLock.writeLock().unlock();
       }
     }
   }
 
   /**
-   * Cleans up the HashSet with send messages.
+   * Cleans up the SkipListMap with send messages.
    */
   private void sendCleanup()
   {
     Configuration config = this.objResources.getConfiguration();
-    if (this.setSendMessages.size() > config.getDataMaxElements())
+    if (this.mapSendMessages.size() > config.getDataMaxElements())
     {
-      this.objSendLock.writeLock().lock();
-      try
+      int diff = this.mapSendMessages.size() - config.getDataMaxElements();
+      for (int key = diff; key < this.mapSendMessages.size(); key++)
       {
-        Iterator<Message> it = this.setSendMessages.iterator();
-        int count = 1;
-        while (it.hasNext())
+        this.mapSendMessages.put(key - diff, this.mapSendMessages.get(key));
+        if (key >= config.getDataMaxElements())
         {
-          it.next();
-          if (count > config.getDataMaxElements())
-          {
-            it.remove();
-          }
-          count++;
+          this.mapSendMessages.remove(key);
         }
-      }
-      finally
-      {
-        this.objSendLock.writeLock().unlock();
       }
     }
   }
 
   /**
-   * Cleans up the HashSet with received messages.
+   * Cleans up the LinkedQueue with received messages.
    */
   private void receiveCleanup()
   {
     Configuration config = this.objResources.getConfiguration();
-    if (this.setReceivedMessages.size() > config.getDataMaxElements())
+    if (this.clqReceivedMessages.size() > config.getDataMaxElements())
     {
-      this.objReceivedLock.writeLock().lock();
-      try
+      int diff = this.clqReceivedMessages.size() - config.getDataMaxElements();
+      for (int key = 0; key < diff; key++)
       {
-        Iterator<Message> it = this.setReceivedMessages.iterator();
-        int count = 1;
-        while (it.hasNext())
-        {
-          it.next();
-          if (count > config.getDataMaxElements())
-          {
-            it.remove();
-          }
-          count++;
-        }
+        this.clqReceivedMessages.remove();
       }
-      finally
+    }
+  }
+
+  /**
+   * Cleans up the LinkedQueue with odd messages.
+   */
+  private void oddCleanup()
+  {
+    Configuration config = this.objResources.getConfiguration();
+    if (this.clqOddMessages.size() > config.getDataMaxElements())
+    {
+      int diff = this.clqOddMessages.size() - config.getDataMaxElements();
+      for (int key = 0; key < diff; key++)
       {
-        this.objReceivedLock.writeLock().unlock();
+        this.clqOddMessages.remove();
       }
     }
   }
@@ -211,10 +187,10 @@ public class DataContainer
   {
     this.objExecutor.shutdown();
 
-    this.setIdentifiers = new HashSet<String>();
-    this.setSendMessages = new HashSet<Message>();
-    this.setReceivedMessages = new HashSet<Message>();
-    this.setOddMessages = new HashSet<Message>();
+    this.mapIdentifiers = new ConcurrentSkipListMap<Integer, String>();
+    this.mapSendMessages = new ConcurrentSkipListMap<Integer, Message>();
+    this.clqReceivedMessages = new ConcurrentLinkedQueue<Message>();
+    this.clqOddMessages = new ConcurrentLinkedQueue<Message>();
 
     mInstances.remove(this.sName);
   }
@@ -248,7 +224,7 @@ public class DataContainer
   public String getUniqueId()
   {
     String id = UUID.randomUUID().toString();
-    this.setIdentifiers.add(id);
+    this.addIdentifier(id);
     return id;
   }
 
@@ -261,370 +237,312 @@ public class DataContainer
    */
   public boolean isOwnedByMe(String id)
   {
-    this.objIdentifiersLock.readLock().lock();
-    try
+    if (Validator.checkString(id))
     {
-      if (this.setIdentifiers.contains(id))
+      if (this.mapIdentifiers.containsValue(id))
       {
         return true;
       }
-      return false;
     }
-    finally
-    {
-      this.objIdentifiersLock.readLock().unlock();
-    }
+    return false;
   }
 
   /**
-   * Adds a given messageid to the set.
+   * Adds a given messageid to the Map.
    *
    * @param id
    *          identifier of the message
    */
   public void addIdentifier(String id)
   {
-    this.objIdentifiersLock.writeLock().lock();
-    try
+    if (Validator.checkString(id))
     {
-      this.setIdentifiers.add(id);
-    }
-    finally
-    {
-      this.objIdentifiersLock.writeLock().unlock();
+      this.mapIdentifiers.put(this.mapIdentifiers.size(), id);
     }
   }
 
   /**
-   * Removes a given messagid from the list if it exists.
+   * Removes a given messageId from the maps if it exists.
    * 
    * @param id
-   *          identifier of a message
+   *          identifier to be removed.
    */
   public void removeIdentifier(String id)
   {
-    this.objIdentifiersLock.writeLock().lock();
-    this.objIdentifiersLock.readLock().lock();
-    try
+    if (Validator.checkString(id))
     {
-      if (this.setIdentifiers.contains(id))
+      if (this.mapIdentifiers.containsValue(id))
       {
-        this.setIdentifiers.remove(id);
+        for (int key = 0; key > this.mapIdentifiers.size(); key++)
+        {
+          if (id == this.mapIdentifiers.get(key))
+          {
+            this.mapIdentifiers.remove(key);
+          }
+        }
       }
     }
-    finally
+  }
+
+  /**
+   * Removes a given key and value from the Map if it exists.
+   * 
+   * @param id
+   *          identifier for the value in the map.
+   */
+  public void removeIdentifierById(Integer id)
+  {
+    if (Validator.checkInteger(id, 0, Integer.MAX_VALUE))
     {
-      this.objIdentifiersLock.readLock().unlock();
-      this.objIdentifiersLock.writeLock().unlock();
+      if (this.mapIdentifiers.containsKey(id))
+      {
+        this.mapIdentifiers.remove(id);
+      }
     }
   }
 
   /**
-   * Getter for HashSet with string bases identifiers.
+   * Getter for SkipListMap with string bases identifiers.
    * 
-   * @return an Set of identifiers.
+   * @return an Map of identifiers.
    */
-  public Set<String> getIdentifiers()
+  public ConcurrentSkipListMap<Integer, String> getIdentifiers()
   {
-    return this.setIdentifiers;
+    return this.mapIdentifiers;
   }
 
   /**
-   * Setter for Set with string bases identifiers.
+   * Setter for SkipListMap with string bases identifiers.
    * 
    * @param identifiers
-   *          an Set of string identifiers.
+   *          an Map of string identifiers.
    */
-  public void setIdentifiers(Set<String> identifiers)
+  public void setIdentifiers(ConcurrentSkipListMap<Integer, String> identifiers)
   {
-    this.setIdentifiers = identifiers;
+    if (Validator.checkObject(identifiers, ConcurrentSkipListMap.class))
+    {
+      this.mapIdentifiers = identifiers;
+    }
   }
 
   /**
-   * Adds a given message to the send Set.
+   * Adds a given message to the send Map.
    * 
    * @param message
    *          the Message object.
    */
   public void addSendMessage(Message message)
   {
-    // TODO : find solution for overflowing send messages set (run thread that cleans periodically).
-    this.objSendLock.writeLock().lock();
-    try
+    if (Validator.checkObject(message, Message.class))
     {
-      this.setSendMessages.add(message);
       if (message.getMessageProperties().getCorrelationId() != null && message.getMessageProperties().getCorrelationId().length > 0)
       {
+        this.mapSendMessages.put(this.mapSendMessages.size(), message);
         this.addIdentifier(message.getMessageProperties().getCorrelationId().toString());
       }
-    }
-    finally
-    {
-      this.objSendLock.writeLock().unlock();
     }
   }
 
   /**
-   * Removes a given message from the send Set.
+   * Removes a given message from the send Map.
    * 
    * @param message
    *          the Message object.
    */
   public void removeSendMessage(Message message)
   {
-    this.objSendLock.writeLock().lock();
-    try
+    if (Validator.checkObject(message, Message.class))
     {
-      this.setSendMessages.remove(message);
-    }
-    finally
-    {
-      this.objSendLock.writeLock().unlock();
+      if (this.mapSendMessages.containsValue(message))
+      {
+        for (int key = 0; key < this.mapSendMessages.size(); key++)
+        {
+          if (message == this.mapSendMessages.get(key))
+          {
+            this.mapSendMessages.remove(key);
+          }
+        }
+      }
     }
   }
 
   /**
-   * Removes a given message from the send Set.
-   * 
+   * Removes a given message from the send Map.
+   *
    * @param id
    *          identifier of the message
    */
   public void removeSendMessageById(String id)
   {
-    this.objSendLock.readLock().lock();
-    try
+    if (Validator.checkString(id))
     {
-      for (Message message : this.setSendMessages)
+      for (int key = 0; key < this.mapSendMessages.size(); key++)
       {
-        if (message.getMessageProperties().getCorrelationId() != null && message.getMessageProperties().getCorrelationId().length > 0)
+        Message message = this.mapSendMessages.get(key);
+        if (Validator.checkObject(message.getMessageProperties().getCorrelationId()))
         {
-          String messageId = message.getMessageProperties().getCorrelationId().toString();
-          if (messageId.equals(id))
+          if (message.getMessageProperties().getCorrelationId().toString() == id)
           {
-            this.removeSendMessage(message);
+            this.mapSendMessages.remove(id);
           }
         }
       }
     }
-    finally
+  }
+
+  /**
+   * Setter for the messages send Map.
+   * 
+   * @param messages
+   *          the Map with Message objects.
+   */
+  public void setSendMessages(ConcurrentSkipListMap<Integer, Message> messages)
+  {
+    if (Validator.checkObject(messages, ConcurrentSkipListMap.class))
     {
-      this.objSendLock.readLock().unlock();
+      this.mapSendMessages = messages;
     }
   }
 
   /**
-   * Setter for the messages send Set.
+   * Getter for the messages send Map.
    * 
-   * @param messages
-   *          the Set with Message objects.
+   * @return Map with messages.
    */
-  public void setSendMessages(Set<Message> messages)
+  public ConcurrentSkipListMap<Integer, Message> getSendMessages()
   {
-    this.setSendMessages = messages;
+    return this.mapSendMessages;
   }
 
   /**
-   * Getter for the messages send Set.
-   * 
-   * @return Set with messages.
-   */
-  public Set<Message> getSendMessages()
-  {
-    return this.setSendMessages;
-  }
-
-  /**
-   * Adds a given message to the receive Set.
+   * Adds a given message to the receive LinkedQueue.
    * 
    * @param message
    *          the Message object.
    */
   public void addReceivedMessage(Message message)
   {
-    this.objReceivedLock.writeLock().lock();
-    try
+    if (Validator.checkObject(message, Message.class))
     {
-      // TODO : Make sure that messages which the same correlationId override each other
-      this.setReceivedMessages.add(message);
-    }
-    finally
-    {
-      this.objReceivedLock.writeLock().unlock();
+      this.clqReceivedMessages.add(message);
     }
   }
 
   /**
-   * Pops the oldest received message from the array
+   * Pops the oldest received message from the LinkedQueue
    * 
-   * @return the oldest message from the array
+   * @return the oldest message from the LinkedQueue
    */
   public Message popReceivedMessage()
   {
-    this.objReceivedLock.readLock().lock();
-    Message message = null;
-    try
-    {
-      Iterator<Message> it = this.setReceivedMessages.iterator();
-      while (it.hasNext())
-      {
-        message = (Message) it.next();
-      }
-    }
-    finally
-    {
-      this.objReceivedLock.readLock().unlock();
-    }
-
-    this.removeReceivedMessage(message);
-    return message;
+    return this.clqReceivedMessages.poll();
   }
 
   /**
-   * Removes a given message from the receive Set.
+   * Removes a given message from the Received queue.
    * 
    * @param message
-   *          the Message object.
+   *          the message to be removed.
    */
   public void removeReceivedMessage(Message message)
   {
-    this.objReceivedLock.writeLock().lock();
-    try
+    if (Validator.checkObject(message, Message.class))
     {
-      this.setReceivedMessages.remove(message);
-    }
-    finally
-    {
-      this.objReceivedLock.writeLock().unlock();
-    }
-  }
-
-  /**
-   * Removes a given message from the received Set.
-   * 
-   * @param id
-   *          identifier of the message
-   */
-  public void removeReceivedMessageById(String id)
-  {
-    this.objReceivedLock.readLock().lock();
-    try
-    {
-      for (Message message : this.setReceivedMessages)
+      if (this.clqReceivedMessages.contains(message))
       {
-        if (message.getMessageProperties().getCorrelationId() != null && message.getMessageProperties().getCorrelationId().length > 0)
-        {
-          String messageId = (String) MessageSerializer.deserialize(message.getMessageProperties().getCorrelationId());
-          if (messageId.equals(id))
-          {
-            this.removeReceivedMessage(message);
-          }
-        }
+        this.clqReceivedMessages.remove(message);
       }
     }
-    finally
-    {
-      this.objReceivedLock.readLock().unlock();
-    }
   }
 
   /**
-   * Setter for the messages receive Set.
+   * Setter for the messages receive LinkedQueue.
    * 
    * @param messages
-   *          the Set with Message objects.
+   *          the LinkedQueue with Message objects.
    */
-  public void setReceivedMessages(Set<Message> messages)
+  public void setReceivedMessages(ConcurrentLinkedQueue<Message> messages)
   {
-    this.objReceivedLock.writeLock().lock();
-    try
+    if (Validator.checkObject(messages, ConcurrentLinkedQueue.class))
     {
-      this.setReceivedMessages = messages;
-    }
-    finally
-    {
-      this.objReceivedLock.writeLock().unlock();
+      this.clqReceivedMessages = messages;
     }
   }
 
   /**
-   * Getter for the messages receive Set.
+   * Getter for the messages receive LinkedQueue.
    * 
-   * @return Set with messages.
+   * @return the LinkedQueue with received messages.
    */
-  public Set<Message> getReceivedMessages()
+  public ConcurrentLinkedQueue<Message> getReceivedMessages()
   {
-    this.objReceivedLock.readLock().lock();
-    try
-    {
-      return this.setReceivedMessages;
-    }
-    finally
-    {
-      this.objReceivedLock.readLock().unlock();
-    }
+    return this.clqReceivedMessages;
   }
 
+  // ODD and DISCARDED MESSAGES.
+
   /**
-   * Adds a message instance to the odd messages set.
+   * Adds a message instance to the odd messages LinkedQueue.
    * 
    * @param message
    *          an instance of a message object.
    */
   public void addOddMessage(Message message)
   {
-    this.setOddMessages.add(message);
+    if (Validator.checkObject(message, Message.class))
+    {
+      this.clqOddMessages.add(message);
+    }
   }
 
   /**
-   * Removes a given message object from the odd messages set.
+   * Pops and returns a message at the head of the OddMessages queue.
+   * 
+   * @return An instance of the Message class or null if the queue was empty.
+   */
+  public Message popOddMessage()
+  {
+    return this.clqOddMessages.poll();
+  }
+
+  /**
+   * Removes a certain message from the received queue.
    * 
    * @param message
-   *          instance of the Message object
+   *          the message to be removed.
    */
   public void removeOddMessage(Message message)
   {
-    this.setOddMessages.remove(message);
-  }
-
-  /**
-   * Removes a message object by id from the odd messages set.
-   * 
-   * @param id
-   *          the message identifier as string.
-   */
-  public void removeOddMessageById(String id)
-  {
-    for (Message message : this.setOddMessages)
+    if (Validator.checkObject(message, Message.class))
     {
-      if (message.getMessageProperties().getCorrelationId() != null && message.getMessageProperties().getCorrelationId().length > 0)
+      if (this.clqOddMessages.contains(message))
       {
-        String messageId = (String) MessageSerializer.deserialize(message.getMessageProperties().getCorrelationId());
-        if (messageId.equals(id))
-        {
-          this.setOddMessages.remove(message);
-        }
+        this.clqOddMessages.remove(message);
       }
     }
   }
 
   /**
-   * Getter for the odd messages set.
+   * Getter for the odd messages LinkedQueue.
    * 
-   * @return a list of odd received messages.
+   * @return a LinkedQueue of odd received messages.
    */
-  public Set<Message> getOddMessages()
+  public ConcurrentLinkedQueue<Message> getOddMessages()
   {
-    return this.setOddMessages;
+    return this.clqOddMessages;
   }
 
   /**
-   * Setter for the odd messages set.
+   * Setter for the odd messages LinkedQueue.
    * 
    * @param messages
-   *          the Set with Message objects.
+   *          the LinkedQueue with Message objects.
    */
-  public void setOddMessages(Set<Message> messages)
+  public void setOddMessages(ConcurrentLinkedQueue<Message> messages)
   {
-    this.setOddMessages = messages;
+    if (Validator.checkObject(messages, ConcurrentLinkedQueue.class))
+    {
+      this.clqOddMessages = messages;
+    }
   }
 }
