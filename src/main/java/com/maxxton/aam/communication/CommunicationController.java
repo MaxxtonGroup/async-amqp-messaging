@@ -58,9 +58,9 @@ public class CommunicationController
    *          the receiver of the message.
    * @param baseMessage
    *          the message to be send.
-   * @return outcome of the send method. True for success and false for failed.
+   * @return outcome of the send method. An valid UUID if the message was send correctly, null if it was not.
    */
-  public boolean packAndSend(String receiver, BaseMessage baseMessage)
+  public String packAndSend(String receiver, BaseMessage baseMessage)
   {
     return this.packAndSend(receiver, baseMessage, null);
   }
@@ -74,17 +74,23 @@ public class CommunicationController
    *          the message to be send.
    * @param responseTo
    *          correlationId where the message is a response to.
-   * @return outcome of the send method. True for success and false for failed.
+   * @return outcome of the send method. An valid UUID if the message was send correctly, null if it was not.
    */
-  public boolean packAndSend(String receiver, BaseMessage baseMessage, String responseTo)
+  public String packAndSend(String receiver, BaseMessage baseMessage, String responseTo)
   {
     MessageProperties properties = new MessageProperties();
-    properties.setCorrelationId(responseTo == null || responseTo == "" ? UUID.randomUUID().toString().getBytes() : responseTo.getBytes());
+    String uuid = responseTo == null || responseTo == "" ? UUID.randomUUID().toString() : responseTo;
+    properties.setCorrelationId(uuid.getBytes());
     properties.setTimestamp(new Date());
 
     byte[] messageBytes = MessageSerializer.serialize(baseMessage);
     Message message = new Message(messageBytes, properties);
-    return objSender.sendMessage(receiver, message);
+    if (objSender.sendMessage(receiver, message))
+    {
+      return uuid;
+    }
+
+    return null;
   }
 
   /**

@@ -60,7 +60,7 @@ You can create a new Messenger object by running this code.
 ```
 MessagingFactory objFactory = MessagingFactory.getInstance();
 Messenger objMessenger = objFactory.createMessenger("my-messenger-name");
-objMessenger.loadConfiguration(getClass().getClassLoader().getResource("custom.properties").getPath());
+objMessenger.loadConfiguration("custom.properties");
 objMessenger.start();
 ```
 This creates a Messenger instance with the name **my-messenger-name**.

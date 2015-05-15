@@ -50,9 +50,9 @@ public class Messenger
    *          the receiver of the message as string
    * @param payload
    *          the contents of the message (can be any object)
-   * @return outcome of the send method. True for success and false for failed.
+   * @return outcome of the send method. An valid UUID if the message was send correctly, null if it was not.
    */
-  public boolean sendMessage(MessageType type, String receiver, Object payload)
+  public String sendMessage(MessageType type, String receiver, Object payload)
   {
     return this.sendMessage(type, receiver, payload, null);
   }
@@ -68,9 +68,9 @@ public class Messenger
    *          the contents of the message (can be any object)
    * @param responseTo
    *          correlationId where the message is a response to.
-   * @return outcome of the send method. True for success and false for failed.
+   * @return outcome of the send method. An valid UUID if the message was send correctly, null if it was not.
    */
-  public boolean sendMessage(MessageType messageType, String receiver, Object payload, String responseTo)
+  public String sendMessage(MessageType messageType, String receiver, Object payload, String responseTo)
   {
     if (this.blnIsStarted)
     {
@@ -91,7 +91,7 @@ public class Messenger
     {
       objMonitor.warn(Messenger.class, "You need to call the start() method to be able to receive messages from the server.");
     }
-    return false;
+    return null;
   }
 
   /**
