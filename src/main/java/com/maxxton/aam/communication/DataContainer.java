@@ -338,7 +338,7 @@ public class DataContainer
       if (message.getMessageProperties().getCorrelationId() != null && message.getMessageProperties().getCorrelationId().length > 0)
       {
         this.mapSendMessages.put(this.mapSendMessages.size(), message);
-        this.addIdentifier(message.getMessageProperties().getCorrelationId().toString());
+        this.addIdentifier(new String(message.getMessageProperties().getCorrelationId()));
       }
     }
   }
@@ -379,9 +379,10 @@ public class DataContainer
       for (int key = 0; key < this.mapSendMessages.size(); key++)
       {
         Message message = this.mapSendMessages.get(key);
-        if (Validator.checkObject(message.getMessageProperties().getCorrelationId()))
+        String messageId = new String(message.getMessageProperties().getCorrelationId());
+        if (Validator.checkObject(messageId))
         {
-          if (message.getMessageProperties().getCorrelationId().toString() == id)
+          if (messageId == id)
           {
             this.mapSendMessages.remove(id);
           }

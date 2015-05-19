@@ -283,7 +283,7 @@ public class ReceiveController implements MessageListener
     {
       if (ciBytes.length > 0)
       {
-        String correlationId = properties.getCorrelationId().toString();
+        String correlationId = new String(ciBytes);
         Object messageBody = MessageSerializer.deserialize(message.getBody());
         if (messageBody instanceof StatusMessage || messageBody instanceof ResponseMessage)
         {
