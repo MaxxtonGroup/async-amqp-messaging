@@ -65,15 +65,15 @@ public class MessagingFactoryTest
   {
     System.out.print("MessagingFactory : Testing creational pattern...");
 
-    Messenger msgr = objMessageFactory.createMessenger("test");
+    Messenger msgr = objMessageFactory.createMessenger("test", "/test.properties");
     assertNotNull("The messenger cannot be NULL.", msgr);
 
-    Messenger otherMsgr = objMessageFactory.createMessenger("other");
+    Messenger otherMsgr = objMessageFactory.createMessenger("other", "/test.properties");
     assertNotNull("The other messenger cannot be NULL.", otherMsgr);
 
     assertNotEquals("The instances returned by the creational method are the same.", msgr, otherMsgr);
 
-    Messenger sameMsgr = objMessageFactory.createMessenger("test");
+    Messenger sameMsgr = objMessageFactory.createMessenger("test", "/test.properties");
     assertNotNull("The same messenger cannot be NULL.", sameMsgr);
 
     Messenger notAllowedName = objMessageFactory.createMessenger("a1.3'34lsad39)(");
@@ -95,9 +95,9 @@ public class MessagingFactoryTest
   {
     System.out.print("MessagingFactory : Testing destroy method...");
 
-    Messenger msgr = this.objMessageFactory.createMessenger("test");
+    Messenger msgr = this.objMessageFactory.createMessenger("test", "/test.properties");
     this.objMessageFactory.destroyMessenger("test");
-    Messenger otherMsgr = this.objMessageFactory.createMessenger("test");
+    Messenger otherMsgr = this.objMessageFactory.createMessenger("test", "/test.properties");
 
     assertNotEquals("The Messenger instance should not be the same.", msgr, otherMsgr);
 

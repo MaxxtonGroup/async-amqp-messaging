@@ -35,9 +35,7 @@ public class MessengerTest
   @Before
   public void setup()
   {
-    this.objMessenger = new Messenger("test");
-    this.objMessenger.loadConfiguration("/test.properties");
-    this.objMessenger.start();
+    this.objMessenger = new Messenger("test", "/test.properties");
     assertNotNull("The messenger cannot be NULL.", this.objMessenger);
   }
 
@@ -88,9 +86,7 @@ public class MessengerTest
     String strPayload = "Hello World";
     this.objMessenger.sendMessage(MessageType.GENERATION_MESSAGE, "other", strPayload);
 
-    Messenger receiver = new Messenger("other");
-    receiver.loadConfiguration("/test.properties");
-    receiver.start();
+    Messenger receiver = new Messenger("other", "/test.properties");
 
     MessageDetails details = receiver.receiveMessage(1000);
 
@@ -111,9 +107,7 @@ public class MessengerTest
   {
     System.out.print("Messenger : Testing configuration loading...");
 
-    Messenger other = new Messenger("other");
-    other.loadConfiguration("/test.properties");
-    other.start();
+    Messenger other = new Messenger("other", "/test.properties");
 
     Configuration objConfig = other.getResources().getConfiguration();
     assertNotNull("The configuration instance cannot be Null.", objConfig);
@@ -149,9 +143,7 @@ public class MessengerTest
 
     this.objMessenger.sendMessage(MessageType.GENERATION_MESSAGE, "other", strPayload);
 
-    Messenger other = new Messenger("other");
-    other.loadConfiguration("/test.properties");
-    other.start();
+    Messenger other = new Messenger("other", "/test.properties");
 
     Callback objCallback = new Callback()
     {

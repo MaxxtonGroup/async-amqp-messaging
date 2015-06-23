@@ -49,15 +49,29 @@ public class MessagingFactory
     }
     return objInstance;
   }
-
+  
   /**
    * Creates and/or returns an instance on the Messenger class based on a given name.
    * 
    * @param name
-   *          the messenger name
+   *          the messenger name           
    * @return a newly created or existing instance of the Messenger class.
    */
   public Messenger createMessenger(String name)
+  {
+    return this.createMessenger(name, "/default.properties");
+  }
+
+  /**
+   * Creates and/or returns an instance on the Messenger class based on a given name and configuration.
+   * 
+   * @param name
+   *          the messenger name
+   * @param configFile
+   *          the configuration file to be loaded
+   * @return a newly created or existing instance of the Messenger class.
+   */
+  public Messenger createMessenger(String name, String configFile)
   {
     Messenger messenger = null;
     if (Validator.checkString(name, "[a-zA-Z]+"))
@@ -68,7 +82,7 @@ public class MessagingFactory
       }
       else
       {
-        messenger = new Messenger(name.toLowerCase());
+        messenger = new Messenger(name.toLowerCase(), configFile);
         this.mapMessengerMap.put(name.toLowerCase(), messenger);
       }
     }

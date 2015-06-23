@@ -22,7 +22,6 @@ public class Messenger
 
   private Resources objResources;
   private CommunicationController objCommunication;
-  private boolean blnIsStarted;
 
   /**
    * Constructor for the Messenger class.
@@ -32,13 +31,29 @@ public class Messenger
    */
   public Messenger(String messengerName)
   {
+    this(messengerName, "/default.properties");
+  }
+
+  /**
+   * Constructor for the Messenger class.
+   * 
+   * @param messengerName
+   *          name of the messenger client.
+   * @param configFile
+   *          file to be loaded into configuration
+   */
+  public Messenger(String messengerName, String configFile)
+  {
     Resources resources = new Resources();
     resources.getConfiguration().setName(messengerName);
     this.setResources(resources);
+    this.loadConfiguration(configFile);
+
+    MonitorFactory.start();
+    CommunicationController controller = new CommunicationController(this.getResources());
+    this.setCommunication(controller);
 
     this.objMonitor = MonitorFactory.getMonitor(this.objResources.getConfiguration().getName());
-
-    this.blnIsStarted = false;
   }
 
   /**
@@ -72,24 +87,17 @@ public class Messenger
    */
   public String sendMessage(MessageType messageType, String receiver, Object payload, String responseTo)
   {
-    if (this.blnIsStarted)
+    BaseMessage message = MessageFactory.createMessage(messageType);
+    if (Validator.checkObject(message, BaseMessage.class))
     {
-      BaseMessage message = MessageFactory.createMessage(messageType);
-      if (Validator.checkObject(message, BaseMessage.class))
-      {
-        message.setPayload(payload);
-        message.setSender(this.objResources.getConfiguration().getName());
-        message.setReceiver(receiver.toLowerCase());
-        return this.objCommunication.packAndSend(receiver.toLowerCase(), message, responseTo);
-      }
-      else
-      {
-        objMonitor.warn(Messenger.class, "The messagetype you are sending is null. Be sure to fill all parameters correctly.");
-      }
+      message.setPayload(payload);
+      message.setSender(this.objResources.getConfiguration().getName());
+      message.setReceiver(receiver.toLowerCase());
+      return this.objCommunication.packAndSend(receiver.toLowerCase(), message, responseTo);
     }
     else
     {
-      objMonitor.warn(Messenger.class, "You need to call the start() method to be able to receive messages from the server.");
+      objMonitor.warn(Messenger.class, "The messagetype you are sending is null. Be sure to fill all parameters correctly.");
     }
     return null;
   }
@@ -103,20 +111,13 @@ public class Messenger
    */
   public MessageDetails receiveMessage(int millis)
   {
-    if (this.blnIsStarted)
+    BaseMessage message = this.objCommunication.unpackAndReceive(millis);
+    if (Validator.checkObject(message, BaseMessage.class))
     {
-      BaseMessage message = this.objCommunication.unpackAndReceive(millis);
-      if (Validator.checkObject(message, BaseMessage.class))
-      {
-        MessageDetails details = new MessageDetails("", message.getSender(), message.getReceiver(), message.getMessageType(), message.getPayload());
-        return details;
-      }
-      objMonitor.info(Messenger.class, "There is currently no message available.");
+      MessageDetails details = new MessageDetails("", message.getSender(), message.getReceiver(), message.getMessageType(), message.getPayload());
+      return details;
     }
-    else
-    {
-      objMonitor.warn(Messenger.class, "You need to call the start() method to be able to receive messages from the server.");
-    }
+    objMonitor.info(Messenger.class, "There is currently no message available.");
     return null;
   }
 
@@ -140,36 +141,10 @@ public class Messenger
    * @param configFile
    *          path to the configuration file.
    */
-  public void loadConfiguration(String configFile)
+  private void loadConfiguration(String configFile)
   {
-    if (!this.blnIsStarted)
-    {
-      MonitorFactory.loadConfiguration(configFile);
-      this.objResources.getConfiguration().loadConfiguration(configFile);
-    }
-    else
-    {
-      objMonitor.warn(Messenger.class, "This messenger instance has already been started. Changes in the configuration are likely to be discarded.");
-    }
-  }
-
-  /**
-   * Start method to notify the Messenger to start communicating.
-   */
-  public void start()
-  {
-    if (!this.blnIsStarted)
-    {
-      MonitorFactory.start();
-
-      CommunicationController controller = new CommunicationController(this.getResources());
-      this.setCommunication(controller);
-      this.blnIsStarted = true;
-    }
-    else
-    {
-      objMonitor.warn(Messenger.class, "This messenger instance has already been started. No new controller has been initiated.");
-    }
+    MonitorFactory.loadConfiguration(configFile);
+    this.objResources.getConfiguration().loadConfiguration(configFile);
   }
 
   /**

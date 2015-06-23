@@ -146,9 +146,7 @@ public class ReceiveControllerTest
 
     String strPayload = "Hello World";
 
-    Messenger other = new Messenger("other");
-    other.loadConfiguration("/test.properties");
-    other.start();
+    Messenger other = new Messenger("other", "/test.properties");
 
     other.sendMessage(MessageType.GENERATION_MESSAGE, "test", strPayload);
 
