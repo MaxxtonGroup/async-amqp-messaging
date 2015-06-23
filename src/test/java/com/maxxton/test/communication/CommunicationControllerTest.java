@@ -23,7 +23,7 @@ import com.maxxton.aam.resources.Resources;
  * @copyright Maxxton 2015
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class CommunicationControllerTests
+public class CommunicationControllerTest
 {
 
   private Resources objResources;

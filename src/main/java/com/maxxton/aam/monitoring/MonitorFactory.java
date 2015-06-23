@@ -122,7 +122,8 @@ public class MonitorFactory extends AppenderSkeleton
       }
       catch (Exception e)
       {
-        MonitorFactory.objMonitor.error(MonitorFactory.class, "Failed to initiate the Zabbix Agent. No active/passive communication with the server available, ALL monitoring dropped.");
+        MonitorFactory.objMonitor.error(MonitorFactory.class, 
+            "Failed to initiate the Zabbix Agent. No active/passive communication with the server available, ALL monitoring dropped.");
       }
     }
   }

@@ -17,7 +17,7 @@ import com.maxxton.aam.communication.MessageSerializer;
  * @copyright Maxxton 2015
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class MessageSerializerTests
+public class MessageSerializerTest
 {
 
   /**

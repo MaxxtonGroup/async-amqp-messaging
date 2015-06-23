@@ -28,7 +28,7 @@ import com.maxxton.aam.communication.DataContainer;
  * @copyright Maxxton 2015
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class DataContainerTests
+public class DataContainerTest
 {
 
   private DataContainer objContainer;

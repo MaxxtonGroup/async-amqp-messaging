@@ -29,7 +29,7 @@ import com.maxxton.aam.resources.Resources;
  * @copyright Maxxton 2015
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class SendControllerTests
+public class SendControllerTest
 {
 
   private Resources objResources;

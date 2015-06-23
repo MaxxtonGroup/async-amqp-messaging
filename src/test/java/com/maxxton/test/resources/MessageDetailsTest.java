@@ -19,7 +19,7 @@ import com.maxxton.aam.resources.MessageDetails;
  * @copyright Maxxton 2015
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class MessageDetailsTests
+public class MessageDetailsTest
 {
 
   @Before

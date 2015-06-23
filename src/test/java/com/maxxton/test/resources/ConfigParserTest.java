@@ -19,7 +19,7 @@ import com.maxxton.aam.resources.ConfigParser;
  * @copyright Maxxton 2015
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class ConfigParserTests
+public class ConfigParserTest
 {
 
   @Before

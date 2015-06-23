@@ -24,7 +24,7 @@ import com.maxxton.aam.resources.Resources;
  * @copyright Maxxton 2015
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class MessengerTests
+public class MessengerTest
 {
 
   private Messenger objMessenger;

@@ -17,7 +17,7 @@ import com.maxxton.aam.communication.Messenger;
  * @copyright Maxxton 2015
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class MessagingFactoryTests
+public class MessagingFactoryTest
 {
 
   private MessagingFactory objMessageFactory;

@@ -20,7 +20,7 @@ import com.maxxton.aam.resources.Configuration;
  * @copyright Maxxton 2015
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class ConfigurationTests
+public class ConfigurationTest
 {
   private Configuration objConfiguration;
 

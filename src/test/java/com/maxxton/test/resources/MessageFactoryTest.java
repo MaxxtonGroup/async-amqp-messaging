@@ -24,7 +24,7 @@ import static org.junit.Assert.*;
  * @copyright Maxxton 2015
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class MessageFactoryTests
+public class MessageFactoryTest
 {
 
   @Before
